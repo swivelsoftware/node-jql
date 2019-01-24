@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "umd",
+    "strict": true,
+    "esModuleInterop": true,
+    "noImplicitAny": false,
+    "strictPropertyInitialization": false,
+    "outDir": "dist",
+    "baseUrl": "src"
+  },
+  "include": [
+    "src/**/*.ts"
+  ]
+}
