@@ -16,7 +16,7 @@ export class Limit implements ILimit {
     switch (typeof limit) {
       case 'object':
         this.expression = create(limit.expression, { allow })
-        if (limit.$offset) { this.$offset = create(limit.$offset, { allow }) }
+        if (limit.$offset) this.$offset = create(limit.$offset, { allow })
         break
       case 'undefined':
         break

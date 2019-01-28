@@ -1,5 +1,5 @@
 import { create } from './expression/create'
-import { IExpression } from './expression/index'
+import { $and, IExpression } from './expression/index'
 import { ITableOrSubquery, TableOrSubquery } from './table-or-subquery'
 
 type JoinType = 'INNER' | 'LEFT' | 'RIGHT' | 'FULL' | 'CROSS'
@@ -27,8 +27,8 @@ export class JoinClause implements IJoinClause {
       case 'object':
         this.operator = joinClause.operator || { type: 'INNER' }
         this.tableOrSubquery = new TableOrSubquery(joinClause.tableOrSubquery)
-        if (joinClause.$on) { this.$on = Array.isArray(joinClause.$on) ? create({ classname: '$and', expressions: joinClause.$on }) : create(joinClause.$on) }
-        if (joinClause.$using) { this.$using = Array.isArray(joinClause.$using) ? joinClause.$using : [joinClause.$using] }
+        if (joinClause.$on) this.$on = Array.isArray(joinClause.$on) ? new $and({ expressions: joinClause.$on }) : create(joinClause.$on)
+        if (joinClause.$using) this.$using = Array.isArray(joinClause.$using) ? joinClause.$using : [joinClause.$using]
         break
       case 'undefined':
         break

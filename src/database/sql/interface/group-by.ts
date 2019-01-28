@@ -1,5 +1,5 @@
 import { create } from './expression/create'
-import { IExpression } from './expression/index'
+import { $and, IExpression } from './expression/index'
 
 export interface IGroupBy {
   expressions: IExpression[] | IExpression
@@ -14,9 +14,9 @@ export class GroupBy implements IGroupBy {
     switch (typeof groupBy) {
       case 'object':
         let expressions = groupBy.expressions
-        if (!Array.isArray(expressions)) { expressions = [expressions] }
+        if (!Array.isArray(expressions)) expressions = [expressions]
         this.expressions = expressions.map((expression) => create(expression))
-        if (groupBy.$having) { this.$having = Array.isArray(groupBy.$having) ? create({ classname: '$and', expressions: groupBy.$having }) : create(groupBy.$having) }
+        if (groupBy.$having) this.$having = Array.isArray(groupBy.$having) ? new $and({ expressions: groupBy.$having }) : create(groupBy.$having)
         break
       case 'undefined':
         break

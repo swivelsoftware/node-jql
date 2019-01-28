@@ -22,7 +22,7 @@ export class FunctionExpression implements IFunctionExpression {
       case 'object':
         this.name = json.name
         let params = json.params
-        if (!Array.isArray(params)) { params = [params] }
+        if (!Array.isArray(params)) params = [params]
         this.params = params.map((param) => paramIsExpression(param) ? create(param) : param)
         break
       case 'undefined':

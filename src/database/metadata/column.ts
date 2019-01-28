@@ -6,7 +6,7 @@ export class Column {
 
   public validate(value: any): boolean {
     const type = typeof value
-    if (type === 'symbol' || type === 'undefined' || type === 'function') { throw new Error(`type '${type}' is unserializable`) }
+    if (type === 'symbol' || type === 'undefined' || type === 'function') throw new Error(`type '${type}' is unserializable`)
     if (this.type !== true &&
       (typeof this.type === 'string' && typeof value !== this.type) ||
       (Array.isArray(this.type) && this.type.indexOf(type) === -1)

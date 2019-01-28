@@ -28,20 +28,20 @@ export class Metadata {
 
   public table(name: string): Table {
     const table = this.tables_[name]
-    if (this.checkTable && !table) { throw new Error(`table '${name}' not found`) }
+    if (this.checkTable && !table) throw new Error(`table '${name}' not found`)
     return table
   }
 
   public registerTable(name: string, table: Table): Metadata {
-    if (this.checkTable && this.tables_[name]) { throw new Error(`table '${name}' already exists`) }
-    if (!this.tables_[name]) { this.tables_[name] = new Table(this, table) }
+    if (this.checkTable && this.tables_[name]) throw new Error(`table '${name}' already exists`)
+    if (!this.tables_[name]) this.tables_[name] = new Table(this, table)
     return this
   }
 
   public unregisterTable(name: string): Table {
     const table = this.tables_[name]
-    if (this.checkTable && !table) { throw new Error(`table '${name}' not found`) }
-    if (table) { delete this.tables_[name] }
+    if (this.checkTable && !table) throw new Error(`table '${name}' not found`)
+    if (table) delete this.tables_[name]
     return table
   }
 }

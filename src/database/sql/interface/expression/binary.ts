@@ -22,7 +22,7 @@ export class BinaryExpression implements IBinaryExpression {
         this.parameters = json.parameters
         this.left = create(json.left)
         this.operator = json.operator
-        if (json.right) { this.right = create(json.right) }
+        if (json.right) this.right = create(json.right)
         break
       case 'undefined':
         break

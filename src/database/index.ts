@@ -50,8 +50,8 @@ export class Database {
       const row = rows[i]
       try {
         const table = this.metadata.table(name)
-        if (table) { table.validate(row) }
-        if (!this.database[name]) { this.database[name] = [] }
+        if (table) table.validate(row)
+        if (!this.database[name]) this.database[name] = []
         this.database[name].push(...rows)
       } catch (e) {
         throw new Error(`fail to insert row '${JSON.stringify(row)}'. ${(e as Error).message}`)

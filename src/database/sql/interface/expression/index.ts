@@ -1,5 +1,5 @@
 export interface IExpression {
-  classname: string
+  classname?: string
   [key: string]: any
 }
 

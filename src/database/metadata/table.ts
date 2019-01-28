@@ -34,7 +34,7 @@ export class Table {
   }
 
   public addColumn(name: string, type: Type[] | Type | boolean = true): Table {
-    if (this.metadata && this.metadata.checkColumn && this.columns_[name]) { throw new Error(`column '${name}' already exists in table '${this.name}'`) }
+    if (this.metadata && this.metadata.checkColumn && this.columns_[name]) throw new Error(`column '${name}' already exists in table '${this.name}'`)
     if (!this.columns_[name]) {
       this.columns_[name] = new Column(name, type)
       this.columnOrders_.push(name)
@@ -44,7 +44,7 @@ export class Table {
 
   public removeColumn(name: string): Column {
     const column = this.columns_[name]
-    if (this.metadata && this.metadata.checkColumn && !column) { throw new Error(`column '${name}' not found in table '${this.name}'`) }
+    if (this.metadata && this.metadata.checkColumn && !column) throw new Error(`column '${name}' not found in table '${this.name}'`)
     if (column) {
       delete this.columns_[name]
       this.columnOrders_.splice(this.columnOrders_.indexOf(name), 1)
@@ -53,8 +53,8 @@ export class Table {
   }
 
   public validate(value: any): boolean {
-    if (!this.metadata) { throw new Error(`table '${this.name}' not yet binded to any database`) }
-    if (typeof value === 'object') { throw new Error(`a table row must be a json object`) }
+    if (!this.metadata) throw new Error(`table '${this.name}' not yet binded to any database`)
+    if (typeof value === 'object') throw new Error(`a table row must be a json object`)
     if (this.metadata.checkColumn || this.metadata.checkType) {
       for (const key of Object.keys(value)) {
         if (this.metadata.checkColumn && !this.columns_[key]) {
