@@ -22,8 +22,8 @@ export class BetweenExpression implements IBetweenExpression {
         this.parameters = json.parameters
         this.$not = json.$not
         this.left = create(json.left)
-        if (json.start) { this.start = create(json.start) }
-        if (json.end) { this.end = create(json.end) }
+        if (json.start) this.start = create(json.start)
+        if (json.end) this.end = create(json.end)
         break
       case 'undefined':
         break

@@ -20,7 +20,7 @@ export class LikeExpression implements ILikeExpression {
         this.parameters = json.parameters
         this.$not = json.$not
         this.left = create(json.left)
-        if (json.right) { this.right = create(json.right) }
+        if (json.right) this.right = create(json.right)
         break
       case 'undefined':
         break

@@ -16,7 +16,7 @@ export class OrderingTerm implements IOrderingTerm {
     switch (typeof orderingTerm) {
       case 'object':
         this.expression = create(orderingTerm.expression)
-        if (orderingTerm.order) { this.order = orderingTerm.order }
+        if (orderingTerm.order) this.order = orderingTerm.order
         break
       case 'undefined':
         break

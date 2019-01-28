@@ -22,12 +22,12 @@ export class CaseExpression implements ICaseExpression {
       case 'object':
         this.parameters = json.parameters
         let $when = json.cases
-        if (!Array.isArray($when)) { $when = [$when] }
+        if (!Array.isArray($when)) $when = [$when]
         this.cases = $when.map((when) => ({
           $then: create(when.$then),
           $when: create(when.$when),
         }))
-        if (json.$else) { this.$else = create(json.$else) }
+        if (json.$else) this.$else = create(json.$else)
         break
       case 'undefined':
         break

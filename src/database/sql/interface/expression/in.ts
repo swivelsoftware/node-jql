@@ -21,7 +21,7 @@ export class InExpression implements InJson {
         this.parameters = json.parameters
         this.$not = json.$not
         this.left = create(json.left)
-        if (json.query) { this.query = new Query(json.query) }
+        if (json.query) this.query = new Query(json.query)
         break
       case 'undefined':
         break

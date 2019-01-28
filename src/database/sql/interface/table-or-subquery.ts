@@ -15,9 +15,9 @@ export class TableOrSubquery implements ITableOrSubquery {
     switch (typeof tableOrSubquery) {
       case 'object':
         this.name = tableOrSubquery.name
-        if (tableOrSubquery.query) { this.query = new Query(tableOrSubquery.query) }
+        if (tableOrSubquery.query) this.query = new Query(tableOrSubquery.query)
         this.$as = tableOrSubquery.$as
-        if (this.query && !this.$as) { throw new Error(`missing alias. an alias is a must if using query in TableOrSubquery`) }
+        if (this.query && !this.$as) throw new Error(`missing alias. an alias is a must if using query in TableOrSubquery`)
         break
       case 'undefined':
         break
