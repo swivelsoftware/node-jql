@@ -1,15 +1,19 @@
-export interface Expression {
+export interface IExpression {
   classname: string
   [key: string]: any
 }
 
-export { BetweenExpression as $between } from "./between";
-export { BinaryExpression as $binary } from "./binary";
-export { CaseExpression as $case } from "./case";
-export { ColumnExpression as $column } from "./column";
-export { ExistsExpression as $exists } from "./exists";
-export { FunctionExpression as $function } from "./function";
-export { AndGroupedExpression as $and, OrGroupedExpression as $or } from './grouped'
-export { InExpression as $in } from "./in";
-export { LikeExpression as $like } from "./like";
-export { ValueExpression as $value } from "./value";
+export interface IUnknownExpression {
+  parameters?: string[]
+}
+
+export { BetweenExpression as $between, IBetweenExpression } from './between'
+export { BinaryExpression as $binary, IBinaryExpression } from './binary'
+export { CaseExpression as $case, ICaseExpression } from './case'
+export { ColumnExpression as $column, IColumnExpression } from './column'
+export { ExistsExpression as $exists, IExistsExpression } from './exists'
+export { FunctionExpression as $function, IFunctionExpression } from './function'
+export { AndGroupedExpression as $and, OrGroupedExpression as $or, IGroupedExpression } from './grouped'
+export { InExpression as $in, InJson } from './in'
+export { LikeExpression as $like, ILikeExpression } from './like'
+export { ValueExpression as $value, IValueExpression } from './value'

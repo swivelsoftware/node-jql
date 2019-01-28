@@ -1,23 +1,23 @@
-import { Query } from "../query";
+import { IQuery, Query } from '../query'
 
-interface TableOrSubqueryJson {
+export interface ITableOrSubquery {
   name?: string
-  query?: Query
+  query?: IQuery
   $as?: string
 }
 
-export class TableOrSubquery implements TableOrSubqueryJson {
-  name?: string
-  query?: Query
-  $as?: string
+export class TableOrSubquery implements ITableOrSubquery {
+  public name?: string
+  public query?: Query
+  public $as?: string
 
-  constructor (tableOrSubquery?: TableOrSubqueryJson) {
+  constructor(tableOrSubquery?: ITableOrSubquery) {
     switch (typeof tableOrSubquery) {
       case 'object':
         this.name = tableOrSubquery.name
-        if (tableOrSubquery.query) this.query = new Query(tableOrSubquery.query)
+        if (tableOrSubquery.query) { this.query = new Query(tableOrSubquery.query) }
         this.$as = tableOrSubquery.$as
-        if (this.query && !this.$as) throw new Error(`missing alias. an alias is a must if using query in TableOrSubquery`)
+        if (this.query && !this.$as) { throw new Error(`missing alias. an alias is a must if using query in TableOrSubquery`) }
         break
       case 'undefined':
         break

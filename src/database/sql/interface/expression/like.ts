@@ -1,29 +1,35 @@
-import { Expression } from "./index";
-import { create } from "./__create";
+import { create } from './create'
+import { IExpression, IUnknownExpression } from './index'
 
-interface LikeJson extends Expression {
+export interface ILikeExpression extends IExpression, IUnknownExpression {
   $not?: boolean
-  left: Expression
-  right: Expression
+  left: IExpression
+  right?: IExpression
 }
 
-export class LikeExpression implements LikeJson {
-  readonly classname = '$like'
-  $not?: boolean
-  left: Expression
-  right: Expression
+export class LikeExpression implements ILikeExpression {
+  public readonly classname = '$like'
+  public parameters?: string[]
+  public $not?: boolean
+  public left: IExpression
+  public right?: IExpression
 
-  constructor (json?: LikeJson) {
+  constructor(json?: ILikeExpression) {
     switch (typeof json) {
       case 'object':
+        this.parameters = json.parameters
         this.$not = json.$not
         this.left = create(json.left)
-        this.right = create(json.right)
+        if (json.right) { this.right = create(json.right) }
         break
       case 'undefined':
         break
       default:
-        throw new Error(`invalid 'expression' object`)
+        throw new Error(`invalid 'json' object`)
     }
+  }
+
+  public toString(): string {
+    return `? ${this.$not ? 'NOT ' : ''}LIKE ?`
   }
 }

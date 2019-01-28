@@ -1,25 +1,27 @@
-import { Expression } from "./index";
+import { IExpression } from './index'
 
-interface ValueJson extends Expression {
+export interface IValueExpression extends IExpression {
   value?: any
   unknown?: boolean
 }
 
-export class ValueExpression implements ValueJson {
-  readonly classname = '$value'
-  value?: any
-  unknown?: boolean
+export class ValueExpression implements IValueExpression {
+  public readonly classname = '$value'
+  public value: any
 
-  constructor (json?: ValueJson) {
+  constructor(json?: IValueExpression) {
     switch (typeof json) {
       case 'object':
         this.value = json.value
-        this.unknown = json.unknown
         break
       case 'undefined':
         break
       default:
-        throw new Error(`invalid 'expression' object`)
+        throw new Error(`invalid 'json' object`)
     }
+  }
+
+  public toString(): string {
+    return JSON.stringify(this.value)
   }
 }

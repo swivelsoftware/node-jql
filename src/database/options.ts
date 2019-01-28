@@ -1,4 +1,4 @@
-export interface DatabaseOptions {
+export interface IDatabaseOptions {
   check?: {
     // if table exists before any operations
     table?: boolean
@@ -7,6 +7,6 @@ export interface DatabaseOptions {
     column?: boolean
 
     // if type matches before any operations
-    type?: boolean
+    type?: boolean,
   }
 }

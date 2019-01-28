@@ -1,11 +1,19 @@
 {
   "name": "node-jql",
-  "version": "0.0.1",
-  "description": "SQL-like syntax for processing json",
+  "version": "0.0.15",
+  "description": "In-memory SQL database in Node.js",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "engines": {
+    "node": ">=6.16.0"
+  },
   "scripts": {
-    "jison": "jison",
-    "tsc": "tsc"
+    "test": "jest",
+    "lint": "tslint -p tsconfig.json",
+    "lint:test": "tslint -p tsconfig.test.json",
+    "build": "npm run lint && tsc",
+    "prepublishOnly": "npm run build",
+    "postpublish": "rimraf dist"
   },
   "repository": {
     "type": "git",
@@ -19,8 +27,13 @@
   "homepage": "https://github.com/kennysng/node-jql#readme",
   "devDependencies": {
     "@types/core-js": "^2.5.0",
+    "@types/jest": "^23.3.13",
     "@types/lodash": "^4.14.120",
     "@types/node": "^10.12.18",
+    "jest": "^23.6.0",
+    "rimraf": "^2.6.3",
+    "ts-jest": "^23.10.5",
+    "tslint": "^5.12.1",
     "typescript": "^3.2.4"
   },
   "dependencies": {

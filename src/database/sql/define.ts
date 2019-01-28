@@ -1,18 +1,19 @@
-import { Sql } from "./index";
-import { createFunction } from "utils/createFunction";
+import { createFunction } from '../../utils/createFunction'
+import { Sql } from './index'
 
-interface DefineJson extends Sql {
+export interface IDefineStatement {
   name: string
-  value?: string | number | bigint | boolean
+  value?: string | number | boolean
   function?: Function | string
 }
 
-export class DefineStatement implements DefineJson {
-  name: string
-  value?: string | number | bigint | boolean
-  function?: Function
+export class DefineStatement extends Sql implements IDefineStatement {
+  public name: string
+  public value?: string | number | boolean
+  public function?: Function
 
-  constructor (defineStatement?: DefineStatement) {
+  constructor(defineStatement?: DefineStatement) {
+    super()
     switch (typeof defineStatement) {
       case 'object':
         this.name = defineStatement.name
@@ -26,7 +27,7 @@ export class DefineStatement implements DefineJson {
     }
   }
 
-  validate (): boolean {
+  public validate(): boolean {
     // no need to check
     return true
   }

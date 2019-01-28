@@ -1,22 +1,22 @@
-import { Expression } from "./expression/index";
-import { create } from "./expression/__create";
+import { create } from './expression/create'
+import { IExpression } from './expression/index'
 
 type Order = 'ASC' | 'DESC'
 
-interface OrderingTermJson {
-  expression: Expression
+export interface IOrderingTerm {
+  expression: IExpression
   order?: Order
 }
 
-export class OrderingTerm implements OrderingTermJson {
-  expression: Expression
-  order?: Order
+export class OrderingTerm implements IOrderingTerm {
+  public expression: IExpression
+  public order?: Order
 
-  constructor (orderingTerm?: OrderingTermJson) {
+  constructor(orderingTerm?: IOrderingTerm) {
     switch (typeof orderingTerm) {
       case 'object':
         this.expression = create(orderingTerm.expression)
-        if (orderingTerm.order) this.order = orderingTerm.order
+        if (orderingTerm.order) { this.order = orderingTerm.order }
         break
       case 'undefined':
         break
