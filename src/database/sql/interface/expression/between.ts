@@ -1,32 +1,38 @@
-import { Expression } from "./index";
-import { create } from "./__create";
+import { create } from './create'
+import { IExpression, IUnknownExpression } from './index'
 
-interface BetweenJson extends Expression {
+export interface IBetweenExpression extends IExpression, IUnknownExpression {
   $not?: boolean
-  left: Expression
-  start?: Expression
-  end?: Expression
+  left: IExpression
+  start?: IExpression
+  end?: IExpression
 }
 
-export class BetweenExpression implements BetweenJson {
-  readonly classname = '$between'
-  $not?: boolean
-  left: Expression
-  start?: Expression
-  end?: Expression
+export class BetweenExpression implements IBetweenExpression {
+  public readonly classname = '$between'
+  public parameters?: string[]
+  public $not?: boolean
+  public left: IExpression
+  public start?: IExpression
+  public end?: IExpression
 
-  constructor (json?: BetweenJson) {
+  constructor(json?: IBetweenExpression) {
     switch (typeof json) {
       case 'object':
+        this.parameters = json.parameters
         this.$not = json.$not
         this.left = create(json.left)
-        if (json.start) this.start = create(json.start)
-        if (json.end) this.end = create(json.end)
+        if (json.start) { this.start = create(json.start) }
+        if (json.end) { this.end = create(json.end) }
         break
       case 'undefined':
         break
       default:
-        throw new Error(`invalid 'expression' object`)
+        throw new Error(`invalid 'json' object`)
     }
+  }
+
+  public toString(): string {
+    return `? ${this.$not ? 'NOT ' : ''}BETWEEN ? AND ?`
   }
 }

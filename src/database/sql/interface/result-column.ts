@@ -1,16 +1,16 @@
-import { create } from "./expression/__create";
-import { Expression } from "./expression/index";
+import { create } from './expression/create'
+import { IExpression } from './expression/index'
 
-interface ResultColumnJson {
-  expression: Expression
+export interface IResultColumn {
+  expression: IExpression
   $as?: string
 }
 
-export class ResultColumn implements ResultColumnJson {
-  expression: Expression
-  $as?: string
+export class ResultColumn implements IResultColumn {
+  public expression: IExpression
+  public $as?: string
 
-  constructor (resultColumn?: ResultColumnJson) {
+  constructor(resultColumn?: IResultColumn) {
     switch (typeof resultColumn) {
       case 'object':
         this.expression = create(resultColumn.expression)

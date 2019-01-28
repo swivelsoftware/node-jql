@@ -3,13 +3,17 @@
     "target": "es6",
     "module": "umd",
     "strict": true,
+    "declaration": true,
     "esModuleInterop": true,
     "noImplicitAny": false,
     "strictPropertyInitialization": false,
-    "outDir": "dist",
-    "baseUrl": "src"
+    "outDir": "dist"
   },
   "include": [
     "src/**/*.ts"
+  ],
+  "exclude": [
+    "dist",
+    "node_modules"
   ]
 }

@@ -1,20 +1,19 @@
-import { Metadata } from "./metadata/index";
-import { DatabaseOptions } from "./options";
-import { Table } from "./metadata/table";
-import _ = require("lodash");
-import { Sql } from "./sql/index";
-import { Transaction } from "./transaction";
+import _ = require('lodash')
+import { Metadata } from './metadata/index'
+import { Table } from './metadata/table'
+import { IDatabaseOptions } from './options'
+import { Sql } from './sql/index'
 
-export type DatabaseStructure = { [key: string]: any[] }
+export interface IDatabase { [key: string]: any[] }
 
 export class Database {
   public readonly metadata: Metadata
-  private readonly database: DatabaseStructure
+  private readonly database: IDatabase
 
-  constructor (options?: DatabaseOptions)
-  constructor (initialState?: DatabaseStructure, options?: DatabaseOptions)
-  constructor (...args: any[]) {
-    let initialState: DatabaseStructure = {}, options: DatabaseOptions
+  constructor(options?: IDatabaseOptions)
+  constructor(initialState?: IDatabase, options?: IDatabaseOptions)
+  constructor(...args: any[]) {
+    let initialState: IDatabase = {}, options: IDatabaseOptions
     switch (args.length) {
       case 1:
         options = args[0]
@@ -29,33 +28,32 @@ export class Database {
     this.metadata = new Metadata(options)
   }
 
-  createTable (name: string, table: Table): Database {
+  public createTable(name: string, table: Table): Database {
     this.metadata.registerTable(name, table)
     this.database[name] = []
     return this
   }
 
-  dropTable (name: string): Database {
+  public dropTable(name: string): Database {
     this.metadata.unregisterTable(name)
     delete this.database[name]
     return this
   }
 
-  query<T> (...sql: Sql[]): T {
-    const transaction = new Transaction(this)
-    return transaction.run<T>(...sql)
+  public query<T>(sql: Sql): T|undefined {
+    // TODO
+    return undefined
   }
 
-  insert (name: string, ...rows: any[]) {
+  public insert(name: string, ...rows: any[]) {
     for (let i = 0, length = rows.length; i < length; i += 1) {
       const row = rows[i]
       try {
         const table = this.metadata.table(name)
-        if (table) table.validate(row)
-        if (!this.database[name]) this.database[name] = []
+        if (table) { table.validate(row) }
+        if (!this.database[name]) { this.database[name] = [] }
         this.database[name].push(...rows)
-      }
-      catch (e) {
+      } catch (e) {
         throw new Error(`fail to insert row '${JSON.stringify(row)}'. ${(e as Error).message}`)
       }
     }

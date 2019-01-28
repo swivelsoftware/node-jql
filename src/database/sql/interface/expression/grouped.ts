@@ -1,39 +1,47 @@
-import { Expression } from "./index";
-import { create } from "./__create";
+import { create } from './create'
+import { IExpression, IUnknownExpression } from './index'
 
-interface GroupedJson extends Expression {
-  expressions: Expression[]
+type GroupedType = 'AND' | 'OR'
+
+export interface IGroupedExpression extends IExpression, IUnknownExpression {
+  expressions: IExpression[]
 }
 
-abstract class GropuedExpression implements GroupedJson {
-  classname = '$and'
-  expressions: Expression[]
+abstract class GropuedExpression implements IGroupedExpression {
+  public classname = '$and'
+  public parameters?: string[]
+  public expressions: IExpression[]
 
-  constructor (readonly type: string, json?: GroupedJson) {
+  constructor(readonly type: GroupedType, json?: IGroupedExpression) {
     switch (typeof json) {
       case 'object':
-        json.expressions = json.expressions.map(expression => create(expression))
+        this.parameters = json.parameters
+        this.expressions = json.expressions.map((expression) => create(expression))
         break
       case 'undefined':
         break
       default:
-        throw new Error(`invalid 'expression' object`)
+        throw new Error(`invalid 'json' object`)
     }
+  }
+
+  public toString(): string {
+    return `(${this.expressions.map((expression) => expression.toString()).join(` ${this.type} `)})`
   }
 }
 
 export class AndGroupedExpression extends GropuedExpression {
-  readonly classname = '$and'
+  public readonly classname = '$and'
 
-  constructor (json?: GroupedJson) {
+  constructor(json?: IGroupedExpression) {
     super('AND', json)
   }
 }
 
 export class OrGroupedExpression extends GropuedExpression {
-  readonly classname = '$or'
+  public readonly classname = '$or'
 
-  constructor (json?: GroupedJson) {
+  constructor(json?: IGroupedExpression) {
     super('OR', json)
   }
 }

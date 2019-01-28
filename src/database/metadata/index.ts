@@ -1,47 +1,47 @@
-import { Table } from "./table";
-import { DatabaseOptions } from "database/options";
-import { createReadonly } from "utils/createReadonly";
+import { createReadonly } from '../../utils/createReadonly'
+import { IDatabaseOptions } from '../options'
+import { Table } from './table'
 
 export class Metadata {
-  public readonly options: DatabaseOptions
-  private readonly _tables: { [key: string]: Table } = {}
+  public readonly options: IDatabaseOptions
+  private readonly tables_: { [key: string]: Table } = {}
 
-  constructor (options: DatabaseOptions = {}) {
+  constructor(options: IDatabaseOptions = {}) {
     this.options = createReadonly(options)
   }
 
-  get tables (): Table[] {
-    return Object.keys(this._tables).map(table => this._tables[table])
+  get tables(): Table[] {
+    return Object.keys(this.tables_).map((table) => this.tables_[table])
   }
 
-  get checkTable (): boolean {
+  get checkTable(): boolean {
     return this.options.check && this.options.check.table ? true : false
   }
 
-  get checkColumn (): boolean {
+  get checkColumn(): boolean {
     return this.options.check && this.options.check.column ? true : false
   }
 
-  get checkType (): boolean {
+  get checkType(): boolean {
     return this.options.check && this.options.check.type ? true : false
   }
 
-  table (name: string): Table {
-    const table = this._tables[name]
-    if (this.checkTable && !table) throw new Error(`table '${name}' not found`)
+  public table(name: string): Table {
+    const table = this.tables_[name]
+    if (this.checkTable && !table) { throw new Error(`table '${name}' not found`) }
     return table
   }
 
-  registerTable (name: string, table: Table): Metadata {
-    if (this.checkTable && this._tables[name]) throw new Error(`table '${name}' already exists`)
-    if (!this._tables[name]) this._tables[name] = new Table(this, table)
+  public registerTable(name: string, table: Table): Metadata {
+    if (this.checkTable && this.tables_[name]) { throw new Error(`table '${name}' already exists`) }
+    if (!this.tables_[name]) { this.tables_[name] = new Table(this, table) }
     return this
   }
 
-  unregisterTable (name: string): Table {
-    const table = this._tables[name]
-    if (this.checkTable && !table) throw new Error(`table '${name}' not found`)
-    if (table) delete this._tables[name]
+  public unregisterTable(name: string): Table {
+    const table = this.tables_[name]
+    if (this.checkTable && !table) { throw new Error(`table '${name}' not found`) }
+    if (table) { delete this.tables_[name] }
     return table
   }
 }

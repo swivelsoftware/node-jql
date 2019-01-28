@@ -1,36 +1,42 @@
-import { Expression } from "./index";
-import { create } from "./__create";
+import { create } from './create'
+import { IExpression, IUnknownExpression } from './index'
 
-interface CaseWhen {
-  $when: Expression
-  $then: Expression
+interface ICase {
+  $when: IExpression
+  $then: IExpression
 }
 
-interface CaseJson extends Expression {
-  $when: CaseWhen[] | CaseWhen
-  $else?: Expression
+export interface ICaseExpression extends IExpression, IUnknownExpression {
+  cases: ICase[] | ICase
+  $else?: IExpression
 }
 
-export class CaseExpression implements CaseJson {
-  readonly classname = '$case'
-  $when: CaseWhen[]
-  $else?: Expression
+export class CaseExpression implements ICaseExpression {
+  public readonly classname = '$case'
+  public parameters?: string[]
+  public cases: ICase[]
+  public $else?: IExpression
 
-  constructor (json?: CaseJson) {
+  constructor(json?: ICaseExpression) {
     switch (typeof json) {
       case 'object':
-        let $when = json.$when
-        if (!Array.isArray($when)) $when = [$when]
-        this.$when = $when.map(when => ({
+        this.parameters = json.parameters
+        let $when = json.cases
+        if (!Array.isArray($when)) { $when = [$when] }
+        this.cases = $when.map((when) => ({
+          $then: create(when.$then),
           $when: create(when.$when),
-          $then: create(when.$then)
         }))
-        if (json.$else) this.$else = create(json.$else)
+        if (json.$else) { this.$else = create(json.$else) }
         break
       case 'undefined':
         break
       default:
-        throw new Error(`invalid 'expression' object`)
+        throw new Error(`invalid 'json' object`)
     }
+  }
+
+  public toString(): string {
+    return `CASE ${this.cases.map(() => `WHEN ? THEN ?`).join(' ')}${this.$else ? ` ELSE ?` : ''} END`
   }
 }

@@ -1,20 +1,22 @@
-import { Expression } from "./expression/index";
-import { create } from "./expression/__create";
+import { create } from './expression/create'
+import { IExpression } from './expression/index'
 
-interface GroupByJson {
-  expressions: Expression[] | Expression
-  $having?: Expression[] | Expression
+export interface IGroupBy {
+  expressions: IExpression[] | IExpression
+  $having?: IExpression[] | IExpression
 }
 
-export class GroupBy implements GroupByJson {
-  expressions: Expression
-  $having?: Expression
+export class GroupBy implements IGroupBy {
+  public expressions: IExpression[]
+  public $having?: IExpression
 
-  constructor (groupBy?: GroupByJson) {
+  constructor(groupBy?: IGroupBy) {
     switch (typeof groupBy) {
       case 'object':
-        this.expressions = Array.isArray(groupBy.expressions) ? create({ classname: '$and', expressions: groupBy.expressions }) : create(groupBy.expressions)
-        if (groupBy.$having) this.$having = Array.isArray(groupBy.$having) ? create({ classname: '$and', expressions: groupBy.$having }) : create(groupBy.$having)
+        let expressions = groupBy.expressions
+        if (!Array.isArray(expressions)) { expressions = [expressions] }
+        this.expressions = expressions.map((expression) => create(expression))
+        if (groupBy.$having) { this.$having = Array.isArray(groupBy.$having) ? create({ classname: '$and', expressions: groupBy.$having }) : create(groupBy.$having) }
         break
       case 'undefined':
         break
