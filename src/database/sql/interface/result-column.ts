@@ -1,5 +1,5 @@
 import { create } from './expression/create'
-import { IExpression } from './expression/index'
+import { Expression, IExpression } from './expression/index'
 
 export interface IResultColumn {
   expression: IExpression
@@ -7,7 +7,7 @@ export interface IResultColumn {
 }
 
 export class ResultColumn implements IResultColumn {
-  public expression: IExpression
+  public expression: Expression
   public $as?: string
 
   constructor(resultColumn?: IResultColumn) {

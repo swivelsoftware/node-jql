@@ -1,32 +1,30 @@
+import squel = require('squel')
 import { IQuery, Query } from '../../query'
-import { IExpression, IUnknownExpression } from './index'
+import { Expression, IExpression } from './index'
 
-export interface IExistsExpression extends IExpression, IUnknownExpression {
+export interface IExistsExpression extends IExpression {
   $not?: boolean
   query: IQuery
 }
 
-export class ExistsExpression implements IExistsExpression {
+export class ExistsExpression extends Expression implements IExistsExpression {
   public readonly classname = '$exists'
-  public parameters?: string[]
   public $not?: boolean
   public query: Query
 
   constructor(json?: IExistsExpression) {
-    switch (typeof json) {
-      case 'object':
-        this.parameters = json.parameters
-        this.$not = json.$not
-        this.query = new Query(json.query)
-        break
-      case 'undefined':
-        break
-      default:
-        throw new Error(`invalid 'json' object`)
+    super(json)
+    if (json) {
+      this.$not = json.$not
+      this.query = new Query(json.query)
     }
   }
 
-  public toString(): string {
-    return `${this.$not ? 'NOT ' : ''}EXISTS ?`
+  public toSquel(): squel.BaseBuilder {
+    const result = squel.expr()
+    const expr = this.$not ? 'NOT EXISTS ?' : 'EXISTS ?'
+    const params: any[] = []
+    params.push(this.query.toSquel())
+    return result.and(expr, ...params)
   }
 }

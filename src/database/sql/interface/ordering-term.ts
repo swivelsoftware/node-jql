@@ -1,5 +1,5 @@
 import { create } from './expression/create'
-import { IExpression } from './expression/index'
+import { Expression, IExpression } from './expression/index'
 
 type Order = 'ASC' | 'DESC'
 
@@ -9,7 +9,7 @@ export interface IOrderingTerm {
 }
 
 export class OrderingTerm implements IOrderingTerm {
-  public expression: IExpression
+  public expression: Expression
   public order?: Order
 
   constructor(orderingTerm?: IOrderingTerm) {

@@ -1,5 +1,5 @@
 import { create } from './expression/create'
-import { IExpression } from './expression/index'
+import { Expression, IExpression } from './expression/index'
 
 export interface ILimit {
   expression: IExpression
@@ -9,8 +9,8 @@ export interface ILimit {
 const allow = ['$case', '$function', '$value']
 
 export class Limit implements ILimit {
-  public expression: IExpression
-  public $offset?: IExpression
+  public expression: Expression
+  public $offset?: Expression
 
   constructor(limit?: ILimit) {
     switch (typeof limit) {

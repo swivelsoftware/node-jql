@@ -1,12 +1,13 @@
 import { createReadonly } from '../../utils/createReadonly'
+import { Database } from '../index'
 import { IDatabaseOptions } from '../options'
 import { Table } from './table'
 
 export class Metadata {
   public readonly options: IDatabaseOptions
-  private readonly tables_: { [key: string]: Table } = {}
+  private readonly tables_: { [key in string]: Table } = {}
 
-  constructor(options: IDatabaseOptions = {}) {
+  constructor(readonly database: Database, options: IDatabaseOptions = {}) {
     this.options = createReadonly(options)
   }
 
@@ -26,16 +27,20 @@ export class Metadata {
     return this.options.check && this.options.check.type ? true : false
   }
 
+  get checkOverridable(): boolean {
+    return this.options.check && this.options.check.overridable ? true : false
+  }
+
   public table(name: string): Table {
     const table = this.tables_[name]
     if (this.checkTable && !table) throw new Error(`table '${name}' not found`)
     return table
   }
 
-  public registerTable(name: string, table: Table): Metadata {
+  public registerTable(name: string, table: Table): Table {
     if (this.checkTable && this.tables_[name]) throw new Error(`table '${name}' already exists`)
     if (!this.tables_[name]) this.tables_[name] = new Table(this, table)
-    return this
+    return this.tables_[name]
   }
 
   public unregisterTable(name: string): Table {

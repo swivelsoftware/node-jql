@@ -1,12 +1,11 @@
 import * as Expressions from './index'
-import Expression = Expressions.IExpression
 
 interface ICreateOptions {
   allow?: string[]
   disallow?: string[]
 }
 
-export function create(expression: Expression, options: ICreateOptions = {}): Expression {
+export function create(expression: Expressions.IExpression, options: ICreateOptions = {}): Expressions.Expression {
   switch (typeof expression) {
     case 'object':
       if (!expression.classname) throw new Error(`expression class is not defined`)

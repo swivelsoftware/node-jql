@@ -1,5 +1,5 @@
 import { create } from './expression/create'
-import { $and, IExpression } from './expression/index'
+import { $and, Expression, IExpression } from './expression/index'
 
 export interface IGroupBy {
   expressions: IExpression[] | IExpression
@@ -7,8 +7,8 @@ export interface IGroupBy {
 }
 
 export class GroupBy implements IGroupBy {
-  public expressions: IExpression[]
-  public $having?: IExpression
+  public expressions: Expression[]
+  public $having?: Expression
 
   constructor(groupBy?: IGroupBy) {
     switch (typeof groupBy) {

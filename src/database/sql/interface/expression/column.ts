@@ -1,29 +1,25 @@
-import { IExpression } from './index'
+import squel = require('squel')
+import { Expression, IExpression } from './index'
 
 export interface IColumnExpression extends IExpression {
   table?: string
   name: string
 }
 
-export class ColumnExpression implements IColumnExpression {
+export class ColumnExpression extends Expression implements IColumnExpression {
   public readonly classname = '$column'
   public table?: string
   public name: string
 
   constructor(json?: IColumnExpression) {
-    switch (typeof json) {
-      case 'object':
-        this.table = json.table
-        this.name = json.name
-        break
-      case 'undefined':
-        break
-      default:
-        throw new Error(`invalid 'json' object`)
+    super(json)
+    if (json) {
+      this.table = json.table
+      this.name = json.name
     }
   }
 
-  public toString(): string {
-    return `${this.table ? `\'${this.table}\'.` : ''}\`${this.name}\``
+  public toSquel(): squel.BaseBuilder {
+    return squel.str(`${this.table ? `\'${this.table}\'.` : ''}\`${this.name}\``)
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "node-jql",
-  "version": "0.0.16",
+  "version": "0.1.0",
   "description": "In-memory SQL database in Node.js",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -12,8 +12,8 @@
     "lint": "tslint -p tsconfig.json",
     "lint:test": "tslint -p tsconfig.test.json",
     "build": "npm run lint && tsc",
-    "prepublishOnly": "npm run build",
-    "postpublish": "rimraf dist"
+    "prepublishOnly": "npm i && npm run build",
+    "postpublish": "rm package-lock.json && rimraf dist"
   },
   "repository": {
     "type": "git",
@@ -26,10 +26,10 @@
   },
   "homepage": "https://github.com/kennysng/node-jql#readme",
   "devDependencies": {
-    "@types/core-js": "^2.5.0",
     "@types/jest": "^23.3.13",
     "@types/lodash": "^4.14.120",
     "@types/node": "^10.12.18",
+    "chalk": "^2.4.2",
     "jest": "^23.6.0",
     "rimraf": "^2.6.3",
     "ts-jest": "^23.10.5",
@@ -37,8 +37,8 @@
     "typescript": "^3.2.4"
   },
   "dependencies": {
-    "core-js": "^2.6.2",
     "lodash": "^4.17.11",
-    "proxy-polyfill": "^0.3.0"
+    "proxy-polyfill": "^0.3.0",
+    "squel": "^5.12.2"
   }
 }

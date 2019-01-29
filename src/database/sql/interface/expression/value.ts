@@ -1,27 +1,20 @@
-import { IExpression } from './index'
+import squel = require('squel')
+import { Expression, IExpression } from './index'
 
 export interface IValueExpression extends IExpression {
-  value?: any
-  unknown?: boolean
+  value: any
 }
 
-export class ValueExpression implements IValueExpression {
+export class ValueExpression extends Expression implements IValueExpression {
   public readonly classname = '$value'
   public value: any
 
   constructor(json?: IValueExpression) {
-    switch (typeof json) {
-      case 'object':
-        this.value = json.value
-        break
-      case 'undefined':
-        break
-      default:
-        throw new Error(`invalid 'json' object`)
-    }
+    super(json)
+    if (json) this.value = json.value
   }
 
-  public toString(): string {
-    return JSON.stringify(this.value)
+  public toSquel(): squel.BaseBuilder {
+    return squel.str(JSON.stringify(this.value))
   }
 }

@@ -1,5 +1,26 @@
-export abstract class Sql {
+import squel = require('squel')
+
+export interface ISql {
+}
+
+export abstract class Sql implements ISql {
+  constructor(json?: ISql) {
+    switch (typeof json) {
+      case 'object':
+      case 'undefined':
+        break
+      default:
+        throw new Error(`invalid 'json' object`)
+    }
+  }
+
   public abstract validate(): boolean
+
+  public abstract toSquel(): squel.BaseBuilder
+
+  public toString(): string {
+    return this.toSquel().toString()
+  }
 }
 
 export { DefineStatement } from './define'

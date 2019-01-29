@@ -2,13 +2,15 @@ import _ = require('lodash')
 import { Metadata } from './metadata/index'
 import { Table } from './metadata/table'
 import { IDatabaseOptions } from './options'
+import { Sandbox } from './sandbox/index'
+import { ResultSet } from './sandbox/resultset'
 import { Sql } from './sql/index'
 
-export interface IDatabase { [key: string]: any[] }
+export type IDatabase = any
 
 export class Database {
   public readonly metadata: Metadata
-  private readonly database: IDatabase
+  public readonly database: IDatabase
 
   constructor(options?: IDatabaseOptions)
   constructor(initialState?: IDatabase, options?: IDatabaseOptions)
@@ -25,24 +27,28 @@ export class Database {
         break
     }
     this.database = initialState ? _.cloneDeep(initialState) : {}
-    this.metadata = new Metadata(options)
+    this.metadata = new Metadata(this, options)
   }
 
   public createTable(name: string, table: Table): Database {
-    this.metadata.registerTable(name, table)
-    this.database[name] = []
+    table = this.metadata.registerTable(name, table)
+    this.database[table.symbol] = []
     return this
   }
 
   public dropTable(name: string): Database {
-    this.metadata.unregisterTable(name)
-    delete this.database[name]
+    const table = this.metadata.unregisterTable(name)
+    delete this.database[table.symbol]
     return this
   }
 
-  public query<T>(sql: Sql): T|undefined {
-    // TODO
-    return undefined
+  public count(name: string): number {
+    const table = this.metadata.table(name)
+    return table ? this.database[table.symbol].length : 0
+  }
+
+  public query<T>(sql: Sql, sandbox: Sandbox = new Sandbox(this)): ResultSet<T>|undefined {
+    return sandbox.run(sql)
   }
 
   public insert(name: string, ...rows: any[]) {
@@ -51,8 +57,8 @@ export class Database {
       try {
         const table = this.metadata.table(name)
         if (table) table.validate(row)
-        if (!this.database[name]) this.database[name] = []
-        this.database[name].push(...rows)
+        if (!this.database[table.symbol]) this.database[table.symbol] = []
+        this.database[table.symbol].push(...rows)
       } catch (e) {
         throw new Error(`fail to insert row '${JSON.stringify(row)}'. ${(e as Error).message}`)
       }

@@ -1,5 +1,5 @@
 import { create } from './expression/create'
-import { $and, IExpression } from './expression/index'
+import { $and, Expression, IExpression } from './expression/index'
 import { ITableOrSubquery, TableOrSubquery } from './table-or-subquery'
 
 type JoinType = 'INNER' | 'LEFT' | 'RIGHT' | 'FULL' | 'CROSS'
@@ -19,7 +19,7 @@ export interface IJoinClause {
 export class JoinClause implements IJoinClause {
   public operator: IJoinOperator
   public tableOrSubquery: TableOrSubquery
-  public $on?: IExpression
+  public $on?: Expression
   public $using?: string[]
 
   constructor(joinClause?: IJoinClause) {

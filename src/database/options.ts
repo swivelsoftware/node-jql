@@ -7,6 +7,9 @@ export interface IDatabaseOptions {
     column?: boolean
 
     // if type matches before any operations
-    type?: boolean,
+    type?: boolean
+
+    // if defined variable can be overrided
+    overridable?: boolean,
   }
 }

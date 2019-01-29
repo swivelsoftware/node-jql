@@ -1,38 +1,31 @@
+import squel = require('squel')
 import { create } from './create'
-import { IExpression } from './index'
-
-type Param = IExpression | string | number | boolean
+import { Expression, IExpression, Parameter } from './index'
 
 export interface IFunctionExpression extends IExpression {
   name: string
-  params: Param[] | Param
 }
 
-function paramIsExpression(param: Param): param is IExpression {
-  return typeof param !== 'string' && typeof param !== 'number' && typeof param !== 'boolean'
+function isExpression(parameter: Parameter): parameter is IExpression {
+  return typeof parameter !== 'string' && typeof parameter !== 'number' && typeof parameter !== 'boolean'
 }
 
-export class FunctionExpression implements IFunctionExpression {
+export class FunctionExpression extends Expression implements IFunctionExpression {
   public readonly classname = '$function'
   public name: string
-  public params: Param[]
 
   constructor(json?: IFunctionExpression) {
-    switch (typeof json) {
-      case 'object':
-        this.name = json.name
-        let params = json.params
-        if (!Array.isArray(params)) params = [params]
-        this.params = params.map((param) => paramIsExpression(param) ? create(param) : param)
-        break
-      case 'undefined':
-        break
-      default:
-        throw new Error(`invalid 'json' object`)
-    }
+    super(json)
+    if (json) this.name = json.name
   }
 
-  public toString(): string {
-    return `${this.name}(${this.params.map(() => '?').join(', ')})`
+  public toSquel(): squel.BaseBuilder {
+    const params: any[] = []
+    const args = (this.parameters || []).map((value) => {
+      params.push(isExpression(value) ? create(value).toSquel() : value)
+      return '?'
+    })
+    const expr = `${this.name}(${args.join(', ')})`
+    return squel.str(expr, ...params)
   }
 }

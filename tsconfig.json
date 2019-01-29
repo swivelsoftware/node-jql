@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "es6",
     "module": "umd",
+    "moduleResolution": "node",
     "strict": true,
     "declaration": true,
     "esModuleInterop": true,
@@ -13,7 +14,7 @@
     "src/**/*.ts"
   ],
   "exclude": [
-    "dist",
+    "test",
     "node_modules"
   ]
 }
