@@ -16,19 +16,19 @@ export class Metadata {
   }
 
   get checkTable(): boolean {
-    return this.options.check && this.options.check.table ? true : false
+    return !this.options.skip || !this.options.skip.checkTable ? true : false
   }
 
   get checkColumn(): boolean {
-    return this.options.check && this.options.check.column ? true : false
+    return !this.options.skip || !this.options.skip.checkColumn ? true : false
   }
 
   get checkType(): boolean {
-    return this.options.check && this.options.check.type ? true : false
+    return !this.options.skip || !this.options.skip.checkType ? true : false
   }
 
   get checkOverridable(): boolean {
-    return this.options.check && this.options.check.overridable ? true : false
+    return !this.options.skip || !this.options.skip.checkOverridable ? true : false
   }
 
   public table(name: string): Table {

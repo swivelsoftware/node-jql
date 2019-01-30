@@ -1,21 +1,53 @@
 import { Table } from '../metadata/table'
 import { ICursor } from './cursor'
+import { Column } from '../metadata/column';
+
+export type Index = { column: Column, index: number }
 
 export class ResultSet<T> extends Array<T> implements ICursor {
   private currentIndex = -1
 
-  constructor(readonly table?: Table, ...args: any[]) {
+  constructor(readonly metadata: Table, ...args: any[]) {
     super(...args)
+    return new Proxy(this, {
+      get(target, p) {
+        if (typeof p === 'number') return undefined
+        return target[p]
+      },
+      set(target, p, value): boolean {
+        if (typeof p !== 'number') {
+          target[p] = value
+          return true
+        }
+        return false
+      },
+    })
   }
 
   public count(): number {
     return this.length
   }
 
-  public get<U = T>(p: string|number|symbol): U {
+  public columnIndexOf(name: string): Index[]|number {
+    const index = this.metadata.columns.findIndex(column => column.toString() === name)
+    if (index > -1) return index
+
+    const result = this.metadata.columns.reduce<Index[]>((result, column, index) => {
+      if (column.name === name) result.push({ column, index })
+      return result
+    }, [])
+    return !result.length ? -1 : result.length === 1 ? result[0].index : result
+  }
+
+  public get<U = T>(p: number|symbol): U {
     if (this.currentIndex < 0) throw new Error('call cursor.next() first')
     if (this.reachEnd()) throw new Error('cursor reaches the end')
-    return this[this.currentIndex] as any
+    if (typeof p === 'number') {
+      const column = this.metadata.columns[p]
+      if (!column) throw new Error(`column index '${p}' out of bound`)
+      p = column.symbol
+    }
+    return this[this.currentIndex][p] as any
   }
 
   public next(): boolean {

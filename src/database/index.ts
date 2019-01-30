@@ -10,28 +10,14 @@ export type IDatabase = any
 
 export class Database {
   public readonly metadata: Metadata
-  public readonly database: IDatabase
+  public readonly database: IDatabase = {}
 
-  constructor(options?: IDatabaseOptions)
-  constructor(initialState?: IDatabase, options?: IDatabaseOptions)
-  constructor(...args: any[]) {
-    let initialState: IDatabase = {}, options: IDatabaseOptions
-    switch (args.length) {
-      case 1:
-        options = args[0]
-        break
-      case 2:
-      default:
-        initialState = args[0]
-        options = args[1]
-        break
-    }
-    this.database = initialState ? _.cloneDeep(initialState) : {}
+  constructor(options?: IDatabaseOptions) {
     this.metadata = new Metadata(this, options)
   }
 
-  public createTable(name: string, table: Table): Database {
-    table = this.metadata.registerTable(name, table)
+  public createTable(table: Table): Database {
+    table = this.metadata.registerTable(table.name, table)
     this.database[table.symbol] = []
     return this
   }
@@ -47,21 +33,21 @@ export class Database {
     return table ? this.database[table.symbol].length : 0
   }
 
-  public query<T>(sql: Sql, sandbox: Sandbox = new Sandbox(this)): ResultSet<T>|undefined {
+  public query<T>(sql: Sql, sandbox: Sandbox = new Sandbox(this)): ResultSet<T> {
     return sandbox.run(sql)
   }
 
   public insert(name: string, ...rows: any[]) {
+    const table = this.metadata.table(name)
     for (let i = 0, length = rows.length; i < length; i += 1) {
       const row = rows[i]
       try {
-        const table = this.metadata.table(name)
         if (table) table.validate(row)
-        if (!this.database[table.symbol]) this.database[table.symbol] = []
-        this.database[table.symbol].push(...rows)
       } catch (e) {
-        throw new Error(`fail to insert row '${JSON.stringify(row)}'. ${(e as Error).message}`)
+        throw new Error(`fail to insert row '${JSON.stringify(row)}'. ${(e as Error).stack}`)
       }
     }
+    if (!this.database[table.symbol]) this.database[table.symbol] = []
+    this.database[table.symbol].push(...rows)
   }
 }

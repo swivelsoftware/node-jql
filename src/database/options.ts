@@ -1,15 +1,15 @@
 export interface IDatabaseOptions {
-  check?: {
+  skip?: {
     // if table exists before any operations
-    table?: boolean
+    checkTable?: boolean
 
     // if column exists before any operations
-    column?: boolean
+    checkColumn?: boolean
 
     // if type matches before any operations
-    type?: boolean
+    checkType?: boolean
 
     // if defined variable can be overrided
-    overridable?: boolean,
+    checkOverridable?: boolean,
   }
 }

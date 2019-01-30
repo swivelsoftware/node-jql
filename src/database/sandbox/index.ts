@@ -3,67 +3,115 @@ import { Logger } from '../../utils/logger'
 import { functions } from '../functions'
 import { Database } from '../index'
 import { Table } from '../metadata/table'
-import { $and, $between, $binary, $case, $column, $exists, $function, $in, $or, $value, DefineStatement, Expression, Query, Sql } from '../sql/index'
+import { $and, $between, $binary, $case, $column, $exists, $function, $in, $or, $value, DefineStatement, Expression, Query, ResultColumn, Sql } from '../sql/index'
 import { ICursor } from './cursor'
 import { ResultSet } from './resultset'
+import { Column, Type } from '../metadata/column';
 
 const logger = new Logger(__dirname)
 
+class ResultSetTable extends Table {
+  constructor() {
+    super('Result')
+    for (const column of this.columns) if (column.isPrereserved) this.forceRemoveColumn(column.name)
+  }
+
+  private forceRemoveColumn(name: string) {
+    const index = this.columnOrders_.indexOf(name)
+    if (index > -1) this.columnOrders_.splice(index, 1)
+    delete this.columns_[name]
+  }
+
+  public addColumn(column: Column): Table
+  public addColumn(name: string, type: Type[] | Type | boolean, symbol?: symbol): Table
+  public addColumn(...args: any[]): Table {
+    let table: string|undefined, name: string, type: Type[] | Type | boolean, symbol: symbol
+    if (args.length === 1 && args[0] instanceof Column) {
+      const column: Column = args[0]
+      table = column.table
+      name = column.name
+      type = column.type
+      symbol = column.symbol || Symbol(name)
+    }
+    else {
+      name = args[0]
+      type = args[1] || true
+      symbol = args[2] || Symbol(name)
+    }
+    const column = table ? new Column(table, name, symbol, type) : new Column(name, symbol, type)
+    name = column.toString()
+    if (!this.columns_[name]) {
+      this.columns_[name] = column
+      this.columnOrders_.push(name)
+    }
+    return this
+  }
+
+  public removeColumn(name: string): Column | undefined {
+    logger.warn('you cannot remove column from ResultSetTable')
+    return undefined
+  }
+
+  public validate(value: any): boolean {
+    return true
+  }
+}
+
 class IntermediateCursor implements ICursor {
-  private readonly indices: number[] = []
+  private index: number = -1
   private current: any = undefined
 
   constructor(private readonly sandbox: Sandbox, private readonly tables: Table[]) {
   }
 
   public count(): number {
-    return this.tables.reduce((result, table) => result + table.count, 0)
+    return this.tables.reduce((result, table) => (result || 1) * table.count, 0)
   }
 
-  public get<T>(p: string|number|symbol): T {
+  public get<T>(p: symbol): T {
     if (!this.current) throw new Error(this.reachEnd() ? 'cursor reaches the end' : 'call cursor.next() first')
     return this.current[p]
   }
 
   public next(): boolean {
+    // move indices
+    this.index += 1
+
     // check end
     if (this.reachEnd()) {
       this.current = undefined
       return false
     }
 
+    // break indices
+    const indices: number[] = []
+    for (let i = this.tables.length - 1, base = 1; i >= 0; i -= 1) {
+      const count = this.tables[i].count
+      indices[i] = Math.floor(this.index / base) % count
+      base *= count
+    }
+
     // current row
     const row = this.current = {}
     for (let i = 0, length = this.tables.length; i < length; i += 1) {
-      const index = this.indices[i] || 0
+      const index = indices[i]
       const table = this.tables[i]
       const row_ = this.sandbox.context[table.symbol][index]
-      for (const { name, symbol } of table.columns) {
-        row[symbol] = row_[symbol] || row_[name]
+      for (const { name, symbol, isPrereserved } of table.columns) {
+        if (isPrereserved && name === 'index') {
+          row[symbol] = index
+        }
+        else {
+          row[symbol] = row_[symbol] || row_[name]
+        }
       }
-    }
-
-    // move indices
-    for (let i = this.tables.length - 1, carry = 1; carry > 0 && i >= 0; i -= 1) {
-      const count = this.tables[i].count
-      let index = this.indices[i] || 0
-      index += carry--
-      if (index === count) {
-        index = 0
-        carry = 1
-      }
-      this.indices[i] = index
     }
 
     return true
   }
 
   public reachEnd(): boolean {
-    for (let i = 0, length = this.tables.length; i < length; i += 1) {
-      const table = this.tables[i], index = this.indices[i] || 0
-      if (index < this.sandbox.context[table.symbol].length) return false
-    }
-    return true
+    return this.index === this.count()
   }
 }
 
@@ -75,14 +123,14 @@ export class Sandbox {
     if (sandbox) this.context = _.cloneDeep(sandbox.context)
   }
 
-  public run <T>(sql: Sql): ResultSet<T>|undefined {
+  public run <T>(sql: Sql): ResultSet<T> {
     if (sql instanceof DefineStatement) {
       // update sandbox context
       const { name, symbol, $ifNotExists, value, function: function_, query } = sql
       if (this.defined[name] && (!$ifNotExists || !this.database.metadata.checkOverridable)) throw new Error(`'${name}' is already defined`)
       this.context[symbol] = value || function_ || this.runQuery(query as Query)
       this.defined[name] = symbol
-      return undefined
+      return new ResultSet<T>(new ResultSetTable())
     }
     else if (sql instanceof Query) {
       // retrieve results from database
@@ -107,15 +155,15 @@ export class Sandbox {
       if (query_) {
         if (!$as) throw new Error('[FATAL] missing alias. an alias is a must if using query in TableOrSubquery')
         const resultset = sandbox_.runQuery(query_)
-        if (!resultset.table /* === !resultset.length */) return new ResultSet()
-        table = resultset.table
+        if (!resultset.metadata /* === !resultset.length */) return new ResultSet(new ResultSetTable())
+        table = resultset.metadata
         content = resultset
       }
       else {
         if (!name) throw new Error('[FATAL] missing table name')
         table = this.database.metadata.table(name)
-        if ($as) table = table.clone(Symbol($as))
-        content = this.database.database[name]
+        if ($as) table = table.clone($as)
+        content = this.database.database[table.symbol]
         if (this.database.metadata.checkTable && !content) throw new Error(`table '${name}' not exists`)
         else if (!table) logger.warn(`table '${name}' not exists'`)
       }
@@ -126,15 +174,47 @@ export class Sandbox {
     // TODO join
 
     // prepare result set
-    const table = new Table('$result')
-    const columnMappings: { [key in symbol]: Expression } = {}
-    for (const { expression, $as } of query.$select) {
+    const resultsetTable = new ResultSetTable()
+
+    function register(expression: Expression, $as?: string) {
       const name = $as || expression.toString()
       const symbol = Symbol(name)
-      table.addColumn(name, true, symbol)
+      if (expression instanceof $column) {
+        resultsetTable.addColumn(expression.table ? new Column(expression.table, expression.name, symbol) : new Column(expression.name, symbol))
+      }
+      else {
+        resultsetTable.addColumn(name, true, symbol)
+      }
       columnMappings[symbol] = expression
     }
-    const resultset = new ResultSet<T>(table)
+
+    const columnMappings: { [key in symbol]: Expression } = {}
+    for (const { expression, $as } of query.$select) {
+      if (expression instanceof $column && expression.name === '*') {
+        // wildcard
+        if (expression.table) {
+          // target table
+          const table = tables.find((table) => table.name === expression.table)
+          if (!table) throw new Error(`table '${expression.name}' not exists`)
+          for (const column of table.columns) {
+            register(new $column({ table: table.name, name: column.name }))
+          }
+        }
+        else {
+          // all tables
+          for (const table of tables) {
+            for (const column of table.columns) {
+              register(new $column({ table: table.name, name: column.name }))
+            }
+          }
+        }
+      }
+      else {
+        // target expression
+        register(expression, $as)
+      }
+    }
+    const resultset = new ResultSet<T>(resultsetTable)
 
     // TODO limit
 
@@ -144,7 +224,7 @@ export class Sandbox {
       // TODO where
 
       const row = {} as T
-      for (const { symbol } of table.columns) {
+      for (const { symbol } of resultsetTable.columns) {
         const expression = columnMappings[symbol]
         row[symbol] = this.evaluateExpression(cursor, expression, tables)
       }

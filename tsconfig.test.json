@@ -7,15 +7,14 @@
     "declaration": true,
     "esModuleInterop": true,
     "noImplicitAny": false,
-    "strictPropertyInitialization": false,
-    "outDir": "dist"
+    "strictPropertyInitialization": false
   },
   "include": [
-    "src/**/*.ts"
+    "scripts/**/*.ts",
+    "test/**/*.ts"
   ],
   "exclude": [
-    "scripts",
-    "test",
+    "src",
     "node_modules"
   ]
 }

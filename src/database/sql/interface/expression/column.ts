@@ -20,6 +20,6 @@ export class ColumnExpression extends Expression implements IColumnExpression {
   }
 
   public toSquel(): squel.BaseBuilder {
-    return squel.str(`${this.table ? `\'${this.table}\'.` : ''}\`${this.name}\``)
+    return squel.str(`${this.table ? `\`${this.table}\`.` : ''}\`${this.name}\``)
   }
 }
