@@ -10,16 +10,16 @@ export class ResultColumn implements IResultColumn {
   public expression: Expression
   public $as?: string
 
-  constructor(resultColumn?: IResultColumn) {
-    switch (typeof resultColumn) {
+  constructor(json?: IResultColumn) {
+    switch (typeof json) {
       case 'object':
-        this.expression = create(resultColumn.expression)
-        this.$as = resultColumn.$as
+        this.expression = create(json.expression)
+        this.$as = json.$as
         break
       case 'undefined':
         break
       default:
-        throw new Error(`invalid 'resultColumn' object`)
+        throw new Error(`invalid 'json' object`)
     }
   }
 }

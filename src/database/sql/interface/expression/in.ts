@@ -13,7 +13,7 @@ export class InExpression extends Expression implements InJson {
   public readonly classname = '$in'
   public parameters?: any[]
   public $not?: boolean
-  public left: IExpression
+  public left: Expression
   public query: Query
 
   constructor(json?: InJson) {

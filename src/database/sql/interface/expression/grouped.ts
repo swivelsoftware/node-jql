@@ -13,10 +13,7 @@ abstract class GropuedExpression extends Expression implements IGroupedExpressio
   constructor(json?: IGroupedExpression) {
     super(json)
     if (json) {
-      this.expressions = json.expressions.map((expression) => {
-        if (expression.classname === '$column' || expression.classname === 'value') throw new Error(`invalid expression '${expression.classname}' for '${this.classname}'`)
-        return create(expression)
-      })
+      this.expressions = json.expressions.map((expression) => create(expression))
     }
   }
 

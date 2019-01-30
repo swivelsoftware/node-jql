@@ -12,16 +12,16 @@ export class Limit implements ILimit {
   public expression: Expression
   public $offset?: Expression
 
-  constructor(limit?: ILimit) {
-    switch (typeof limit) {
+  constructor(json?: ILimit) {
+    switch (typeof json) {
       case 'object':
-        this.expression = create(limit.expression, { allow })
-        if (limit.$offset) this.$offset = create(limit.$offset, { allow })
+        this.expression = create(json.expression, { allow })
+        if (json.$offset) this.$offset = create(json.$offset, { allow })
         break
       case 'undefined':
         break
       default:
-        throw new Error(`invalid 'limit' object`)
+        throw new Error(`invalid 'json' object`)
     }
   }
 }

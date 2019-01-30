@@ -33,7 +33,7 @@ export class Metadata {
 
   public table(name: string): Table {
     const table = this.tables_[name]
-    if (this.checkTable && !table) throw new Error(`table '${name}' not found`)
+    if (this.checkTable && !table) throw new Error(`table '${name}' not exists`)
     return table
   }
 
@@ -45,7 +45,7 @@ export class Metadata {
 
   public unregisterTable(name: string): Table {
     const table = this.tables_[name]
-    if (this.checkTable && !table) throw new Error(`table '${name}' not found`)
+    if (this.checkTable && !table) throw new Error(`table '${name}' not exists`)
     if (table) delete this.tables_[name]
     return table
   }

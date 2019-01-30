@@ -41,6 +41,7 @@ export class CaseExpression extends Expression implements ICaseExpression {
       let cases = json.cases
       if (!Array.isArray(cases)) cases = [cases]
       this.cases = cases.map((case_) => new Case(case_))
+      if (!cases.length) throw new Error('there must be at least 1 case in $case')
       if (json.$else) this.$else = create(json.$else)
     }
   }

@@ -11,18 +11,18 @@ export class TableOrSubquery implements ITableOrSubquery {
   public query?: Query
   public $as?: string
 
-  constructor(tableOrSubquery?: ITableOrSubquery) {
-    switch (typeof tableOrSubquery) {
+  constructor(json?: ITableOrSubquery) {
+    switch (typeof json) {
       case 'object':
-        this.name = tableOrSubquery.name
-        if (tableOrSubquery.query) this.query = new Query(tableOrSubquery.query)
-        this.$as = tableOrSubquery.$as
-        if (this.query && !this.$as) throw new Error(`missing alias. an alias is a must if using query in TableOrSubquery`)
+        this.name = json.name
+        if (json.query) this.query = new Query(json.query)
+        this.$as = json.$as
+        if (this.query && !this.$as) throw new Error(`every derived table must have its own alias`)
         break
       case 'undefined':
         break
       default:
-        throw new Error(`invalid 'tableOrSubquery' object`)
+        throw new Error(`invalid 'json' object`)
     }
   }
 }

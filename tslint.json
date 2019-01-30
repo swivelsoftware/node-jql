@@ -10,6 +10,7 @@
     ],
     "max-classes-per-file": false,
     "max-line-length": false,
+    "no-conditional-assignment": false,
     "no-empty-interface": false,
     "no-shadowed-variable": false,
     "no-string-literal": false,

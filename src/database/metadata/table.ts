@@ -1,3 +1,4 @@
+import { isSymbol } from 'util'
 import { Column, Type } from './column'
 import { Metadata } from './index'
 
@@ -20,6 +21,7 @@ export class Table {
   protected readonly columns_: { [key in string]: Column } = {}
   protected readonly columnOrders_: string[] = []
 
+  constructor(name: string, table?: Table, symbol?: symbol)
   constructor(name: string, symbol?: symbol)
   constructor(metadata: Metadata, table: Table, symbol?: symbol)
   constructor(...args: any[]) {
@@ -27,16 +29,31 @@ export class Table {
     switch (args.length) {
       case 1:
         name = args[0]
-        symbol = args[1] || Symbol(name)
+        symbol = Symbol(name)
         break
       default:
       case 2:
-        metadata = args[0]
-        const table = args[1] as Table
-        name = table.name
-        symbol = args[2] || Symbol(name)
-        this.columns_ = table.columns_
-        this.columnOrders_ = table.columnOrders_
+        if (isSymbol(args[1])) {
+          name = args[0]
+          symbol = args[1] || Symbol(name)
+        }
+        else if (args[1] instanceof Table) {
+          const table = args[1] as Table
+          if (args[0] instanceof Metadata) {
+            metadata = args[0]
+            name = table.name
+          }
+          else {
+            name = args[0]
+          }
+          symbol = args[2] || Symbol(name)
+          this.columns_ = table.columns_
+          this.columnOrders_ = table.columnOrders_
+        }
+        else {
+          name = args[0]
+          symbol = Symbol(name)
+        }
         break
     }
 
@@ -46,12 +63,6 @@ export class Table {
 
     // pre-reserved column
     if (!this.columns_['index']) this.addPrereservedColumn('index', 'number')
-  }
-
-  private addPrereservedColumn(name: string, type: Type[] | Type | boolean = true, symbol?: symbol) {
-    const column = this.columns_[name] = new Column(name, symbol || Symbol(name), type)
-    column['prereserved'] = true
-    this.columnOrders_.push(name)
   }
 
   public addColumn(column: Column): Table
@@ -69,7 +80,7 @@ export class Table {
       type = args[1] || true
       symbol = args[2] || Symbol(name)
     }
-    if (this.metadata && this.metadata.checkColumn && this.columns_[name]) throw new Error(`column '${name}' already exists in table '${this.name}'`)
+    if (this.metadata && this.metadata.checkColumn && this.columns_[name]) throw new Error(`column \`${this.name}\`.\`${name}\` already exists`)
     if (!this.columns_[name]) {
       this.columns_[name] = new Column(name, symbol, type)
       this.columnOrders_.push(name)
@@ -78,8 +89,8 @@ export class Table {
   }
 
   public removeColumn(name: string): Column | undefined {
-    if (this.metadata && this.metadata.checkColumn && !this.columns_[name]) throw new Error(`column '${name}' not exists in table '${this.name}'`)
-    if (this.columns_[name].isPrereserved) throw new Error(`you cannot remove the prereserved column '${name}'`)
+    if (this.metadata && this.metadata.checkColumn && !this.columns_[name]) throw new Error(`unknown column \`${this.name}\`.\`${name}\``)
+    if (this.columns_[name].isPrereserved) throw new Error(`you cannot remove prereserved column '${name}'`)
     if (this.columns_[name]) {
       delete this.columns_[name]
       this.columnOrders_.splice(this.columnOrders_.indexOf(name), 1)
@@ -93,14 +104,14 @@ export class Table {
     if (this.metadata.checkColumn || this.metadata.checkType) {
       for (const key of Object.keys(value)) {
         if (this.metadata.checkColumn && !value[key]) {
-          throw new Error(`column '${key}' not found`)
+          throw new Error(`unknown column \`${this.name}\`.\`${name}\``)
         }
         if (this.metadata.checkType) {
           try {
             this.columns_[key].validate(value[key])
           }
           catch (e) {
-            throw new Error(`invalid value '${JSON.stringify(value[key])}'. ${(e as Error).message}`)
+            throw new Error(`invalid column value '${JSON.stringify(value[key])}'. ${(e as Error).message}`)
           }
         }
       }
@@ -116,5 +127,11 @@ export class Table {
     else {
       return new Table(name || this.name, symbol)
     }
+  }
+
+  private addPrereservedColumn(name: string, type: Type[] | Type | boolean = true, symbol?: symbol) {
+    const column = this.columns_[name] = new Column(name, symbol || Symbol(name), type)
+    column['prereserved'] = true
+    this.columnOrders_.push(name)
   }
 }

@@ -2,24 +2,20 @@ import _ = require('lodash')
 import { Logger } from '../../utils/logger'
 import { functions } from '../functions'
 import { Database } from '../index'
+import { Column, Type } from '../metadata/column'
 import { Table } from '../metadata/table'
-import { $and, $between, $binary, $case, $column, $exists, $function, $in, $or, $value, DefineStatement, Expression, Query, ResultColumn, Sql } from '../sql/index'
+import { $and, $between, $binary, $case, $column, $exists, $function, $in, $or, $value, DefineStatement, Expression, JoinClause, Query, ResultColumn, Sql, TableOrSubquery } from '../sql/index'
 import { ICursor } from './cursor'
 import { ResultSet } from './resultset'
-import { Column, Type } from '../metadata/column';
 
 const logger = new Logger(__dirname)
 
 class ResultSetTable extends Table {
-  constructor() {
-    super('Result')
-    for (const column of this.columns) if (column.isPrereserved) this.forceRemoveColumn(column.name)
-  }
+  public readonly mappings: { [key in symbol]: Expression } = {}
 
-  private forceRemoveColumn(name: string) {
-    const index = this.columnOrders_.indexOf(name)
-    if (index > -1) this.columnOrders_.splice(index, 1)
-    delete this.columns_[name]
+  constructor(name: string = 'Result', table?: Table) {
+    super(name, table)
+    for (const column of this.columns) if (column.isPrereserved) this.forceRemoveColumn(column.name)
   }
 
   public addColumn(column: Column): Table
@@ -54,6 +50,12 @@ class ResultSetTable extends Table {
 
   public validate(value: any): boolean {
     return true
+  }
+
+  private forceRemoveColumn(name: string) {
+    const index = this.columnOrders_.indexOf(name)
+    if (index > -1) this.columnOrders_.splice(index, 1)
+    delete this.columns_[name]
   }
 }
 
@@ -134,6 +136,7 @@ export class Sandbox {
     }
     else if (sql instanceof Query) {
       // retrieve results from database
+      this.validateQuery(sql)
       return this.runQuery(sql)
     }
     else {
@@ -141,22 +144,118 @@ export class Sandbox {
     }
   }
 
-  private runQuery <T>(query: Query): ResultSet<T> {
-    // create sandbox
-    const sandbox_ = new Sandbox(this.database, this)
+  private validateQuery(query: Query, tableAliases: { [key: string]: Table } = {}) {
+    // dummy sandbox
+    const sandbox = new Sandbox(this.database, this)
 
-    // clone query for further manipulation
-    query = new Query(query)
-
-    // cache tables to be used
-    const tables: Table[] = []
+    // $from
     for (const { name, query: query_, $as } of query.$from) {
+      let table
+      if (query_) {
+        this.validateQuery(query_)
+        table = this.prepareResultSet(query_.$select, sandbox.prepareTables(query_.$from, query_.$join))
+      }
+      else if (name) {
+        table = this.database.metadata.table(name)
+      }
+      if (!table) throw new Error(`table '${name}' not exists`)
+      tableAliases[($as || name) as string] = table
+    }
+
+    // $select
+    for (const { expression } of query.$select) {
+      this.validateExpression(expression, tableAliases)
+    }
+
+    // TODO $join
+    // TODO $where
+    // TODO $group
+    // TODO $order
+    // TODO $limit
+  }
+
+  private validateExpression(expression: Expression, tableAliases: { [key: string]: Table } = {}) {
+    if (expression instanceof $between) {
+      const { left, start, end } = expression
+      this.validateExpression(left)
+      if (start) this.validateExpression(start)
+      if (end) this.validateExpression(end)
+    }
+    else if (expression instanceof $binary) {
+      const { left, right } = expression
+      this.validateExpression(left)
+      if (right) this.validateExpression(right)
+    }
+    else if (expression instanceof $case) {
+      const { cases, $else } = expression
+      for (const { $when, $then } of cases) {
+        this.validateExpression($when)
+        this.validateExpression($then)
+      }
+      if ($else) this.validateExpression($else)
+    }
+    else if (expression instanceof $column) {
+      const { table: tableName, name } = expression
+      if (name !== '*') {
+        if (tableName) {
+          const table = tableAliases[tableName]
+          if (!table) throw new Error(`table '${tableName}' not exists`)
+          if (!table.columns.find((column) => column.name === name)) throw new Error(`unknown column \`${tableName}\`.\`${name}\``)
+        }
+        else {
+          const columns = Object.keys(tableAliases).reduce<Column[]>((result, key) => {
+            if (result.length > 1) throw new Error(`column '${name}' in field list is ambiguous`)
+            const table = tableAliases[key]
+            const column = table.columns.find((column) => column.name === name)
+            if (column) result.push(column)
+            return result
+          }, [])
+          if (!columns.length) throw new Error(`unknown column '${name}'`)
+        }
+      }
+    }
+    else if (expression instanceof $exists) {
+      const { query } = expression
+      this.validateQuery(query, tableAliases)
+    }
+    else if (expression instanceof $function) {
+      const { name } = expression
+      let function_: Function = functions[name]
+      if (!function_) {
+        const symbol = this.defined[name]
+        if (!symbol) throw new Error(`function '${name}' is not defined`)
+        function_ = this.context[symbol]
+        if (typeof function_ !== 'function') throw new Error(`'${name}' is not a function`)
+      }
+    }
+    else if (expression instanceof $and || expression instanceof $or) {
+      for (const expression_ of expression.expressions) {
+        this.validateExpression(expression_)
+      }
+    }
+    else if (expression instanceof $in) {
+      const { left, query } = expression
+      this.validateExpression(left)
+      this.validateQuery(query, tableAliases)
+    }
+    else if (expression instanceof $value) {
+      // do nothing
+    }
+    else {
+      throw new Error(`invalid expression '${expression.classname}'`)
+    }
+  }
+
+  private prepareTables(tableOrSubqueries: TableOrSubquery[], joinClauses?: JoinClause[]): Table[] {
+    const tables: Table[] = []
+
+    // $from
+    for (const { name, query: query_, $as } of tableOrSubqueries) {
       let table: Table, content: any
       if (query_) {
-        if (!$as) throw new Error('[FATAL] missing alias. an alias is a must if using query in TableOrSubquery')
-        const resultset = sandbox_.runQuery(query_)
+        const resultset = this.runQuery(query_)
         if (!resultset.metadata /* === !resultset.length */) return new ResultSet(new ResultSetTable())
-        table = resultset.metadata
+        table = new ResultSetTable($as as string, resultset.metadata)
         content = resultset
       }
       else {
@@ -167,12 +266,16 @@ export class Sandbox {
         if (this.database.metadata.checkTable && !content) throw new Error(`table '${name}' not exists`)
         else if (!table) logger.warn(`table '${name}' not exists'`)
       }
-      sandbox_.context[table.symbol] = content || []
+      this.context[table.symbol] = content || []
       tables.push(table)
     }
 
-    // TODO join
+    // TODO $join
 
+    return tables
+  }
+
+  private prepareResultSet <T>(resultColumns: ResultColumn[], tables: Table[]): ResultSet<T> {
     // prepare result set
     const resultsetTable = new ResultSetTable()
 
@@ -180,16 +283,29 @@ export class Sandbox {
       const name = $as || expression.toString()
       const symbol = Symbol(name)
       if (expression instanceof $column) {
-        resultsetTable.addColumn(expression.table ? new Column(expression.table, expression.name, symbol) : new Column(expression.name, symbol))
+        if (!expression.table) {
+          // check ambiguous column
+          const ambiguous = tables.reduce<number>((result, table) => {
+            if (result < 2 && table.columns.find((column) => column.name === name)) {
+              result += 1
+            }
+            return result
+          }, 0) > 1
+          if (ambiguous) throw new Error(`ambiguous column '${name}'`)
+
+          resultsetTable.addColumn(new Column(expression.name, symbol))
+        }
+        else {
+          resultsetTable.addColumn(new Column(expression.table, expression.name, symbol))
+        }
       }
       else {
         resultsetTable.addColumn(name, true, symbol)
       }
-      columnMappings[symbol] = expression
+      resultsetTable.mappings[symbol] = expression
     }
 
-    const columnMappings: { [key in symbol]: Expression } = {}
-    for (const { expression, $as } of query.$select) {
+    for (const { expression, $as } of resultColumns) {
       if (expression instanceof $column && expression.name === '*') {
         // wildcard
         if (expression.table) {
@@ -214,18 +330,31 @@ export class Sandbox {
         register(expression, $as)
       }
     }
-    const resultset = new ResultSet<T>(resultsetTable)
+    return new ResultSet<T>(resultsetTable)
+  }
 
-    // TODO limit
+  private runQuery <T>(query: Query, ...args: any[]): ResultSet<T> {
+    // create sandbox
+    const sandbox = new Sandbox(this.database, this)
+
+    // clone query for further manipulation
+    query = new Query(query)
+
+    // cache tables to be used
+    const tables = sandbox.prepareTables(query.$from, query.$join)
+
+    // create result set
+    const resultset = sandbox.prepareResultSet<T>(query.$select, tables)
+    const resultsetTable = resultset.metadata as ResultSetTable
 
     // iterate rows
-    const cursor = new IntermediateCursor(sandbox_, tables)
+    const cursor = new IntermediateCursor(sandbox, tables)
     while (cursor.next()) {
       // TODO where
 
       const row = {} as T
       for (const { symbol } of resultsetTable.columns) {
-        const expression = columnMappings[symbol]
+        const expression = resultsetTable.mappings[symbol]
         row[symbol] = this.evaluateExpression(cursor, expression, tables)
       }
       resultset.push(row)
@@ -234,6 +363,8 @@ export class Sandbox {
     // TODO group by
 
     // TODO order by
+
+    // TODO limit
 
     return resultset
   }
@@ -250,7 +381,6 @@ export class Sandbox {
     }
     else if (expression instanceof $column) {
       const { table: tableName, name } = expression
-      if (!tableName && tables.length > 1) throw new Error(`ambiguous column '${name}'`)
       const table = tableName ? tables.find((table) => table.name === tableName) : tables[0]
       if (this.database.metadata.checkTable && !table) throw new Error(`table '${name}' not exists`)
       if (!table) {
@@ -273,14 +403,27 @@ export class Sandbox {
       let function_: Function = functions[name]
       if (!function_) {
         const symbol = this.defined[name]
-        if (!symbol) throw new Error(`'${name}' is not defined`)
         function_ = this.context[symbol]
-        if (typeof function_ !== 'function') throw new Error(`'${name}' is not a function`)
       }
       return function_(...parameters)
     }
-    else if (expression instanceof $and || expression instanceof $or) {
-      // TODO
+    else if (expression instanceof $and) {
+      let result: boolean = true
+      for (const expression_ of expression.expressions) {
+        if (result = result && !!this.evaluateExpression(cursor, expression_, tables)) {
+          return false
+        }
+      }
+      return result
+    }
+    else if (expression instanceof $or) {
+      let result: boolean = false
+      for (const expression_ of expression.expressions) {
+        if (result = result || !!this.evaluateExpression(cursor, expression_, tables)) {
+          return true
+        }
+      }
+      return result
     }
     else if (expression instanceof $in) {
       // TODO

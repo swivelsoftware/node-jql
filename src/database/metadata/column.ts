@@ -1,4 +1,4 @@
-import { isSymbol } from "util";
+import { isSymbol } from 'util'
 
 export type Type = 'string' | 'number' | 'bigint' | 'boolean' | 'object'
 
@@ -6,10 +6,10 @@ export type Type = 'string' | 'number' | 'bigint' | 'boolean' | 'object'
  * 1) column name must be unique within a table
  */
 export class Column {
-  readonly table?: string
-  readonly name: string
-  readonly symbol: symbol
-  readonly type: Type[] | Type | boolean
+  public readonly table?: string
+  public readonly name: string
+  public readonly symbol: symbol
+  public readonly type: Type[] | Type | boolean
 
   constructor(table: string, name: string, symbol: symbol, type?: Type[] | Type | boolean)
   constructor(name: string, symbol: symbol, type?: Type[] | Type | boolean)
@@ -47,17 +47,17 @@ export class Column {
 
   public validate(value?: any): boolean {
     const type = typeof value
-    if (type === 'symbol' || type === 'undefined' || type === 'function') throw new Error(`type '${type}' is unserializable`)
+    if (type === 'symbol' || type === 'undefined' || type === 'function') throw new Error(`unserializable type '${type}'`)
     if (this.type !== true &&
       (typeof this.type === 'string' && typeof value !== this.type) ||
       (Array.isArray(this.type) && this.type.indexOf(type) === -1)
     ) {
-      throw new Error(`column '${this.name}' expects type '${JSON.stringify(this.type)}'. got type '${type}'`)
+      throw new Error(`column '${this.name}' expected '${JSON.stringify(this.type)}' but received '${type}'`)
     }
     return true
   }
 
-  toString(): string {
+  public toString(): string {
     return this.table ? `${this.table}.${this.name}` : this.name
   }
 }

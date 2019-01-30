@@ -49,7 +49,7 @@ export class Query extends Sql implements IQuery {
       }
 
       if (!this.$select.length && !this.$from.length) {
-        throw new Error(`invalid query: you must specify either $select or $from, or both`)
+        throw new Error(`invalid query. you must specify either $select or $from, or both`)
       }
 
       if (json.$join) {
@@ -138,7 +138,6 @@ export class Query extends Sql implements IQuery {
 
     // from
     const $from = this.$from
-    if (!$from) throw new Error(`missing '$from' in query`)
     for (const { name, query, $as } of $from) {
       sql = sql.from(query ? query.toSquel() : name as string, $as)
     }
@@ -239,7 +238,7 @@ export class Query extends Sql implements IQuery {
     }
     else if (expression instanceof $column) {
       const { table, name } = expression
-      if (table && !tableAliases[table]) throw new Error(`unknown column '${table}.${name}'`)
+      if (table && !tableAliases[table]) throw new Error(`unknown column \`${table}\`.\`${name}\``)
     }
     else if (expression instanceof $exists) {
       const { query } = expression

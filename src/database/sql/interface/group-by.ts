@@ -10,18 +10,18 @@ export class GroupBy implements IGroupBy {
   public expressions: Expression[]
   public $having?: Expression
 
-  constructor(groupBy?: IGroupBy) {
-    switch (typeof groupBy) {
+  constructor(json?: IGroupBy) {
+    switch (typeof json) {
       case 'object':
-        let expressions = groupBy.expressions
+        let expressions = json.expressions
         if (!Array.isArray(expressions)) expressions = [expressions]
         this.expressions = expressions.map((expression) => create(expression))
-        if (groupBy.$having) this.$having = Array.isArray(groupBy.$having) ? new $and({ expressions: groupBy.$having }) : create(groupBy.$having)
+        if (json.$having) this.$having = Array.isArray(json.$having) ? new $and({ expressions: json.$having }) : create(json.$having)
         break
       case 'undefined':
         break
       default:
-        throw new Error(`invalid 'groupBy' object`)
+        throw new Error(`invalid 'json' object`)
     }
   }
 }

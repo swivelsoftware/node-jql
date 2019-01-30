@@ -1,8 +1,8 @@
+import { Column } from '../metadata/column'
 import { Table } from '../metadata/table'
 import { ICursor } from './cursor'
-import { Column } from '../metadata/column';
 
-export type Index = { column: Column, index: number }
+export interface Index { column: Column, index: number }
 
 export class ResultSet<T> extends Array<T> implements ICursor {
   private currentIndex = -1
@@ -29,7 +29,7 @@ export class ResultSet<T> extends Array<T> implements ICursor {
   }
 
   public columnIndexOf(name: string): Index[]|number {
-    const index = this.metadata.columns.findIndex(column => column.toString() === name)
+    const index = this.metadata.columns.findIndex((column) => column.toString() === name)
     if (index > -1) return index
 
     const result = this.metadata.columns.reduce<Index[]>((result, column, index) => {
@@ -44,7 +44,7 @@ export class ResultSet<T> extends Array<T> implements ICursor {
     if (this.reachEnd()) throw new Error('cursor reaches the end')
     if (typeof p === 'number') {
       const column = this.metadata.columns[p]
-      if (!column) throw new Error(`column index '${p}' out of bound`)
+      if (!column) throw new Error(`column index out of bound: ${p}`)
       p = column.symbol
     }
     return this[this.currentIndex][p] as any

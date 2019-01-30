@@ -1,4 +1,4 @@
-import { Database, Query, Table, TableOrSubquery, Index } from '../src'
+import { Database, Index, Query, Table, TableOrSubquery } from '../src'
 
 let database: Database
 
@@ -65,7 +65,7 @@ test('Query from Table1 & Table2', () => {
     $from: [
       new TableOrSubquery({ name: 'Table1' }),
       new TableOrSubquery({ name: 'Table2' }),
-    ]
+    ],
   }))
 
   // test: 6 rows

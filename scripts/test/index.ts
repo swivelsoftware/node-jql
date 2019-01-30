@@ -32,7 +32,7 @@ for (const { name, fn } of tests) {
     })
     .then(() => {
       const timeTaken = process.hrtime(start)
-      console.log(chalk.inverse('[TEST]'), name, chalk.green(`completed in ${timeTaken[0] * 1e6 + Math.round(timeTaken[1] * 1e-6)}ms`))
+      console.log(chalk.inverse('[TEST]'), name, chalk.green(`completed in ${timeTaken[0] * 1e6 + Math.round(timeTaken[1] * 1e-6)}ms`), `memory used: ${chalk.green(`${Math.round(process.memoryUsage().heapUsed / 1024 / 1024 * 10) / 10}MB`)}`)
       console.log()
     })
     .catch((e) => {

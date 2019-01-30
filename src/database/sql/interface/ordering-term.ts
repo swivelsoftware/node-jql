@@ -12,16 +12,16 @@ export class OrderingTerm implements IOrderingTerm {
   public expression: Expression
   public order?: Order
 
-  constructor(orderingTerm?: IOrderingTerm) {
-    switch (typeof orderingTerm) {
+  constructor(json?: IOrderingTerm) {
+    switch (typeof json) {
       case 'object':
-        this.expression = create(orderingTerm.expression)
-        if (orderingTerm.order) this.order = orderingTerm.order
+        this.expression = create(json.expression)
+        if (json.order) this.order = json.order
         break
       case 'undefined':
         break
       default:
-        throw new Error(`invalid 'orderingTerm' object`)
+        throw new Error(`invalid 'json' object`)
     }
   }
 }

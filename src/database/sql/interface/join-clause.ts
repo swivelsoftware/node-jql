@@ -22,18 +22,18 @@ export class JoinClause implements IJoinClause {
   public $on?: Expression
   public $using?: string[]
 
-  constructor(joinClause?: IJoinClause) {
-    switch (typeof joinClause) {
+  constructor(json?: IJoinClause) {
+    switch (typeof json) {
       case 'object':
-        this.operator = joinClause.operator || { type: 'INNER' }
-        this.tableOrSubquery = new TableOrSubquery(joinClause.tableOrSubquery)
-        if (joinClause.$on) this.$on = Array.isArray(joinClause.$on) ? new $and({ expressions: joinClause.$on }) : create(joinClause.$on)
-        if (joinClause.$using) this.$using = Array.isArray(joinClause.$using) ? joinClause.$using : [joinClause.$using]
+        this.operator = json.operator || { type: 'INNER' }
+        this.tableOrSubquery = new TableOrSubquery(json.tableOrSubquery)
+        if (json.$on) this.$on = Array.isArray(json.$on) ? new $and({ expressions: json.$on }) : create(json.$on)
+        if (json.$using) this.$using = Array.isArray(json.$using) ? json.$using : [json.$using]
         break
       case 'undefined':
         break
       default:
-        throw new Error(`invalid 'joinClause' object`)
+        throw new Error(`invalid 'json' object`)
     }
   }
 }
