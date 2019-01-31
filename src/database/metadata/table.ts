@@ -1,20 +1,12 @@
 import { isSymbol } from 'util'
+import { Metadata } from '.'
+import { JQLError } from '../../utils/error'
 import { Column, Type } from './column'
-import { Metadata } from './index'
 
 /**
  * 1) table name must be unique within a database
  */
 export class Table {
-
-  get columns(): Column[] {
-    return this.columnOrders_.map((column) => this.columns_[column])
-  }
-
-  get count(): number {
-    if (!this.metadata) throw new Error(`table '${this.name}' not yet binded to any database`)
-    return this.metadata.database.count(this.name)
-  }
   public readonly name: string
   public readonly symbol: symbol
   protected readonly metadata?: Metadata
@@ -65,6 +57,15 @@ export class Table {
     if (!this.columns_['index']) this.addPrereservedColumn('index', 'number')
   }
 
+  get columns(): Column[] {
+    return this.columnOrders_.map((column) => this.columns_[column])
+  }
+
+  get count(): number {
+    if (!this.metadata) throw new JQLError(`table '${this.name}' not yet binded to any database`)
+    return this.metadata.database.count(this.name)
+  }
+
   public addColumn(column: Column): Table
   public addColumn(name: string, type: Type[] | Type | boolean, symbol?: symbol): Table
   public addColumn(...args: any[]): Table {
@@ -80,7 +81,7 @@ export class Table {
       type = args[1] || true
       symbol = args[2] || Symbol(name)
     }
-    if (this.metadata && this.metadata.checkColumn && this.columns_[name]) throw new Error(`column \`${this.name}\`.\`${name}\` already exists`)
+    if (this.metadata && this.metadata.checkColumn && this.columns_[name]) throw new JQLError(`column \`${this.name}\`.\`${name}\` already exists`)
     if (!this.columns_[name]) {
       this.columns_[name] = new Column(name, symbol, type)
       this.columnOrders_.push(name)
@@ -89,34 +90,34 @@ export class Table {
   }
 
   public removeColumn(name: string): Column | undefined {
-    if (this.metadata && this.metadata.checkColumn && !this.columns_[name]) throw new Error(`unknown column \`${this.name}\`.\`${name}\``)
-    if (this.columns_[name].isPrereserved) throw new Error(`you cannot remove prereserved column '${name}'`)
-    if (this.columns_[name]) {
+    const column = this.columns_[name]
+    if (this.metadata && this.metadata.checkColumn && !column) throw new JQLError(`unknown column \`${this.name}\`.\`${name}\``)
+    if (column.isPrereserved) throw new JQLError(`you cannot remove prereserved column '${name}'`)
+    if (column) {
       delete this.columns_[name]
       this.columnOrders_.splice(this.columnOrders_.indexOf(name), 1)
     }
-    return this.columns_[name]
+    return column
   }
 
-  public validate(value: any): boolean {
-    if (!this.metadata) throw new Error(`table '${this.name}' not yet binded to any database`)
-    if (typeof value !== 'object') throw new Error(`a table row must be a json object`)
+  public validate(value: any) {
+    if (!this.metadata) throw new JQLError(`table '${this.name}' not yet binded to any database`)
+    if (typeof value !== 'object') throw new JQLError(`a table row must be a json object`)
     if (this.metadata.checkColumn || this.metadata.checkType) {
       for (const key of Object.keys(value)) {
-        if (this.metadata.checkColumn && !value[key]) {
-          throw new Error(`unknown column \`${this.name}\`.\`${name}\``)
+        if (this.metadata.checkColumn && !this.columns_[key]) {
+          throw new JQLError(`unknown column \`${this.name}\`.\`${key}\``)
         }
         if (this.metadata.checkType) {
           try {
             this.columns_[key].validate(value[key])
           }
           catch (e) {
-            throw new Error(`invalid column value '${JSON.stringify(value[key])}'. ${(e as Error).message}`)
+            throw new JQLError(`invalid column value '${JSON.stringify(value[key])}'`, e)
           }
         }
       }
     }
-    return true
   }
 
   public clone(name?: string): Table {
@@ -129,8 +130,8 @@ export class Table {
     }
   }
 
-  private addPrereservedColumn(name: string, type: Type[] | Type | boolean = true, symbol?: symbol) {
-    const column = this.columns_[name] = new Column(name, symbol || Symbol(name), type)
+  private addPrereservedColumn(name: string, type: Type[] | Type | boolean = true, symbol: symbol = Symbol(name)) {
+    const column = this.columns_[name] = new Column(name, symbol, type)
     column['prereserved'] = true
     this.columnOrders_.push(name)
   }

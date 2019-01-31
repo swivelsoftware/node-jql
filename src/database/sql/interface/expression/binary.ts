@@ -1,8 +1,8 @@
 import squel = require('squel')
-import { create } from './create'
-import { Expression, IExpression, IUnknownExpression } from './index'
+import { Expression, IExpression, IUnknownExpression } from './__base'
+import { create } from './__create'
 
-type ExprOperator = '=' | '<>' | '<' | '<=' | '>' | '>=' | 'IS' | 'IS NULL' | 'IS NOT NULL' | 'LIKE' | 'NOT LIKE'
+type ExprOperator = '=' | '<>' | '<' | '<=' | '>' | '>=' | 'LIKE' | 'NOT LIKE'
 
 export interface IBinaryExpression extends IUnknownExpression {
   left: IExpression

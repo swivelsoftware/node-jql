@@ -1,8 +1,8 @@
 import squel = require('squel')
-import { create } from './create'
-import { Expression, IExpression, Parameter } from './index'
+import { Expression, IExpression, IUnknownExpression, Parameter } from './__base'
+import { create } from './__create'
 
-export interface IFunctionExpression extends IExpression {
+export interface IFunctionExpression extends IUnknownExpression {
   name: string
 }
 
@@ -13,10 +13,14 @@ function isExpression(parameter: Parameter): parameter is IExpression {
 export class FunctionExpression extends Expression implements IFunctionExpression {
   public readonly classname = '$function'
   public name: string
+  public parameters: Parameter[]
 
   constructor(json?: IFunctionExpression) {
     super(json)
-    if (json) this.name = json.name
+    if (json) {
+      this.name = json.name
+      this.parameters = json.parameters || []
+    }
   }
 
   public toSquel(): squel.BaseBuilder {
@@ -26,6 +30,6 @@ export class FunctionExpression extends Expression implements IFunctionExpressio
       return '?'
     })
     const expr = `${this.name}(${args.join(', ')})`
-    return squel.str(expr, ...params)
+    return squel.rstr(expr, ...params)
   }
 }

@@ -1,6 +1,7 @@
 import squel = require('squel')
-import { create } from './create'
-import { Expression, IExpression } from './index'
+import { JQLError } from '../../../../utils/error'
+import { Expression, IExpression } from './__base'
+import { create } from './__create'
 
 interface ICase {
   $when: IExpression
@@ -20,7 +21,7 @@ export class Case implements ICase {
       case 'undefined':
         break
       default:
-        throw new Error(`invalid 'json' object`)
+        throw new JQLError(`invalid 'json' object`)
     }
   }
 }
@@ -41,21 +42,19 @@ export class CaseExpression extends Expression implements ICaseExpression {
       let cases = json.cases
       if (!Array.isArray(cases)) cases = [cases]
       this.cases = cases.map((case_) => new Case(case_))
-      if (!cases.length) throw new Error('there must be at least 1 case in $case')
+      if (!cases.length) throw new JQLError('there must be at least 1 case in $case')
       if (json.$else) this.$else = create(json.$else)
     }
   }
 
   public toSquel(): squel.BaseBuilder {
-    const result = squel.expr() // TODO use squel.case()
-    const params: any[] = []
-    const cases = this.cases.map(({ $when, $then }) => {
-      params.push($when.toSquel())
-      params.push($then.toSquel())
-      return `WHEN ? THEN ?`
-    })
-    const expr = `CASE ${cases.join(' ')}${this.$else ? ' ELSE ?' : ''} END`
-    if (this.$else) params.push(this.$else.toSquel())
-    return result.and(expr, ...params)
+    let result = squel.case(null as any)
+    for (const { $when, $then } of this.cases) {
+      result = result
+        .when('?', $when.toSquel())
+        .then($then.toSquel())
+    }
+    if (this.$else) result = result.else(this.$else.toSquel())
+    return result
   }
 }

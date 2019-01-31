@@ -1,8 +1,8 @@
 import squel = require('squel')
-import { create } from './create'
-import { Expression, IExpression } from './index'
+import { Expression, IExpression } from './__base'
+import { create } from './__create'
 
-export interface IGroupedExpression extends IExpression {
+export interface IGroupedExpression {
   expressions: IExpression[]
 }
 

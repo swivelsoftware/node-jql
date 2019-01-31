@@ -1,8 +1,8 @@
 import squel = require('squel')
 import { IQuery, Query } from '../../query'
-import { Expression, IExpression } from './index'
+import { Expression } from './__base'
 
-export interface IExistsExpression extends IExpression {
+export interface IExistsExpression {
   $not?: boolean
   query: IQuery
 }

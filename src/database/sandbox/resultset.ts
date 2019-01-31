@@ -1,3 +1,4 @@
+import { JQLError } from '../../utils/error'
 import { Column } from '../metadata/column'
 import { Table } from '../metadata/table'
 import { ICursor } from './cursor'
@@ -36,15 +37,15 @@ export class ResultSet<T> extends Array<T> implements ICursor {
       if (column.name === name) result.push({ column, index })
       return result
     }, [])
-    return !result.length ? -1 : result.length === 1 ? result[0].index : result
+    return result.length === 0 ? -1 : result.length === 1 ? result[0].index : result
   }
 
   public get<U = T>(p: number|symbol): U {
-    if (this.currentIndex < 0) throw new Error('call cursor.next() first')
-    if (this.reachEnd()) throw new Error('cursor reaches the end')
+    if (this.currentIndex < 0) throw new JQLError('call cursor.next() first')
+    if (this.reachEnd()) throw new JQLError('cursor reaches the end')
     if (typeof p === 'number') {
       const column = this.metadata.columns[p]
-      if (!column) throw new Error(`column index out of bound: ${p}`)
+      if (!column) throw new JQLError(`column index out of bound: ${p}`)
       p = column.symbol
     }
     return this[this.currentIndex][p] as any

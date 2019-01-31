@@ -1,7 +1,7 @@
 import squel = require('squel')
-import { Expression, IExpression } from './index'
+import { Expression } from './__base'
 
-export interface IValueExpression extends IExpression {
+export interface IValueExpression {
   value: any
 }
 
@@ -15,6 +15,6 @@ export class ValueExpression extends Expression implements IValueExpression {
   }
 
   public toSquel(): squel.BaseBuilder {
-    return squel.str(JSON.stringify(this.value))
+    return squel.rstr(Array.isArray(this.value) ? `(${this.value.map((item) => JSON.stringify(item)).join(', ')})` : JSON.stringify(this.value))
   }
 }

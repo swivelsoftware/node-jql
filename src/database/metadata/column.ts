@@ -1,4 +1,5 @@
 import { isSymbol } from 'util'
+import { JQLError } from '../../utils/error'
 
 export type Type = 'string' | 'number' | 'bigint' | 'boolean' | 'object'
 
@@ -42,19 +43,18 @@ export class Column {
   }
 
   get isPrereserved(): boolean {
-    return !!this['prereserved']
+    return this['prereserved'] === true
   }
 
-  public validate(value?: any): boolean {
+  public validate(value?: any) {
     const type = typeof value
-    if (type === 'symbol' || type === 'undefined' || type === 'function') throw new Error(`unserializable type '${type}'`)
+    if (type === 'symbol' || type === 'undefined' || type === 'function') throw new JQLError(`unserializable type '${type}'`)
     if (this.type !== true &&
       (typeof this.type === 'string' && typeof value !== this.type) ||
       (Array.isArray(this.type) && this.type.indexOf(type) === -1)
     ) {
-      throw new Error(`column '${this.name}' expected '${JSON.stringify(this.type)}' but received '${type}'`)
+      throw new JQLError(`column '${this.name}' expected '${JSON.stringify(this.type)}' but received '${type}'`)
     }
-    return true
   }
 
   public toString(): string {

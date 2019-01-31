@@ -1,12 +1,15 @@
 import _ = require('lodash')
-import { Metadata } from './metadata/index'
+import { JQLError } from '../utils/error'
+import { Metadata } from './metadata'
 import { Table } from './metadata/table'
 import { IDatabaseOptions } from './options'
-import { Sandbox } from './sandbox/index'
+import { Sandbox } from './sandbox'
 import { ResultSet } from './sandbox/resultset'
-import { Sql } from './sql/index'
+import { Sql } from './sql'
 
-export type IDatabase = any
+export type IDatabase = {
+  [key in symbol]: any[]
+}
 
 export class Database {
   public readonly metadata: Metadata
@@ -30,11 +33,12 @@ export class Database {
 
   public count(name: string): number {
     const table = this.metadata.table(name)
+    // table checked. no need to check again
     return table ? this.database[table.symbol].length : 0
   }
 
-  public query<T>(sql: Sql, sandbox: Sandbox = new Sandbox(this)): ResultSet<T> {
-    return sandbox.run(sql)
+  public query<T>(sql: Sql): ResultSet<T> {
+    return new Sandbox(this).run(sql)
   }
 
   public insert(name: string, ...rows: any[]) {
@@ -44,7 +48,7 @@ export class Database {
       try {
         if (table) table.validate(row)
       } catch (e) {
-        throw new Error(`fail to insert row '${JSON.stringify(row)}'. ${(e as Error).stack}`)
+        throw new JQLError(`fail to insert row '${JSON.stringify(row)}'`, e)
       }
     }
     if (!this.database[table.symbol]) this.database[table.symbol] = []

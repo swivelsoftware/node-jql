@@ -1,7 +1,7 @@
 import squel = require('squel')
-import { Expression, IExpression } from './index'
+import { Expression } from './__base'
 
-export interface IColumnExpression extends IExpression {
+export interface IColumnExpression {
   table?: string
   name: string
 }
@@ -20,6 +20,6 @@ export class ColumnExpression extends Expression implements IColumnExpression {
   }
 
   public toSquel(): squel.BaseBuilder {
-    return squel.str(`${this.table ? `\`${this.table}\`.` : ''}\`${this.name}\``)
+    return squel.rstr(`${this.table ? `\`${this.table}\`.` : ''}${this.name === '*' ? '*' : `\`${this.name}\``}`)
   }
 }

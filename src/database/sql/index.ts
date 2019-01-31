@@ -1,4 +1,5 @@
 import squel = require('squel')
+import { JQLError } from '../../utils/error'
 
 export interface ISql {
 }
@@ -10,11 +11,11 @@ export abstract class Sql implements ISql {
       case 'undefined':
         break
       default:
-        throw new Error(`invalid 'json' object`)
+        throw new JQLError(`invalid 'json' object`)
     }
   }
 
-  public abstract validate(): boolean
+  public abstract isValid(): boolean
 
   public abstract toSquel(): squel.BaseBuilder
 
@@ -23,13 +24,6 @@ export abstract class Sql implements ISql {
   }
 }
 
-export { DefineStatement } from './define'
-export { Query } from './query'
-
-export * from './interface/expression/index'
-export * from './interface/group-by'
-export * from './interface/join-clause'
-export * from './interface/limit'
-export * from './interface/ordering-term'
-export * from './interface/result-column'
-export * from './interface/table-or-subquery'
+export { DefineStatement, IDefineStatement } from './define'
+export { Query, IQuery } from './query'
+export * from './interface/index'

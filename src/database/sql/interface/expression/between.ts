@@ -1,6 +1,6 @@
 import squel = require('squel')
-import { create } from './create'
-import { Expression, IExpression, IUnknownExpression } from './index'
+import { Expression, IExpression, IUnknownExpression } from './__base'
+import { create } from './__create'
 
 export interface IBetweenExpression extends IUnknownExpression {
   $not?: boolean

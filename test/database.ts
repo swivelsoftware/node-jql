@@ -1,4 +1,4 @@
-import { Database, Index, Query, Table, TableOrSubquery } from '../src'
+import { $binary, $column, $value, Database, Index, Query, Table, TableOrSubquery } from '../src'
 
 let database: Database
 
@@ -21,13 +21,18 @@ test('Create Table1', () => {
 
 test('Query from Table1', () => {
   const resultset = database.query<any>(new Query({
-    $from: new TableOrSubquery({
+    $from: {
       name: 'Table1',
+    },
+    $where: new $binary({
+      left: new $column({ name: 'column1' }),
+      operator: '=',
+      right: new $value({ value: 'Hello, World' }),
     }),
   }))
 
-  // test: 2 rows
-  expect(resultset.count()).toBe(2)
+  // test: 1 rows
+  expect(resultset.count()).toBe(1)
 
   resultset.next()
 
@@ -36,14 +41,6 @@ test('Query from Table1', () => {
 
   // test: resultset[0].column2 = 8283
   expect(resultset.get(resultset.columnIndexOf('column2') as number)).toBe(8283)
-
-  resultset.next()
-
-  // test: resultset[0].column1 = 'Hello, World'
-  expect(resultset.get(resultset.columnIndexOf('column1') as number)).toBe('Hello, Kennys')
-
-  // test: resultset[0].column2 = 4078
-  expect(resultset.get(resultset.columnIndexOf('column2') as number)).toBe(4078)
 })
 
 test('Create Table2', () => {

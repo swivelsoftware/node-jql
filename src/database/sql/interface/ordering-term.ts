@@ -1,5 +1,6 @@
-import { create } from './expression/create'
-import { Expression, IExpression } from './expression/index'
+import { JQLError } from '../../../utils/error'
+import { Expression, IExpression } from './expression'
+import { create } from './expression/__create'
 
 type Order = 'ASC' | 'DESC'
 
@@ -15,13 +16,18 @@ export class OrderingTerm implements IOrderingTerm {
   constructor(json?: IOrderingTerm) {
     switch (typeof json) {
       case 'object':
-        this.expression = create(json.expression)
-        if (json.order) this.order = json.order
+        try {
+          this.expression = create(json.expression)
+          if (json.order) this.order = json.order
+        }
+        catch (e) {
+          throw new JQLError('fail to create OrderingTerm block', e)
+        }
         break
       case 'undefined':
         break
       default:
-        throw new Error(`invalid 'json' object`)
+        throw new JQLError(`invalid 'json' object`)
     }
   }
 }
