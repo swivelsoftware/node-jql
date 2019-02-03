@@ -1,17 +1,23 @@
 import squel = require('squel')
+import { Type } from '../../../metadata/column'
 import { Expression } from './__base'
 
 export interface IValueExpression {
   value: any
+  type?: Type
 }
 
 export class ValueExpression extends Expression implements IValueExpression {
   public readonly classname = '$value'
   public value: any
+  public type: Type
 
   constructor(json?: IValueExpression) {
     super(json)
-    if (json) this.value = json.value
+    if (json) {
+      this.value = json.value
+      this.type = json.type || true
+    }
   }
 
   public toSquel(): squel.BaseBuilder {

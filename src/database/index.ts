@@ -46,8 +46,10 @@ export class Database {
     for (let i = 0, length = rows.length; i < length; i += 1) {
       const row = rows[i]
       try {
-        if (table) table.validate(row)
-      } catch (e) {
+        table.validate(row)
+        rows[i] = table.normalize(row)
+      }
+      catch (e) {
         throw new JQLError(`fail to insert row '${JSON.stringify(row)}'`, e)
       }
     }

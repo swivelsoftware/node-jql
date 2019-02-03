@@ -67,9 +67,9 @@ export class Table {
   }
 
   public addColumn(column: Column): Table
-  public addColumn(name: string, type: Type[] | Type | boolean, symbol?: symbol): Table
+  public addColumn(name: string, type: Type, symbol?: symbol): Table
   public addColumn(...args: any[]): Table {
-    let name: string, type: Type[] | Type | boolean, symbol: symbol
+    let name: string, type: Type, symbol: symbol
     if (args.length === 1 && args[0] instanceof Column) {
       const column: Column = args[0]
       name = column.name
@@ -81,43 +81,48 @@ export class Table {
       type = args[1] || true
       symbol = args[2] || Symbol(name)
     }
-    if (this.metadata && this.metadata.checkColumn && this.columns_[name]) throw new JQLError(`column \`${this.name}\`.\`${name}\` already exists`)
-    if (!this.columns_[name]) {
-      this.columns_[name] = new Column(name, symbol, type)
-      this.columnOrders_.push(name)
-    }
+    if (this.columns_[name]) throw new JQLError(`column \`${this.name}\`.\`${name}\` already exists`)
+    this.columns_[name] = new Column(name, symbol, type)
+    this.columnOrders_.push(name)
     return this
   }
 
   public removeColumn(name: string): Column | undefined {
     const column = this.columns_[name]
-    if (this.metadata && this.metadata.checkColumn && !column) throw new JQLError(`unknown column \`${this.name}\`.\`${name}\``)
-    if (column.isPrereserved) throw new JQLError(`you cannot remove prereserved column '${name}'`)
-    if (column) {
-      delete this.columns_[name]
-      this.columnOrders_.splice(this.columnOrders_.indexOf(name), 1)
-    }
+    if (!column) throw new JQLError(`unknown column \`${this.name}\`.\`${name}\``)
+    if (column['isPrereserved']) throw new JQLError(`you cannot remove prereserved column '${name}'`)
+    delete this.columns_[name]
+    this.columnOrders_.splice(this.columnOrders_.indexOf(name), 1)
     return column
   }
 
   public validate(value: any) {
     if (!this.metadata) throw new JQLError(`table '${this.name}' not yet binded to any database`)
     if (typeof value !== 'object') throw new JQLError(`a table row must be a json object`)
-    if (this.metadata.checkColumn || this.metadata.checkType) {
-      for (const key of Object.keys(value)) {
-        if (this.metadata.checkColumn && !this.columns_[key]) {
-          throw new JQLError(`unknown column \`${this.name}\`.\`${key}\``)
-        }
-        if (this.metadata.checkType) {
-          try {
-            this.columns_[key].validate(value[key])
-          }
-          catch (e) {
-            throw new JQLError(`invalid column value '${JSON.stringify(value[key])}'`, e)
-          }
-        }
+    for (const key of Object.keys(value)) {
+      if (!this.columns_[key]) {
+        throw new JQLError(`unknown column \`${this.name}\`.\`${key}\``)
+      }
+      try {
+        this.columns_[key].validate(value[key])
+      }
+      catch (e) {
+        throw new JQLError(`invalid column value '${JSON.stringify(value[key])}'`, e)
       }
     }
+  }
+
+  public normalize(value: any): any {
+    if (!this.metadata) throw new JQLError(`table '${this.name}' not yet binded to any database`)
+    if (typeof value !== 'object') throw new JQLError(`a table row must be a json object`)
+    value = { ...value }
+    for (const key of Object.keys(value)) {
+      if (!this.columns_[key]) {
+        throw new JQLError(`unknown column \`${this.name}\`.\`${key}\``)
+      }
+      value[key] = this.columns_[key].normalize(value[key])
+    }
+    return value
   }
 
   public clone(name?: string): Table {
@@ -130,7 +135,7 @@ export class Table {
     }
   }
 
-  private addPrereservedColumn(name: string, type: Type[] | Type | boolean = true, symbol: symbol = Symbol(name)) {
+  private addPrereservedColumn(name: string, type: Type, symbol: symbol = Symbol(name)) {
     const column = this.columns_[name] = new Column(name, symbol, type)
     column['prereserved'] = true
     this.columnOrders_.push(name)

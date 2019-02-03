@@ -1,4 +1,7 @@
-import { $binary, $column, $value, Database, Index, Query, Table, TableOrSubquery } from '../src'
+import { Database } from '.'
+import { Table } from './metadata/table'
+import { Index } from './sandbox/resultset'
+import { $binary, $column, $value, Query, TableOrSubquery } from './sql'
 
 let database: Database
 
@@ -47,14 +50,13 @@ test('Create Table2', () => {
   database.createTable(
     new Table('Table2')
       .addColumn('column3', 'string')
-      .addColumn('column2', 'string'),
+      .addColumn('column2', 'Date'),
   )
   database.insert('Table2',
-    { column3: 'Hello', column2: 'World' },
-    { column3: 'Hello', column2: 'Kennys' },
-    { column3: 'Halo', column2: 'Kennys' },
+    { column3: 'Birthday', column2: '2019-04-21' },
+    { column3: 'Holiday', column2: '2019-01-01' },
   )
-  expect(database.metadata.table('Table2').count).toBe(3)
+  expect(database.metadata.table('Table2').count).toBe(2)
 })
 
 test('Query from Table1 & Table2', () => {
@@ -66,7 +68,7 @@ test('Query from Table1 & Table2', () => {
   }))
 
   // test: 6 rows
-  expect(resultset.count()).toBe(6)
+  expect(resultset.count()).toBe(4)
 
   resultset.next()
 
@@ -80,10 +82,10 @@ test('Query from Table1 & Table2', () => {
   // test: resultset[0].Table1.column2 = 8283
   expect(resultset.get(resultset.columnIndexOf('Table1.column2') as number)).toBe(8283)
 
-  // test: resultset[0].column3 = 'Hello'
-  expect(resultset.get(resultset.columnIndexOf('column3') as number)).toBe('Hello')
+  // test: resultset[0].column3 = 'Birthday'
+  expect(resultset.get(resultset.columnIndexOf('column3') as number)).toBe('Birthday')
 
   // test: resultset[0].Table2.column2 = 'World'
   const { index } = indices.find(({ column }) => column.toString() === 'Table2.column2') as Index
-  expect(resultset.get(index)).toBe('World')
+  expect(resultset.get(index).constructor.name).toBe('Date')
 })

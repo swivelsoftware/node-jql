@@ -3,9 +3,10 @@ import { Database } from '..'
 import { JQLError } from '../../utils/error'
 import { Logger } from '../../utils/logger'
 import { functions } from '../functions'
+import { JQLFunction } from '../functions/__base'
 import { Column, Type } from '../metadata/column'
 import { Table } from '../metadata/table'
-import { $and, $between, $binary, $case, $column, $exists, $function, $in, $isNull, $or, $value, DefineStatement, Expression, JoinClause, Query, ResultColumn, Sql, TableOrSubquery } from '../sql'
+import { $and, $between, $binary, $case, $column, $exists, $function, $in, $isNull, $or, $value, DefineStatement, Expression, JoinClause, Query, ResultColumn, Sql, TableOrSubquery, OrderingTerm } from '../sql'
 import { ICursor } from './cursor'
 import { ResultSet } from './resultset'
 
@@ -16,13 +17,13 @@ class ResultSetTable extends Table {
 
   constructor(name: string = 'Result', table?: Table) {
     super(name, table)
-    for (const column of this.columns) if (column.isPrereserved) this.forceRemoveColumn(column.name)
+    for (const column of this.columns) if (column['isPrereserved']) this.forceRemoveColumn(column.name)
   }
 
   public addColumn(column: Column): Table
-  public addColumn(name: string, type: Type[] | Type | boolean, symbol?: symbol): Table
+  public addColumn(name: string, type: Type, symbol?: symbol): Table
   public addColumn(...args: any[]): Table {
-    let table: string|undefined, name: string, type: Type[] | Type | boolean, symbol: symbol
+    let table: string|undefined, name: string, type: Type, symbol: symbol
     if (args.length === 1 && args[0] instanceof Column) {
       const column: Column = args[0]
       table = column.table
@@ -44,9 +45,10 @@ class ResultSetTable extends Table {
     return this
   }
 
-  public removeColumn(name: string): Column | undefined {
-    logger.warn('you cannot remove column from ResultSetTable')
-    return undefined
+  public addTemporaryColumn(name: string, type: Type, symbol: symbol = Symbol(name)) {
+    const column = this.columns_[name] = new Column(name, symbol, type)
+    column['temporary'] = true
+    this.columnOrders_.push(name)
   }
 
   public validate(value: any) {
@@ -100,8 +102,9 @@ class IntermediateCursor implements ICursor {
       const index = indices[i]
       const table = this.tables[i]
       const row_ = this.sandbox.context[table.symbol][index]
-      for (const { name, symbol, isPrereserved } of table.columns) {
-        if (isPrereserved && name === 'index') {
+      for (const column of table.columns) {
+        const { name, symbol } = column
+        if (column['isPrereserved'] && name === 'index') {
           row[symbol] = index
         }
         else {
@@ -122,6 +125,18 @@ class IntermediateResultSet extends ResultSet<any> {
   constructor(readonly metadata: Table, ...args: any[]) {
     super(metadata, ...args)
   }
+
+  public commit<T>(): ResultSet<T> {
+    const resultset = new ResultSet<T>(this.metadata)
+    for (const row of this) {
+      const row_ = {} as T
+      for (const column of this.metadata.columns) {
+        row_[column.symbol] = column.denormalize(row[column.symbol])
+      }
+      resultset.push(row_)
+    }
+    return resultset
+  }
 }
 
 export class Sandbox {
@@ -135,7 +150,7 @@ export class Sandbox {
   public run <T>(sql: Sql, ...args: any[]): ResultSet<T> {
     if (sql instanceof DefineStatement) {
       // update sandbox context
-      const { name, symbol, $ifNotExists, value, function: function_, query } = sql
+      const { name, symbol, $ifNotExists, value, function_, query } = sql
       if (this.defined[name] && (!$ifNotExists || !this.database.metadata.checkOverridable)) throw new JQLError(`'${name}' is already defined`)
       this.context[symbol] = value || function_ || this.runQuery(query as Query)
       this.defined[name] = symbol
@@ -233,7 +248,7 @@ export class Sandbox {
     }
     else if (expression instanceof $function) {
       const { name } = expression
-      let function_: Function = functions[name]
+      let function_: JQLFunction<any> = functions[name.toLocaleLowerCase()]
       if (!function_) {
         const symbol = this.defined[name]
         if (!symbol) throw new JQLError(`function '${name}' is not defined`)
@@ -283,8 +298,7 @@ export class Sandbox {
         table = this.database.metadata.table(name)
         if ($as) table = table.clone($as)
         content = this.database.database[table.symbol]
-        if (this.database.metadata.checkTable && !table) throw new JQLError(`table '${name}' not exists`)
-        else if (!table) logger.warn(`table '${name}' not exists'`)
+        if (!table) throw new JQLError(`table '${name}' not exists`)
         else content = content || []
       }
       if (content.length === 0) return new ResultSet(new ResultSetTable())
@@ -297,36 +311,77 @@ export class Sandbox {
     return tables
   }
 
-  private prepareResultSet <T>(resultColumns: ResultColumn[], tables: Table[]): IntermediateResultSet {
+  private prepareResultSet <T>(resultColumns: ResultColumn[], orderingTerms: OrderingTerm[] = [], tables: Table[]): IntermediateResultSet {
     // prepare result set
     const resultsetTable = new ResultSetTable()
+    const sandbox = this
 
-    function register(expression: Expression, $as?: string) {
-      const name = $as || expression.toString()
-      const symbol = Symbol(name)
-      if (expression instanceof $column) {
-        if (!expression.table) {
-          // check ambiguous column
-          const ambiguous = tables.reduce<number>((result, table) => {
-            if (result < 2 && table.columns.find((column) => column.name === name)) {
-              result += 1
-            }
-            return result
-          }, 0) > 1
-          if (ambiguous) throw new JQLError(`ambiguous column '${name}'`)
-
-          resultsetTable.addColumn(new Column(expression.name, symbol))
-        }
-        else {
-          resultsetTable.addColumn(new Column(expression.table, expression.name, symbol))
-        }
+    function register(column: Column, $as?: string)
+    function register(expression: Expression, $as?: string)
+    function register(expression: Expression, column: Column, $as?: string)
+    function register(...args: any[]) {
+      let column: Column, expression: Expression, $as: string
+      switch (args.length) {
+        case 2:
+          $as = args[1]
+        case 1:
+          if (args[0] instanceof Column) {
+            column = args[0]
+          }
+          else {
+            expression = args[0]
+          }
+          break
+        case 3:
+          
+          break
       }
-      else {
-        resultsetTable.addColumn(name, true, symbol)
-      }
-      resultsetTable.mappings[symbol] = expression
     }
 
+    /* function register(expression: Expression, $as?: string, column?: Column) {
+      $as = $as || expression.toString()
+      const symbol = Symbol($as)
+      if (expression instanceof $column) {
+        if (column) {
+          column = new Column(expression.name, symbol, column.type)
+        }
+        else if (!expression.table) {
+          // check ambiguous column
+          const columns = tables.reduce<Column[]>((result, table) => {
+            let column: Column|undefined
+            if (result.length < 2 && (column = table.columns.find((column) => column.name === name))) result.push(column)
+            return result
+          }, [])
+          if (columns.length > 1) throw new JQLError(`ambiguous column '${name}'`)
+          column = new Column(expression.name, symbol, columns[0].type)
+        }
+        else {
+          const table = tables.find((table) => table.name === expression.table) as Table
+          const column_ = table.columns.find((column) => column.name === expression.name) as Column
+          column = new Column(expression.table, expression.name, symbol, column_.type)
+        }
+      }
+      if (column) {
+        resultsetTable.addColumn(column)
+      }
+      else if (expression instanceof $function) {
+        let function_: JQLFunction<any> = functions[$as.toLocaleLowerCase()]
+        if (!function_) {
+          const symbol = sandbox.defined[$as]
+          function_ = sandbox.context[symbol]
+        }
+        resultsetTable.addColumn($as, function_.type, symbol)
+      }
+      else if (expression instanceof $value) {
+        resultsetTable.addColumn(name, expression.type, symbol)
+      }
+      else {
+        resultsetTable.addColumn(name, 'boolean', symbol)
+      }
+      resultsetTable.mappings[symbol] = expression
+    } */
+
+    // $select
     for (const { expression, $as } of resultColumns) {
       if (expression instanceof $column && expression.name === '*') {
         // wildcard
@@ -352,6 +407,12 @@ export class Sandbox {
         register(expression, $as)
       }
     }
+
+    // $order
+    for (const { expression } of orderingTerms) {
+      register(expression)
+    }
+
     return new IntermediateResultSet(resultsetTable)
   }
 
@@ -367,7 +428,7 @@ export class Sandbox {
     const tables = sandbox.prepareTables(query.$from || [], query.$join)
 
     // create result set
-    const resultset = sandbox.prepareResultSet<T>(query.$select, tables)
+    let resultset = sandbox.prepareResultSet<T>(query.$select, tables)
     const resultsetTable = resultset.metadata as ResultSetTable
 
     // iterate rows
@@ -383,13 +444,16 @@ export class Sandbox {
       }
     }
 
-    // TODO group by
-
     // TODO order by
+    resultset = resultset.sort((l: any, r: any): number => {
+
+    })
+
+    // TODO group by
 
     // TODO limit
 
-    return resultset
+    return resultset.commit<T>()
   }
 
   private evaluateExpression(cursor: ICursor, expression: Expression, tables: Table[], sandbox: Sandbox = this): any {
@@ -440,8 +504,8 @@ export class Sandbox {
       if (expression.$else) return sandbox.evaluateExpression(cursor, expression.$else, tables, sandbox)
     }
     else if (expression instanceof $column) {
-      const column = this.findColumn(expression, tables, sandbox.database)
-      if (column) return cursor.get(column.symbol)
+      const column = this.findColumn(expression, tables)
+      return cursor.get(column.symbol)
     }
     else if (expression instanceof $exists) {
       const { $not, query } = expression
@@ -450,12 +514,12 @@ export class Sandbox {
     }
     else if (expression instanceof $function) {
       const { name, parameters = [] } = expression
-      let function_: Function = functions[name]
+      let function_: JQLFunction<any> = functions[name.toLocaleLowerCase()]
       if (!function_) {
         const symbol = sandbox.defined[name]
         function_ = sandbox.context[symbol]
       }
-      return function_(...parameters)
+      return function_.run(...parameters)
     }
     else if (expression instanceof $and) {
       let result: boolean = true
@@ -509,20 +573,12 @@ export class Sandbox {
     }
   }
 
-  private findColumn(expression: $column, tables: Table[], database: Database): Column|undefined {
+  private findColumn(expression: $column, tables: Table[]): Column {
     const { table: tableName, name } = expression
     const table = tableName ? tables.find((table) => table.name === tableName) : tables[0]
-    if (database.metadata.checkTable && !table) throw new JQLError(`table '${name}' not exists`)
-    if (!table) {
-      logger.warn(`table '${name}' not exists`)
-      return undefined
-    }
+    if (!table) throw new JQLError(`table '${name}' not exists`)
     const column = table.columns.find((column) => column.name === name)
-    if (database.metadata.checkColumn && !column) throw new JQLError(`column '${expression.toString()}' not exists`)
-    if (!column) {
-      logger.warn(`column '${expression.toString()}' not exists`)
-      return undefined
-    }
+    if (!column) throw new JQLError(`column '${expression.toString()}' not exists`)
     return column
   }
 }

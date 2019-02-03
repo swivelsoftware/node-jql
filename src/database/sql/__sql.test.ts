@@ -1,4 +1,5 @@
-import { $binary, $column, $function, $value, Query } from '../src'
+import { $binary, $column, $function, $value } from './interface'
+import { Query } from './query'
 
 test('SELECT `t1`.`column1` FROM Table1 `t1`', () => {
   const query = new Query({

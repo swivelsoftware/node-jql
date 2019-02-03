@@ -1,7 +1,8 @@
+import moment = require('moment')
 import { isSymbol } from 'util'
 import { JQLError } from '../../utils/error'
 
-export type Type = 'string' | 'number' | 'bigint' | 'boolean' | 'object'
+export type Type = 'string' | 'number' | 'bigint' | 'boolean' | 'object' | 'Date' | true
 
 /**
  * 1) column name must be unique within a table
@@ -10,10 +11,10 @@ export class Column {
   public readonly table?: string
   public readonly name: string
   public readonly symbol: symbol
-  public readonly type: Type[] | Type | boolean
+  public readonly type: Type
 
-  constructor(table: string, name: string, symbol: symbol, type?: Type[] | Type | boolean)
-  constructor(name: string, symbol: symbol, type?: Type[] | Type | boolean)
+  constructor(table: string, name: string, symbol: symbol, type?: Type)
+  constructor(name: string, symbol: symbol, type?: Type)
   constructor(...args: any[]) {
     switch (args.length) {
       case 2:
@@ -25,7 +26,7 @@ export class Column {
         if (isSymbol(args[1])) {
           this.name = args[0]
           this.symbol = args[1]
-          this.type = true
+          this.type = args[2]
         }
         else {
           this.table = args[0]
@@ -42,18 +43,41 @@ export class Column {
     }
   }
 
-  get isPrereserved(): boolean {
-    return this['prereserved'] === true
+  public normalize(value?: any): any {
+    switch (this.type) {
+      case 'Date':
+        return moment(value).valueOf()
+      default:
+        return value
+    }
+  }
+
+  public denormalize(value?: any): any {
+    switch (this.type) {
+      case 'Date':
+        return moment(value).toDate()
+      default:
+        return value
+    }
   }
 
   public validate(value?: any) {
     const type = typeof value
     if (type === 'symbol' || type === 'undefined' || type === 'function') throw new JQLError(`unserializable type '${type}'`)
-    if (this.type !== true &&
-      (typeof this.type === 'string' && typeof value !== this.type) ||
-      (Array.isArray(this.type) && this.type.indexOf(type) === -1)
-    ) {
-      throw new JQLError(`column '${this.name}' expected '${JSON.stringify(this.type)}' but received '${type}'`)
+    if (this.type === true) return
+    switch (this.type) {
+      case 'Date':
+        const moment_ = moment(value)
+        if (!moment_.isValid()) throw new JQLError(`invalid datetime format '${value}'`)
+        break
+      case 'string':
+      case 'number':
+      case 'bigint':
+      case 'boolean':
+      case 'object':
+        if (this.type === type) break
+      default:
+        throw new JQLError(`column '${this.name}' expected '${JSON.stringify(this.type)}' but received '${type}'`)
     }
   }
 
