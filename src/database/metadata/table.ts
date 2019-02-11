@@ -3,6 +3,7 @@ import { Metadata } from '.'
 import { createReadonly } from '../../utils/createReadonly'
 import { JQLError } from '../../utils/error'
 import { Column, Type } from './column'
+import { normalize } from '../../utils/normalize';
 
 /**
  * 1) table name must be unique within a database
@@ -120,7 +121,7 @@ export class Table {
       if (!column) {
         throw new JQLError(`unknown column \`${this.name}\`.\`${key}\``)
       }
-      value[key] = column.normalize(value[key])
+      value[key] = normalize(column.type, value[key])
     }
     return value
   }

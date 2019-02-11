@@ -43,24 +43,6 @@ export class Column {
     }
   }
 
-  public normalize(value?: any): any {
-    switch (this.type) {
-      case 'Date':
-        return moment(value).valueOf()
-      default:
-        return value
-    }
-  }
-
-  public denormalize(value?: any): any {
-    switch (this.type) {
-      case 'Date':
-        return moment(value).toDate()
-      default:
-        return value
-    }
-  }
-
   public validate(value?: any) {
     const type = typeof value
     if (type === 'symbol' || type === 'undefined' || type === 'function') throw new JQLError(`unserializable type '${type}'`)

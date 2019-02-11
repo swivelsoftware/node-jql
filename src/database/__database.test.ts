@@ -1,7 +1,7 @@
 import { Database } from '.'
 import { Table } from './metadata/table'
 import { Index } from './sandbox/resultset'
-import { $binary, $column, $value, Query, TableOrSubquery } from './sql'
+import { $binary, $column, $value, Query, TableOrSubquery, $between } from './sql'
 import moment = require('moment');
 
 let database: Database
@@ -35,10 +35,10 @@ test('Query from Students', () => {
     $from: {
       name: 'Students',
     },
-    $where: new $binary({
-      left: new $column({ name: 'name' }),
-      operator: '=',
-      right: new $value({ value: 'Kennys' }),
+    $where: new $between({
+      left: new $column({ name: 'birthday' }),
+      start: new $value({ type: 'Date', value: '1992-06-01' }),
+      end: new $value({ type: 'Date', value: '1992-06-30' })
     }),
   }))
 

@@ -9,6 +9,8 @@ import { Table } from '../metadata/table'
 import { $and, $between, $binary, $case, $column, $exists, $function, $in, $isNull, $or, $value, DefineStatement, Expression, JoinClause, OrderingTerm, Query, ResultColumn, Sql, TableOrSubquery, Limit } from '../sql'
 import { ICursor } from './cursor'
 import { ResultSet } from './resultset'
+import moment = require('moment');
+import { denormalize } from '../../utils/normalize';
 
 const logger = new Logger(__dirname)
 
@@ -130,7 +132,7 @@ class IntermediateResultSet extends ResultSet<any> {
       if (resultset.length >= limit) break
       const row_ = {} as T
       for (const column of this.metadata.columns) {
-        row_[column.symbol] = column.denormalize(row[column.symbol])
+        row_[column.symbol] = denormalize(column.type, row[column.symbol])
       }
       resultset.push(row_)
     }
@@ -197,8 +199,13 @@ export class Sandbox {
 
     // TODO $join
     // TODO $group
-    // TODO $order
-    // TODO $limit
+
+    // $order
+    if (query.$order) {
+      for (const { expression } of query.$order) {
+        this.validateExpression(expression, tableAliases)
+      }
+    }
   }
 
   private validateExpression(expression: Expression, tableAliases: { [key: string]: Table } = {}) {
@@ -518,7 +525,20 @@ export class Sandbox {
       const startValue = start ? this.evaluateExpression(cursor, start, tables, sandbox, row) : parameters.shift()
       const endValue = end ? this.evaluateExpression(cursor, end, tables, sandbox, row) : parameters.shift()
       if (left instanceof $column) {
-        // TODO based column type
+        const column = this.findColumn(left, tables)
+        switch (column.type) {
+          case 'Date':
+            const mStartValue = moment(startValue)
+            if (!mStartValue.isValid()) throw new JQLError(`invalid date value '${startValue}'`)
+            const mEndValue = moment(endValue)
+            if (!mEndValue.isValid()) throw new JQLError(`invalid date value '${endValue}'`)
+            const mLeftValue = moment(leftValue)
+            const result = mStartValue.isSameOrBefore(mLeftValue) && mEndValue.isSameOrAfter(mLeftValue)
+            return $not ? !result : result
+          case 'object':
+          case 'boolean':
+            throw new JQLError(`invalid $between usage with column type '${column.type}'`)
+        }
       }
       else {
         const result = leftValue >= startValue && leftValue <= endValue
@@ -597,6 +617,7 @@ export class Sandbox {
       let { left, $not, right, parameters } = expression
       if (!right) {
         if (!parameters || parameters[0] === undefined) throw new JQLError(`missing parameter 'right' for $in`)
+        if (!Array.isArray(parameters[0]) || !(parameters[0] instanceof Expression)) throw new JQLError(`invalid parameter 'right' for $in`)
         right = new $value({ value: parameters[0] })
       }
       let values: any[]
@@ -620,7 +641,7 @@ export class Sandbox {
       return $not ? !result : result
     }
     else if (expression instanceof $value) {
-      return expression.value
+      return denormalize(expression.type, expression.value)
     }
     else {
       throw new JQLError(`invalid expression '${expression.classname}'`)
