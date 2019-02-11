@@ -87,7 +87,13 @@ test('Query from Marks with ordering', () => {
       }),
       order: 'DESC'
     },
+    $limit: {
+      value: 3
+    }
   }))
+
+  // test: 3 rows
+  expect(resultset.count()).toBe(3)
 
   resultset.next()
 

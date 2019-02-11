@@ -6,7 +6,7 @@ import { functions } from '../functions'
 import { JQLFunction } from '../functions/__base'
 import { Column, Type } from '../metadata/column'
 import { Table } from '../metadata/table'
-import { $and, $between, $binary, $case, $column, $exists, $function, $in, $isNull, $or, $value, DefineStatement, Expression, JoinClause, OrderingTerm, Query, ResultColumn, Sql, TableOrSubquery } from '../sql'
+import { $and, $between, $binary, $case, $column, $exists, $function, $in, $isNull, $or, $value, DefineStatement, Expression, JoinClause, OrderingTerm, Query, ResultColumn, Sql, TableOrSubquery, Limit } from '../sql'
 import { ICursor } from './cursor'
 import { ResultSet } from './resultset'
 
@@ -122,9 +122,12 @@ class IntermediateResultSet extends ResultSet<any> {
     super(metadata, ...args)
   }
 
-  public commit<T>(): ResultSet<T> {
+  public commit<T>(limit: number = Number.MAX_SAFE_INTEGER, offset: number = 0): ResultSet<T> {
     const resultset = new ResultSet<T>(this.metadata)
+    let i = 0
     for (const row of this) {
+      if (i++ < offset) continue
+      if (resultset.length >= limit) break
       const row_ = {} as T
       for (const column of this.metadata.columns) {
         row_[column.symbol] = column.denormalize(row[column.symbol])
@@ -475,7 +478,7 @@ export class Sandbox {
       }
     }
 
-    // TODO order by
+    // order by
     const $order = query.$order
     if ($order) {
       function findSymbol(expression: Expression): symbol {
@@ -497,9 +500,14 @@ export class Sandbox {
 
     // TODO group by
 
-    // TODO limit
-
-    return resultset.commit<T>()
+    // limit
+    const $limit = query.$limit
+    if ($limit) {
+      return resultset.commit<T>($limit.value, $limit.$offset)
+    }
+    else {
+      return resultset.commit<T>()
+    }
   }
 
   private evaluateExpression(cursor: ICursor, expression: Expression, tables: Table[], sandbox: Sandbox = this, row = {}): any {

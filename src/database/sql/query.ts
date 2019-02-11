@@ -101,11 +101,7 @@ export class Query extends Sql implements IQuery {
       })
     }
 
-    if (json.$limit) {
-      this.$limit = new Limit(json.$limit)
-      this.analyzeExpression(this.$limit.expression)
-      if (this.$limit.$offset) this.analyzeExpression(this.$limit.$offset)
-    }
+    if (json.$limit) this.$limit = new Limit(json.$limit)
   }
 
   public isValid(): boolean {
@@ -237,15 +233,9 @@ export class Query extends Sql implements IQuery {
     // limit
     const $limit = this.$limit
     if ($limit) {
-      const { expression, $offset } = $limit
-      const count = +expression.toString()
-      if (isNaN(count)) throw new JQLError('Squel.js does not support Limit with expression')
-      sql = sql.limit(count)
-      if ($offset) {
-        const offset = +$offset.toString()
-        if (isNaN(offset)) throw new JQLError('Squel.js does not support Offset with expression')
-        sql = sql.offset(count)
-      }
+      const { value, $offset } = $limit
+      sql = sql.limit(value)
+      if ($offset) sql = sql.offset($offset)
     }
 
     return sql
