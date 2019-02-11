@@ -2,6 +2,7 @@ import { Database } from '.'
 import { Table } from './metadata/table'
 import { Index } from './sandbox/resultset'
 import { $binary, $column, $value, Query, TableOrSubquery } from './sql'
+import moment = require('moment');
 
 let database: Database
 
@@ -9,28 +10,35 @@ test('Initialize Database', () => {
   database = new Database()
 })
 
-test('Create Table1', () => {
+test('Create Students', () => {
   database.createTable(
-    new Table('Table1')
-      .addColumn('column1', 'string')
-      .addColumn('column2', 'number'),
+    new Table('Students')
+      .addColumn('name', 'string')
+      .addColumn('gender', 'string')
+      .addColumn('birthday', 'Date')
   )
-  database.insert('Table1',
-    { column1: 'Hello, World', column2: 8283 },
-    { column1: 'Hello, Kennys', column2: 4078 },
+  database.insert('Students',
+    { name: 'Kennys', gender: 'M', birthday: '1992-06-08' },
+    { name: 'Susan', gender: 'F', birthday: '1992-01-01' },
+    { name: 'Donny', gender: 'M', birthday: '1992-08-04' },
+    { name: 'Ken', gender: 'M', birthday: '1992-04-02' },
+    { name: 'Lily', gender: 'F', birthday: '1992-09-30' },
+    { name: 'Chris', gender: 'M', birthday: '1992-12-20' },
+    { name: 'Amy', gender: 'F', birthday: '1992-10-03' },
   )
-  expect(database.metadata.table('Table1').count).toBe(2)
+  
+  expect(database.metadata.table('Students').count).toBe(7)
 })
 
-test('Query from Table1', () => {
+test('Query from Students', () => {
   const resultset = database.query<any>(new Query({
     $from: {
-      name: 'Table1',
+      name: 'Students',
     },
     $where: new $binary({
-      left: new $column({ name: 'column1' }),
+      left: new $column({ name: 'name' }),
       operator: '=',
-      right: new $value({ value: 'Hello, World' }),
+      right: new $value({ value: 'Kennys' }),
     }),
   }))
 
@@ -39,53 +47,50 @@ test('Query from Table1', () => {
 
   resultset.next()
 
-  // test: resultset[0].column1 = 'Hello, World'
-  expect(resultset.get(resultset.columnIndexOf('column1') as number)).toBe('Hello, World')
+  // test: resultset[0].gender = 'M'
+  expect(resultset.get(resultset.columnIndexOf('gender') as number)).toBe('M')
 
-  // test: resultset[0].column2 = 8283
-  expect(resultset.get(resultset.columnIndexOf('column2') as number)).toBe(8283)
+  // test: resultset[0].birthday = Date('1992-06-08')
+  expect((resultset.get(resultset.columnIndexOf('birthday') as number) as Date).getTime()).toBe(moment('1992-06-08').toDate().getTime())
 })
 
-test('Create Table2', () => {
+test('Create Marks', () => {
   database.createTable(
-    new Table('Table2')
-      .addColumn('column3', 'string')
-      .addColumn('column2', 'Date'),
+    new Table('Marks')
+      .addColumn('name', 'string')
+      .addColumn('mark', 'number'),
   )
-  database.insert('Table2',
-    { column3: 'Birthday', column2: '2019-04-21' },
-    { column3: 'Holiday', column2: '2019-01-01' },
+  database.insert('Marks',
+    { name: 'Kennys', mark: 95 },
+    { name: 'Susan', mark: 90 },
+    { name: 'Donny', mark: 100 },
+    { name: 'Ken', mark: 99 },
+    { name: 'Lily', mark: 85 },
+    { name: 'Chris', mark: 75 },
+    { name: 'Amy', mark: 88 },
+    { name: 'Ann', mark: 70 },
+    { name: 'Yoyo', mark: 79 },
+    { name: 'Naomi', mark: 81 },
   )
-  expect(database.metadata.table('Table2').count).toBe(2)
+
+  expect(database.metadata.table('Marks').count).toBe(10)
 })
 
-test('Query from Table1 & Table2', () => {
+test('Query from Marks with ordering', () => {
   const resultset = database.query<any>(new Query({
-    $from: [
-      new TableOrSubquery({ name: 'Table1' }),
-      new TableOrSubquery({ name: 'Table2' }),
-    ],
+    $from: {
+      name: 'Marks',
+    },
+    $order: {
+      expression: new $column({
+        name: 'mark',
+      }),
+      order: 'DESC'
+    },
   }))
-
-  // test: 6 rows
-  expect(resultset.count()).toBe(4)
 
   resultset.next()
 
-  // test: number of column2 = 2
-  const indices = resultset.columnIndexOf('column2') as Index[]
-  expect(indices.length).toBe(2)
-
-  // test: resultset[0].column1 = 'Hello, World'
-  expect(resultset.get(resultset.columnIndexOf('column1') as number)).toBe('Hello, World')
-
-  // test: resultset[0].Table1.column2 = 8283
-  expect(resultset.get(resultset.columnIndexOf('Table1.column2') as number)).toBe(8283)
-
-  // test: resultset[0].column3 = 'Birthday'
-  expect(resultset.get(resultset.columnIndexOf('column3') as number)).toBe('Birthday')
-
-  // test: resultset[0].Table2.column2 = 'World'
-  const { index } = indices.find(({ column }) => column.toString() === 'Table2.column2') as Index
-  expect(resultset.get(index).constructor.name).toBe('Date')
+  // test: resultset[0].name = 'Donny'
+  expect(resultset.get(resultset.columnIndexOf('name') as number)).toBe('Donny')
 })

@@ -172,7 +172,7 @@ export class Sandbox {
         let table
         if (query_) {
           this.validateQuery(query_)
-          table = this.prepareResultSet(query_.$select, sandbox.prepareTables(query_.$from || [], query_.$join))
+          table = this.prepareResultSet(query_, sandbox.prepareTables(query_.$from || [], query_.$join))
         }
         else if (name) {
           table = this.database.metadata.table(name)
@@ -307,7 +307,7 @@ export class Sandbox {
     return tables
   }
 
-  private prepareResultSet(resultColumns: ResultColumn[], tables: Table[], orderingTerms: OrderingTerm[] = []): IntermediateResultSet {
+  private prepareResultSet(query: Query, tables: Table[]): IntermediateResultSet {
     // prepare result set
     const resultsetTable = new ResultSetTable()
     const sandbox = this
@@ -409,7 +409,7 @@ export class Sandbox {
     }
 
     // $select
-    for (const { expression, $as } of resultColumns) {
+    for (const { expression, $as } of query.$select) {
       if (expression instanceof $column && expression.name === '*') {
         // wildcard
         if (expression.table) {
@@ -438,12 +438,10 @@ export class Sandbox {
     }
 
     // $order
-    for (const { expression } of orderingTerms) {
-      // TODO check registered
-
+    for (const { expression } of (query.$order || [])) {
       let column: Column|undefined
       if (expression instanceof $column) column = findColumn(expression)
-      register(expression, column)
+      register(true, expression, column)
     }
 
     return new IntermediateResultSet(resultsetTable)
@@ -461,7 +459,7 @@ export class Sandbox {
     const tables = sandbox.prepareTables(query.$from || [], query.$join)
 
     // create result set
-    const resultset = sandbox.prepareResultSet(query.$select, tables)
+    let resultset = sandbox.prepareResultSet(query, tables)
     const resultsetTable = resultset.metadata as ResultSetTable
 
     // iterate rows
@@ -471,16 +469,31 @@ export class Sandbox {
         const row = {} as T
         for (const { symbol } of resultsetTable.columns) {
           const expression = resultsetTable.mappings[symbol]
-          row[symbol] = this.evaluateExpression(cursor, expression, tables, sandbox)
+          row[symbol] = this.evaluateExpression(cursor, expression, tables, sandbox, row)
         }
         resultset.push(row)
       }
     }
 
     // TODO order by
-    /* resultset = resultset.sort((l: any, r: any): number => {
+    const $order = query.$order
+    if ($order) {
+      function findSymbol(expression: Expression): symbol {
+        for (const symbol of Object.getOwnPropertySymbols(resultsetTable.mappings)) {
+          if (resultsetTable.mappings[symbol] === expression) return symbol
+        }
+        throw new JQLError(`[FATAL] symbol not found for expression '${expression.toString()}'`)
+      }
 
-    }) */
+      resultset = resultset.sort((l: any, r: any): number => {
+        for (const { expression, order } of $order) {
+          const symbol = findSymbol(expression)
+          if (l[symbol] < r[symbol]) return order === 'DESC' ? 1 : -1
+          if (l[symbol] > r[symbol]) return order === 'DESC' ? -1 : 1
+        }
+        return 0
+      })
+    }
 
     // TODO group by
 
@@ -489,13 +502,13 @@ export class Sandbox {
     return resultset.commit<T>()
   }
 
-  private evaluateExpression(cursor: ICursor, expression: Expression, tables: Table[], sandbox: Sandbox = this): any {
+  private evaluateExpression(cursor: ICursor, expression: Expression, tables: Table[], sandbox: Sandbox = this, row = {}): any {
     if (expression instanceof $between) {
       const { left, $not, start, end } = expression
       const parameters = [...(expression.parameters || [])]
-      const leftValue = this.evaluateExpression(cursor, left, tables, sandbox)
-      const startValue = start ? this.evaluateExpression(cursor, start, tables, sandbox) : parameters.shift()
-      const endValue = end ? this.evaluateExpression(cursor, end, tables, sandbox) : parameters.shift()
+      const leftValue = this.evaluateExpression(cursor, left, tables, sandbox, row)
+      const startValue = start ? this.evaluateExpression(cursor, start, tables, sandbox, row) : parameters.shift()
+      const endValue = end ? this.evaluateExpression(cursor, end, tables, sandbox, row) : parameters.shift()
       if (left instanceof $column) {
         // TODO based column type
       }
@@ -507,8 +520,8 @@ export class Sandbox {
     else if (expression instanceof $binary) {
       const { left, operator, right } = expression
       const parameters = [...(expression.parameters || [])]
-      const leftValue = this.evaluateExpression(cursor, left, tables, sandbox)
-      const rightValue = right ? this.evaluateExpression(cursor, right, tables, sandbox) : parameters.shift()
+      const leftValue = this.evaluateExpression(cursor, left, tables, sandbox, row)
+      const rightValue = right ? this.evaluateExpression(cursor, right, tables, sandbox, row) : parameters.shift()
       switch (operator) {
         case '=':
           return leftValue === rightValue
@@ -530,15 +543,15 @@ export class Sandbox {
     }
     else if (expression instanceof $case) {
       for (const { $when, $then } of expression.cases) {
-        if (sandbox.evaluateExpression(cursor, $when, tables, sandbox)) {
-          return sandbox.evaluateExpression(cursor, $then, tables, sandbox)
+        if (sandbox.evaluateExpression(cursor, $when, tables, sandbox, row)) {
+          return sandbox.evaluateExpression(cursor, $then, tables, sandbox, row)
         }
       }
-      if (expression.$else) return sandbox.evaluateExpression(cursor, expression.$else, tables, sandbox)
+      if (expression.$else) return sandbox.evaluateExpression(cursor, expression.$else, tables, sandbox, row)
     }
     else if (expression instanceof $column) {
       const column = this.findColumn(expression, tables)
-      return cursor.get(column.symbol)
+      return row[column.symbol] || cursor.get(column.symbol)
     }
     else if (expression instanceof $exists) {
       const { $not, query } = expression
@@ -552,12 +565,12 @@ export class Sandbox {
         const symbol = sandbox.defined[name]
         function_ = sandbox.context[symbol]
       }
-      return function_.run(...parameters)
+      return function_.run(...(parameters.map((parameter) => parameter instanceof Expression ? sandbox.evaluateExpression(cursor, parameter, tables, sandbox, row) : parameter)))
     }
     else if (expression instanceof $and) {
       let result: boolean = true
       for (const expression_ of expression.expressions) {
-        if (result = result && !!sandbox.evaluateExpression(cursor, expression_, tables, sandbox)) {
+        if (result = result && !!sandbox.evaluateExpression(cursor, expression_, tables, sandbox, row)) {
           return false
         }
       }
@@ -566,7 +579,7 @@ export class Sandbox {
     else if (expression instanceof $or) {
       let result: boolean = false
       for (const expression_ of expression.expressions) {
-        if (result = result || !!this.evaluateExpression(cursor, expression_, tables, sandbox)) {
+        if (result = result || !!this.evaluateExpression(cursor, expression_, tables, sandbox, row)) {
           return true
         }
       }
@@ -580,7 +593,7 @@ export class Sandbox {
       }
       let values: any[]
       if (right instanceof Expression) {
-        let values_ = sandbox.evaluateExpression(cursor, right, tables, sandbox)
+        let values_ = sandbox.evaluateExpression(cursor, right, tables, sandbox, row)
         if (!Array.isArray(values_)) values_ = [values_]
         values = values_
       }
@@ -589,12 +602,12 @@ export class Sandbox {
         values = []
         while (resultset.next()) values.push(resultset.get(0))
       }
-      const value = sandbox.evaluateExpression(cursor, left, tables, sandbox)
+      const value = sandbox.evaluateExpression(cursor, left, tables, sandbox, row)
       return $not ? values.indexOf(value) === -1 : values.indexOf(value) > -1
     }
     else if (expression instanceof $isNull) {
       const { left, $not } = expression
-      const leftValue = this.evaluateExpression(cursor, left, tables, sandbox)
+      const leftValue = this.evaluateExpression(cursor, left, tables, sandbox, row)
       const result = leftValue === undefined
       return $not ? !result : result
     }

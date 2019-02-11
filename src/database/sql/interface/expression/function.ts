@@ -19,7 +19,10 @@ export class FunctionExpression extends Expression implements IFunctionExpressio
     super(json)
     if (json) {
       this.name = json.name
-      this.parameters = json.parameters || []
+      this.parameters = (json.parameters || []).map((parameter) => {
+        if (isExpression(parameter)) return create(parameter)
+        return parameter
+      })
     }
   }
 
