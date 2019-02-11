@@ -27,7 +27,7 @@ export class Case implements ICase {
 }
 
 export interface ICaseExpression {
-  cases: ICase[] | ICase
+  cases: ICase[]|ICase
   $else?: IExpression
 }
 

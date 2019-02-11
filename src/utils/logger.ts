@@ -5,7 +5,7 @@ import { resolve, sep } from 'path'
 
 const ROOT = resolve(__dirname, '..')
 
-type LogLevel = 'DEBUG' | 'INFO' | 'WARN' | 'ERROR'
+type LogLevel = 'DEBUG'|'INFO'|'WARN'|'ERROR'
 
 export class Logger {
   private readonly tag: string

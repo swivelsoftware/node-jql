@@ -1,5 +1,6 @@
 import { isSymbol } from 'util'
 import { Metadata } from '.'
+import { createReadonly } from '../../utils/createReadonly'
 import { JQLError } from '../../utils/error'
 import { Column, Type } from './column'
 
@@ -10,14 +11,13 @@ export class Table {
   public readonly name: string
   public readonly symbol: symbol
   protected readonly metadata?: Metadata
-  protected readonly columns_: { [key in string]: Column } = {}
-  protected readonly columnOrders_: string[] = []
+  protected readonly columns_: Column[] = []
 
   constructor(name: string, table?: Table, symbol?: symbol)
   constructor(name: string, symbol?: symbol)
   constructor(metadata: Metadata, table: Table, symbol?: symbol)
   constructor(...args: any[]) {
-    let name: string, metadata: Metadata | undefined, symbol: symbol
+    let name: string, metadata: Metadata|undefined, symbol: symbol
     switch (args.length) {
       case 1:
         name = args[0]
@@ -40,7 +40,6 @@ export class Table {
           }
           symbol = args[2] || Symbol(name)
           this.columns_ = table.columns_
-          this.columnOrders_ = table.columnOrders_
         }
         else {
           name = args[0]
@@ -54,11 +53,11 @@ export class Table {
     this.metadata = metadata
 
     // pre-reserved column
-    if (!this.columns_['index']) this.addPrereservedColumn('index', 'number')
+    if (!this.columns_.find((column) => column.name === 'index')) this.addPrereservedColumn('index', 'number')
   }
 
   get columns(): Column[] {
-    return this.columnOrders_.map((column) => this.columns_[column])
+    return createReadonly(this.columns_)
   }
 
   get count(): number {
@@ -81,18 +80,17 @@ export class Table {
       type = args[1] || true
       symbol = args[2] || Symbol(name)
     }
-    if (this.columns_[name]) throw new JQLError(`column \`${this.name}\`.\`${name}\` already exists`)
-    this.columns_[name] = new Column(name, symbol, type)
-    this.columnOrders_.push(name)
+    if (this.columns_.find((column) => column.name === name)) throw new JQLError(`column \`${this.name}\`.\`${name}\` already exists`)
+    this.columns_.push(new Column(this.name, name, symbol, type))
     return this
   }
 
-  public removeColumn(name: string): Column | undefined {
-    const column = this.columns_[name]
-    if (!column) throw new JQLError(`unknown column \`${this.name}\`.\`${name}\``)
-    if (column['isPrereserved']) throw new JQLError(`you cannot remove prereserved column '${name}'`)
-    delete this.columns_[name]
-    this.columnOrders_.splice(this.columnOrders_.indexOf(name), 1)
+  public removeColumn(name: string): Column|undefined {
+    const index = this.columns_.findIndex((column) => column.name === name)
+    if (index === -1) throw new JQLError(`unknown column \`${this.name}\`.\`${name}\``)
+    const column = this.columns_[index]
+    if (column['prereserved']) throw new JQLError(`you cannot remove prereserved column '${name}'`)
+    this.columns_.splice(index, 1)
     return column
   }
 
@@ -100,11 +98,12 @@ export class Table {
     if (!this.metadata) throw new JQLError(`table '${this.name}' not yet binded to any database`)
     if (typeof value !== 'object') throw new JQLError(`a table row must be a json object`)
     for (const key of Object.keys(value)) {
-      if (!this.columns_[key]) {
+      const column = this.columns_.find((column) => column.name === key)
+      if (!column) {
         throw new JQLError(`unknown column \`${this.name}\`.\`${key}\``)
       }
       try {
-        this.columns_[key].validate(value[key])
+        column.validate(value[key])
       }
       catch (e) {
         throw new JQLError(`invalid column value '${JSON.stringify(value[key])}'`, e)
@@ -117,10 +116,11 @@ export class Table {
     if (typeof value !== 'object') throw new JQLError(`a table row must be a json object`)
     value = { ...value }
     for (const key of Object.keys(value)) {
-      if (!this.columns_[key]) {
+      const column = this.columns_.find((column) => column.name === key)
+      if (!column) {
         throw new JQLError(`unknown column \`${this.name}\`.\`${key}\``)
       }
-      value[key] = this.columns_[key].normalize(value[key])
+      value[key] = column.normalize(value[key])
     }
     return value
   }
@@ -136,8 +136,8 @@ export class Table {
   }
 
   private addPrereservedColumn(name: string, type: Type, symbol: symbol = Symbol(name)) {
-    const column = this.columns_[name] = new Column(name, symbol, type)
+    const column = new Column(this.name, name, symbol, type)
     column['prereserved'] = true
-    this.columnOrders_.push(name)
+    this.columns_.push(column)
   }
 }

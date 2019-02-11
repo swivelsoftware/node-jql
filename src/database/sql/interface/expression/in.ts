@@ -8,14 +8,14 @@ import { create } from './__create'
 export interface IInJson {
   $not?: boolean
   left: IExpression
-  right?: IExpression | IQuery
+  right?: IExpression|IQuery
 }
 
 export class InExpression extends Expression implements IInJson {
   public readonly classname = '$in'
   public $not?: boolean
   public left: Expression
-  public right?: Expression | Query
+  public right?: Expression|Query
 
   constructor(json?: IInJson) {
     super(json)

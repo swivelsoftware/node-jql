@@ -6,7 +6,7 @@ import { functions } from '../functions'
 import { JQLFunction } from '../functions/__base'
 import { Column, Type } from '../metadata/column'
 import { Table } from '../metadata/table'
-import { $and, $between, $binary, $case, $column, $exists, $function, $in, $isNull, $or, $value, DefineStatement, Expression, JoinClause, Query, ResultColumn, Sql, TableOrSubquery, OrderingTerm } from '../sql'
+import { $and, $between, $binary, $case, $column, $exists, $function, $in, $isNull, $or, $value, DefineStatement, Expression, JoinClause, OrderingTerm, Query, ResultColumn, Sql, TableOrSubquery } from '../sql'
 import { ICursor } from './cursor'
 import { ResultSet } from './resultset'
 
@@ -17,7 +17,7 @@ class ResultSetTable extends Table {
 
   constructor(name: string = 'Result', table?: Table) {
     super(name, table)
-    for (const column of this.columns) if (column['isPrereserved']) this.forceRemoveColumn(column.name)
+    for (const column of this.columns) if (column['prereserved']) this.forceRemoveColumn(column.name)
   }
 
   public addColumn(column: Column): Table
@@ -38,17 +38,14 @@ class ResultSetTable extends Table {
     }
     const column = table ? new Column(table, name, symbol, type) : new Column(name, symbol, type)
     name = column.toString()
-    if (!this.columns_[name]) {
-      this.columns_[name] = column
-      this.columnOrders_.push(name)
-    }
+    this.columns_.push(column)
     return this
   }
 
   public addTemporaryColumn(name: string, type: Type, symbol: symbol = Symbol(name)) {
-    const column = this.columns_[name] = new Column(name, symbol, type)
+    const column = new Column(name, symbol, type)
     column['temporary'] = true
-    this.columnOrders_.push(name)
+    this.columns_.push(column)
   }
 
   public validate(value: any) {
@@ -56,9 +53,8 @@ class ResultSetTable extends Table {
   }
 
   private forceRemoveColumn(name: string) {
-    const index = this.columnOrders_.indexOf(name)
-    if (index > -1) this.columnOrders_.splice(index, 1)
-    delete this.columns_[name]
+    const index = this.columns_.findIndex((column) => column.name === name)
+    if (index > -1) this.columns_.splice(index, 1)
   }
 }
 
@@ -104,7 +100,7 @@ class IntermediateCursor implements ICursor {
       const row_ = this.sandbox.context[table.symbol][index]
       for (const column of table.columns) {
         const { name, symbol } = column
-        if (column['isPrereserved'] && name === 'index') {
+        if (column['prereserved'] && name === 'index') {
           row[symbol] = index
         }
         else {
@@ -311,75 +307,106 @@ export class Sandbox {
     return tables
   }
 
-  private prepareResultSet <T>(resultColumns: ResultColumn[], orderingTerms: OrderingTerm[] = [], tables: Table[]): IntermediateResultSet {
+  private prepareResultSet(resultColumns: ResultColumn[], tables: Table[], orderingTerms: OrderingTerm[] = []): IntermediateResultSet {
     // prepare result set
     const resultsetTable = new ResultSetTable()
     const sandbox = this
 
-    function register(column: Column, $as?: string)
-    function register(expression: Expression, $as?: string)
-    function register(expression: Expression, column: Column, $as?: string)
-    function register(...args: any[]) {
-      let column: Column, expression: Expression, $as: string
-      switch (args.length) {
-        case 2:
-          $as = args[1]
-        case 1:
-          if (args[0] instanceof Column) {
-            column = args[0]
+    function findColumn(expression: $column): Column|undefined {
+      if (expression instanceof $column) {
+        if (expression.table) {
+          const table = tables.find((table) => table.name === expression.table)
+          if (!table) throw new JQLError(`table '${expression.name}' not exists`)
+          return table.columns.find((column) => column.name === expression.name)
+        }
+        else {
+          for (const table of tables) {
+            const column = table.columns.find((column) => column.name === expression.name)
+            if (column) return column
           }
-          else {
-            expression = args[0]
-          }
-          break
-        case 3:
-          
-          break
+        }
       }
     }
 
-    /* function register(expression: Expression, $as?: string, column?: Column) {
-      $as = $as || expression.toString()
+    function register(expression: Expression, $as?: string)
+    function register(expression: Expression, column?: Column, $as?: string)
+    function register(temporary: boolean, expression: Expression, column?: Column, $as?: string)
+    function register(...args: any[]) {
+      let temporary: boolean = false, column: Column|undefined, expression: Expression, $as: string
+      switch (args.length) {
+        case 1:
+          expression = args[0]
+          $as = expression.toString()
+          break
+        case 2:
+          if (args[1] instanceof Column) {
+            expression = args[0]
+            column = args[1]
+            $as = column ? column.name : expression.toString()
+          }
+          else if (typeof args[0] === 'boolean') {
+            temporary = args[0]
+            expression = args[1]
+            $as = expression.toString()
+          }
+          else {
+            expression = args[0]
+            $as = args[1] || expression.toString()
+          }
+          break
+        case 3:
+          if (typeof args[0] === 'boolean') {
+            temporary = args[0]
+            expression = args[1]
+            column = args[2]
+            $as = column ? column.name : expression.toString()
+          }
+          else {
+            expression = args[0]
+            column = args[1]
+            $as = args[2] || (column ? column.name : expression.toString())
+          }
+          break
+        case 4:
+        default:
+          temporary = args[0]
+          expression = args[1]
+          column = args[2]
+          $as = args[3] || (column ? column.name : expression.toString())
+          break
+      }
+
       const symbol = Symbol($as)
-      if (expression instanceof $column) {
-        if (column) {
-          column = new Column(expression.name, symbol, column.type)
-        }
-        else if (!expression.table) {
-          // check ambiguous column
-          const columns = tables.reduce<Column[]>((result, table) => {
-            let column: Column|undefined
-            if (result.length < 2 && (column = table.columns.find((column) => column.name === name))) result.push(column)
-            return result
-          }, [])
-          if (columns.length > 1) throw new JQLError(`ambiguous column '${name}'`)
-          column = new Column(expression.name, symbol, columns[0].type)
-        }
-        else {
-          const table = tables.find((table) => table.name === expression.table) as Table
-          const column_ = table.columns.find((column) => column.name === expression.name) as Column
-          column = new Column(expression.table, expression.name, symbol, column_.type)
-        }
-      }
-      if (column) {
-        resultsetTable.addColumn(column)
-      }
-      else if (expression instanceof $function) {
+      let type
+      if (expression instanceof $function) {
         let function_: JQLFunction<any> = functions[$as.toLocaleLowerCase()]
         if (!function_) {
           const symbol = sandbox.defined[$as]
           function_ = sandbox.context[symbol]
         }
-        resultsetTable.addColumn($as, function_.type, symbol)
+        type = function_.type
       }
       else if (expression instanceof $value) {
-        resultsetTable.addColumn(name, expression.type, symbol)
+        type = expression.type
       }
       else {
-        resultsetTable.addColumn(name, 'boolean', symbol)
+        type = 'boolean'
+      }
+
+      // register columns
+      if (column) {
+        column = column.table ? new Column(column.table, $as, symbol, column.type) : new Column($as, symbol, column.type)
+        if (temporary) column['temporary'] = true
+        resultsetTable.addColumn(column)
+      }
+      else if (temporary) {
+        resultsetTable.addTemporaryColumn($as, type, symbol)
+      }
+      else {
+        resultsetTable.addColumn($as, type, symbol)
       }
       resultsetTable.mappings[symbol] = expression
-    } */
+    }
 
     // $select
     for (const { expression, $as } of resultColumns) {
@@ -390,27 +417,33 @@ export class Sandbox {
           const table = tables.find((table) => table.name === expression.table)
           if (!table) throw new JQLError(`table '${expression.name}' not exists`)
           for (const column of table.columns) {
-            register(new $column({ table: table.name, name: column.name }))
+            register(new $column({ table: table.name, name: column.name }), column)
           }
         }
         else {
           // all tables
           for (const table of tables) {
             for (const column of table.columns) {
-              register(new $column({ table: table.name, name: column.name }))
+              register(new $column({ table: table.name, name: column.name }), column)
             }
           }
         }
       }
       else {
         // target expression
-        register(expression, $as)
+        let column: Column|undefined
+        if (expression instanceof $column) column = findColumn(expression)
+        register(expression, column, $as)
       }
     }
 
     // $order
     for (const { expression } of orderingTerms) {
-      register(expression)
+      // TODO check registered
+
+      let column: Column|undefined
+      if (expression instanceof $column) column = findColumn(expression)
+      register(expression, column)
     }
 
     return new IntermediateResultSet(resultsetTable)
@@ -428,7 +461,7 @@ export class Sandbox {
     const tables = sandbox.prepareTables(query.$from || [], query.$join)
 
     // create result set
-    let resultset = sandbox.prepareResultSet<T>(query.$select, tables)
+    const resultset = sandbox.prepareResultSet(query.$select, tables)
     const resultsetTable = resultset.metadata as ResultSetTable
 
     // iterate rows
@@ -445,9 +478,9 @@ export class Sandbox {
     }
 
     // TODO order by
-    resultset = resultset.sort((l: any, r: any): number => {
+    /* resultset = resultset.sort((l: any, r: any): number => {
 
-    })
+    }) */
 
     // TODO group by
 

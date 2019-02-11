@@ -8,7 +8,7 @@ import { IQuery, Query } from './query'
 export interface IDefineStatement {
   name: string
   $ifNotExists?: boolean
-  value?: string | number | boolean
+  value?: string|number|boolean
   function?: string
   query?: IQuery
 }
@@ -17,7 +17,7 @@ export class DefineStatement extends Sql implements IDefineStatement {
   public name: string
   public symbol: symbol
   public $ifNotExists?: boolean
-  public value?: string | number | boolean
+  public value?: string|number|boolean
   public function_?: JQLFunction<any>
   public query?: Query
 

@@ -2,7 +2,7 @@ import { JQLError } from '../../../utils/error'
 import { Expression, IExpression } from './expression'
 import { create } from './expression/__create'
 
-type Order = 'ASC' | 'DESC'
+type Order = 'ASC'|'DESC'
 
 export interface IOrderingTerm {
   expression: IExpression

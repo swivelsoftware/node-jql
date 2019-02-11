@@ -2,7 +2,7 @@ import moment = require('moment')
 import { isSymbol } from 'util'
 import { JQLError } from '../../utils/error'
 
-export type Type = 'string' | 'number' | 'bigint' | 'boolean' | 'object' | 'Date' | true
+export type Type = 'string'|'number'|'bigint'|'boolean'|'object'|'Date'|true
 
 /**
  * 1) column name must be unique within a table

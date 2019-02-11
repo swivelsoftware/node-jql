@@ -2,7 +2,7 @@ import squel = require('squel')
 import { Expression, IExpression, IUnknownExpression } from './__base'
 import { create } from './__create'
 
-type ExprOperator = '=' | '<>' | '<' | '<=' | '>' | '>=' | 'LIKE' | 'NOT LIKE'
+type ExprOperator = '='|'<>'|'<'|'<='|'>'|'>='|'LIKE'|'NOT LIKE'
 
 export interface IBinaryExpression extends IUnknownExpression {
   left: IExpression

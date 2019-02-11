@@ -16,12 +16,12 @@ function createSetter(index: number, expression: Expression) {
 
 export interface IQuery extends ISql {
   $distinct?: boolean
-  $select?: IResultColumn[] | IResultColumn
-  $from?: ITableOrSubquery[] | ITableOrSubquery
-  $join?: IJoinClause[] | IJoinClause
-  $where?: IExpression[] | IExpression
+  $select?: IResultColumn[]|IResultColumn
+  $from?: ITableOrSubquery[]|ITableOrSubquery
+  $join?: IJoinClause[]|IJoinClause
+  $where?: IExpression[]|IExpression
   $group?: IGroupBy
-  $order?: IOrderingTerm[] | IOrderingTerm
+  $order?: IOrderingTerm[]|IOrderingTerm
   $limit?: ILimit
 }
 
@@ -194,7 +194,7 @@ export class Query extends Sql implements IQuery {
     const $join = this.$join
     if ($join) {
       for (const { operator: { type }, tableOrSubquery: { name, query, $as }, $on } of $join) {
-        const table: squel.BaseBuilder | string = query ? query.toSquel() : name as string
+        const table: squel.BaseBuilder|string = query ? query.toSquel() : name as string
         const expression = $on ? $on.toSquel() as squel.Expression : undefined
         switch (type) {
           case 'INNER':

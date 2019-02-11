@@ -3,8 +3,8 @@ import { $and, Expression, IExpression } from './expression'
 import { create } from './expression/__create'
 
 export interface IGroupBy {
-  expressions: IExpression[] | IExpression
-  $having?: IExpression[] | IExpression
+  expressions: IExpression[]|IExpression
+  $having?: IExpression[]|IExpression
 }
 
 export class GroupBy implements IGroupBy {

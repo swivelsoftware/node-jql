@@ -3,7 +3,7 @@ import { $and, Expression, IExpression } from './expression'
 import { create } from './expression/__create'
 import { ITableOrSubquery, TableOrSubquery } from './table-or-subquery'
 
-type JoinType = 'INNER' | 'LEFT' | 'RIGHT' | 'FULL' | 'CROSS'
+type JoinType = 'INNER'|'LEFT'|'RIGHT'|'FULL'|'CROSS'
 
 interface IJoinOperator {
   $natural?: boolean
@@ -13,8 +13,8 @@ interface IJoinOperator {
 export interface IJoinClause {
   operator?: IJoinOperator
   tableOrSubquery: ITableOrSubquery
-  $on?: IExpression[] | IExpression
-  $using?: string[] | string
+  $on?: IExpression[]|IExpression
+  $using?: string[]|string
 }
 
 export class JoinClause implements IJoinClause {

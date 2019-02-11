@@ -1,7 +1,7 @@
 import squel = require('squel')
 import { JQLError } from '../../../../utils/error'
 
-export type Parameter = IExpression | string | number | boolean | string[] | number[]
+export type Parameter = IExpression|string|number|boolean|string[]|number[]
 
 export function isIExpression(value: any): value is IExpression {
   return 'classname' in value
