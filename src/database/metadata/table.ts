@@ -1,9 +1,10 @@
+import _ = require('lodash')
 import { isSymbol } from 'util'
 import { Metadata } from '.'
 import { createReadonly } from '../../utils/createReadonly'
 import { JQLError } from '../../utils/error'
+import { normalize } from '../../utils/normalize'
 import { Column, Type } from './column'
-import { normalize } from '../../utils/normalize';
 
 /**
  * 1) table name must be unique within a database
@@ -16,7 +17,7 @@ export class Table {
 
   constructor(name: string, table?: Table, symbol?: symbol)
   constructor(name: string, symbol?: symbol)
-  constructor(metadata: Metadata, table: Table, symbol?: symbol)
+  constructor(metadata: Metadata, table: Table, name?: string, symbol?: symbol)
   constructor(...args: any[]) {
     let name: string, metadata: Metadata|undefined, symbol: symbol
     switch (args.length) {
@@ -34,13 +35,13 @@ export class Table {
           const table = args[1] as Table
           if (args[0] instanceof Metadata) {
             metadata = args[0]
-            name = table.name
+            name = args[2] || table.name
           }
           else {
             name = args[0]
           }
-          symbol = args[2] || Symbol(name)
-          this.columns_ = table.columns_
+          symbol = args[3] || Symbol(name)
+          this.columns_ = [...table.columns_]
         }
         else {
           name = args[0]
@@ -126,10 +127,16 @@ export class Table {
     return value
   }
 
+  public merge(table: Table): Table {
+    const result = this.clone(`${this.name}+${table.name}`)
+    result.columns_.push(...table.columns_)
+    return result
+  }
+
   public clone(name?: string): Table {
     const symbol = name ? Symbol(name) : this.symbol
     if (this.metadata) {
-      return new Table(this.metadata, this, symbol)
+      return new Table(this.metadata, this, name, symbol)
     }
     else {
       return new Table(name || this.name, symbol)

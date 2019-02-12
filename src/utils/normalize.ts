@@ -1,10 +1,10 @@
-import { Type } from "../database/metadata/column";
-import moment = require("moment");
+import moment = require('moment')
+import { Type } from '../database/metadata/column'
 
 export function normalize(type: Type, value?: any): any {
   switch (type) {
     case 'Date':
-      return moment(value).valueOf()
+      return value ? moment(value).valueOf() : 0
     default:
       return value
   }
@@ -13,7 +13,7 @@ export function normalize(type: Type, value?: any): any {
 export function denormalize(type: Type, value?: any): any {
   switch (type) {
     case 'Date':
-      return moment(value).toDate()
+      return value ? moment(value).toDate() : undefined
     default:
       return value
   }

@@ -33,7 +33,6 @@ export class Query extends Sql implements IQuery {
   public readonly $distinct?: boolean
   public readonly $select: ResultColumn[]
   public readonly $from?: TableOrSubquery[]
-  public readonly $join?: JoinClause[]
   public readonly $where?: Expression
   public readonly $group?: GroupBy
   public readonly $order?: OrderingTerm[]
@@ -60,23 +59,19 @@ export class Query extends Sql implements IQuery {
       this.$from = $from.map((tableOrSubquery) => {
         const tableOrSubquery_ = new TableOrSubquery(tableOrSubquery)
         if (tableOrSubquery_.query) this.analyzeQuery(tableOrSubquery_.query)
+        if (tableOrSubquery_.$join) {
+          for (const { tableOrSubquery, $on } of tableOrSubquery_.$join) {
+            if (tableOrSubquery.$join) throw new JQLError(`syntax error: you cannot use further join in a $join clause`)
+            if (tableOrSubquery.query) this.analyzeQuery(tableOrSubquery.query)
+            if ($on) this.analyzeExpression($on)
+          }
+        }
         return tableOrSubquery_
       })
     }
 
     if (!this.$select.length && (!this.$from || !this.$from.length)) {
       throw new JQLError(`invalid query. you must specify either $select or $from, or both`)
-    }
-
-    if (json.$join) {
-      let $join = json.$join
-      if (!Array.isArray($join)) $join = [$join]
-      this.$join = $join.map((joinClause) => {
-        const joinClause_ = new JoinClause(joinClause)
-        if (joinClause_.tableOrSubquery.query) this.analyzeQuery(joinClause_.tableOrSubquery.query)
-        if (joinClause_.$on) this.analyzeExpression(joinClause_.$on)
-        return joinClause_
-      })
     }
 
     if (json.$where) {
@@ -111,24 +106,7 @@ export class Query extends Sql implements IQuery {
     if (this.$from) {
       let $from = this.$from
       if (!Array.isArray($from)) $from = [$from]
-      for (const { $as, name, query } of $from) {
-        // check table/alias duplicate
-        const tableAlias = ($as || name) as string
-        if (tableAliases[tableAlias]) {
-          throw new JQLError(`not unique table/alias '${tableAliases[tableAlias]}'`)
-        }
-        tableAliases[tableAlias] = true
-
-        // check query
-        if (query) query.isValid()
-      }
-    }
-
-    // check $join
-    if (this.$join) {
-      let $join = this.$join
-      if (!Array.isArray($join)) $join = [$join]
-      for (const { tableOrSubquery: { $as, name, query }, $on } of $join) {
+      for (const { $as, name, query, $join } of $from) {
         // check table/alias duplicate
         const tableAlias = ($as || name) as string
         if (tableAliases[tableAlias]) {
@@ -139,8 +117,23 @@ export class Query extends Sql implements IQuery {
         // check query
         if (query) query.isValid()
 
-        // check $on
-        if ($on) this.validateExpression($on, tableAliases)
+        // check $join
+        if ($join) {
+          for (const { tableOrSubquery: { $as, name, query }, $on } of $join) {
+            // check table/alias duplicate
+            const tableAlias = ($as || name) as string
+            if (tableAliases[tableAlias]) {
+              throw new JQLError(`not unique table/alias '${tableAliases[tableAlias]}'`)
+            }
+            tableAliases[tableAlias] = true
+
+            // check query
+            if (query) query.isValid()
+
+            // check $on
+            if ($on) this.validateExpression($on, tableAliases)
+          }
+        }
       }
     }
 
@@ -173,41 +166,46 @@ export class Query extends Sql implements IQuery {
   public toSquel(): squel.BaseBuilder {
     let sql = squel.select()
 
-    // from
-    if (this.$from) {
-      for (const { name, query, $as } of this.$from) {
-        sql = sql.from(query ? query.toSquel() : name as string, $as)
-      }
-    }
-
     // select
     const $select = this.$select
     for (const { expression, $as } of $select) {
       sql = sql.field(expression.toSquel(), $as)
     }
 
-    // join
-    const $join = this.$join
-    if ($join) {
-      for (const { operator: { type }, tableOrSubquery: { name, query, $as }, $on } of $join) {
-        const table: squel.BaseBuilder|string = query ? query.toSquel() : name as string
-        const expression = $on ? $on.toSquel() as squel.Expression : undefined
-        switch (type) {
-          case 'INNER':
-            sql = sql.join(table, $as, expression)
-            break
-          case 'LEFT':
-            sql = sql.left_join(table, $as, expression)
-            break
-          case 'RIGHT':
-            sql = sql.right_join(table, $as, expression)
-            break
-          case 'FULL':
-            sql = sql.outer_join(table, $as, expression)
-            break
-          default:
-            logger.warn(`'${type} JOIN' not supported. Fallback to 'LEFT JOIN'`)
-            sql = sql.left_join(table, $as, expression)
+    // from
+    if (this.$from) {
+      let warningFlag = false
+      for (const { name, query, $as, $join } of this.$from) {
+        sql = sql.from(query ? query.toSquel() : name as string, $as)
+
+        if ($join) {
+          if (this.$from.length === 1) {
+            for (const { operator: { type }, tableOrSubquery: { name, query, $as }, $on } of $join) {
+              const table: squel.BaseBuilder|string = query ? query.toSquel() : name as string
+              const expression = $on ? $on.toSquel() as squel.Expression : undefined
+              switch (type) {
+                case 'INNER':
+                  sql = sql.join(table, $as, expression)
+                  break
+                case 'LEFT':
+                  sql = sql.left_join(table, $as, expression)
+                  break
+                case 'RIGHT':
+                  sql = sql.right_join(table, $as, expression)
+                  break
+                case 'FULL':
+                  sql = sql.outer_join(table, $as, expression)
+                  break
+                default:
+                  logger.warn(`'${type} JOIN' not supported. Fallback to 'LEFT JOIN'`)
+                  sql = sql.left_join(table, $as, expression)
+              }
+            }
+          }
+          else if (!warningFlag) {
+            warningFlag = true
+            logger.warn(`Squel.js does not support join clauses on different tables`)
+          }
         }
       }
     }

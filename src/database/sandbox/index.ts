@@ -1,23 +1,23 @@
 import _ = require('lodash')
+import moment = require('moment')
 import { Database } from '..'
 import { JQLError } from '../../utils/error'
 import { Logger } from '../../utils/logger'
+import { denormalize } from '../../utils/normalize'
 import { functions } from '../functions'
 import { JQLFunction } from '../functions/__base'
 import { Column, Type } from '../metadata/column'
 import { Table } from '../metadata/table'
-import { $and, $between, $binary, $case, $column, $exists, $function, $in, $isNull, $or, $value, DefineStatement, Expression, JoinClause, OrderingTerm, Query, ResultColumn, Sql, TableOrSubquery, Limit } from '../sql'
+import { $and, $between, $binary, $case, $column, $exists, $function, $in, $isNull, $or, $value, DefineStatement, Expression, JoinClause, Limit, OrderingTerm, Query, ResultColumn, Sql, TableOrSubquery } from '../sql'
 import { ICursor } from './cursor'
 import { ResultSet } from './resultset'
-import moment = require('moment');
-import { denormalize } from '../../utils/normalize';
 
 const logger = new Logger(__dirname)
 
 class ResultSetTable extends Table {
   public readonly mappings: { [key in symbol]: Expression } = {}
 
-  constructor(name: string = 'Result', table?: Table) {
+  constructor(name: string, table?: Table) {
     super(name, table)
     for (const column of this.columns) if (column['prereserved']) this.forceRemoveColumn(column.name)
   }
@@ -44,8 +44,19 @@ class ResultSetTable extends Table {
     return this
   }
 
-  public addTemporaryColumn(name: string, type: Type, symbol: symbol = Symbol(name)) {
-    const column = new Column(name, symbol, type)
+  public addTemporaryColumn(column: Column)
+  public addTemporaryColumn(name: string, type: Type, symbol?: symbol)
+  public addTemporaryColumn(...args: any[]) {
+    let column: Column, name: string, type: Type, symbol: symbol
+    if (args[0] instanceof Column) {
+      column = args[0]
+    }
+    else {
+      name = args[0]
+      type = args[1]
+      symbol = args[2] || Symbol(name)
+      column = new Column(name, symbol, type)
+    }
     column['temporary'] = true
     this.columns_.push(column)
   }
@@ -68,7 +79,7 @@ class IntermediateCursor implements ICursor {
   }
 
   public count(): number {
-    return this.tables.reduce((result, table) => (result || 1) * table.count, 0)
+    return this.tables.reduce((result, table) => (result || 1) * this.sandbox.context[table.symbol].length, 0)
   }
 
   public get<T>(p: symbol): T {
@@ -89,7 +100,7 @@ class IntermediateCursor implements ICursor {
     // break indices
     const indices: number[] = []
     for (let i = this.tables.length - 1, base = 1; i >= 0; i -= 1) {
-      const count = this.tables[i].count
+      const count = this.sandbox.context[this.tables[i].symbol].length
       indices[i] = Math.floor(this.index / base) % count
       base *= count
     }
@@ -126,12 +137,17 @@ class IntermediateResultSet extends ResultSet<any> {
 
   public commit<T>(limit: number = Number.MAX_SAFE_INTEGER, offset: number = 0): ResultSet<T> {
     const resultset = new ResultSet<T>(this.metadata)
+
+    for (const column of resultset.metadata.columns) {
+      if (column['temporary']) resultset.metadata.removeColumn(column.name)
+    }
+
     let i = 0
     for (const row of this) {
       if (i++ < offset) continue
       if (resultset.length >= limit) break
       const row_ = {} as T
-      for (const column of this.metadata.columns) {
+      for (const column of resultset.metadata.columns) {
         row_[column.symbol] = denormalize(column.type, row[column.symbol])
       }
       resultset.push(row_)
@@ -155,7 +171,7 @@ export class Sandbox {
       if (this.defined[name] && (!$ifNotExists || !this.database.metadata.checkOverridable)) throw new JQLError(`'${name}' is already defined`)
       this.context[symbol] = value || function_ || this.runQuery(query as Query)
       this.defined[name] = symbol
-      return new ResultSet<T>(new ResultSetTable())
+      return new ResultSet<T>(new ResultSetTable(''))
     }
     else if (sql instanceof Query) {
       // retrieve results from database
@@ -173,17 +189,51 @@ export class Sandbox {
 
     // $from
     if (query.$from) {
-      for (const { name, query: query_, $as } of query.$from) {
+      const this_ = this
+
+      function validateTableOrSubquery({ name, query: query_ }: TableOrSubquery): Table {
         let table
         if (query_) {
-          this.validateQuery(query_)
-          table = this.prepareResultSet(query_, sandbox.prepareTables(query_.$from || [], query_.$join))
+          this_.validateQuery(query_)
+          table = this_.prepareResultSet(query_, sandbox.prepareTables(query_)).metadata
         }
         else if (name) {
-          table = this.database.metadata.table(name)
+          table = this_.database.metadata.table(name)
         }
         if (!table) throw new JQLError(`table '${name}' not exists`)
-        tableAliases[($as || name) as string] = table
+        return table
+      }
+
+      function validateJoinClause(mainTable: Table, joinClause: JoinClause, tableAliases: { [key: string]: Table }) {
+        const { tableOrSubquery: { $as, ...tableOrSubquery_ }, $on, $using } = joinClause
+        const table = validateTableOrSubquery(tableOrSubquery_)
+        tableAliases[($as || tableOrSubquery_.name) as string] = table
+        if ($on) {
+          this_.validateExpression($on, tableAliases)
+        }
+        else if ($using) {
+          const $on_ = joinClause.$on = new $and({ expressions: [] })
+          for (const key of $using) {
+            if (!mainTable.columns.find((column) => column.name === key)) throw new JQLError(`unknown column '${key}' in '${mainTable.name}'`)
+            if (!table.columns.find((column) => column.name === key)) throw new JQLError(`unknown column '${key}' in '${table.name.replace(/'/g, '\\\'')}'`)
+            $on_.expressions.push(new $binary({
+              left: new $column({ table: mainTable.name, name: key }),
+              operator: '=',
+              right: new $column({ table: $as || tableOrSubquery_.name, name: key }),
+            }))
+          }
+        }
+      }
+
+      for (const { $as, $join, ...tableOrSubquery } of query.$from) {
+        const table = validateTableOrSubquery(tableOrSubquery)
+        tableAliases[($as || tableOrSubquery.name) as string] = table
+        if ($join) {
+          const tableAliases_: { [key: string]: Table } = {}
+          tableAliases_[($as || tableOrSubquery.name) as string] = table
+          for (const joinClause of $join) validateJoinClause(table, joinClause, tableAliases_)
+          tableAliases = Object.assign(tableAliases, tableAliases_)
+        }
       }
     }
 
@@ -197,7 +247,6 @@ export class Sandbox {
       this.validateExpression(query.$where, tableAliases)
     }
 
-    // TODO $join
     // TODO $group
 
     // $order
@@ -288,11 +337,11 @@ export class Sandbox {
     }
   }
 
-  private prepareTables(tableOrSubqueries: TableOrSubquery[], joinClauses?: JoinClause[]): Table[] {
+  private prepareTables(query: Query): Table[] {
     const tables: Table[] = []
 
     // $from
-    for (const { name, query: query_, $as } of tableOrSubqueries) {
+    for (const { name, query: query_, $as, $join } of (query.$from || [])) {
       let table: Table, content: any[]
       if (query_) {
         const resultset = this.runQuery(query_)
@@ -307,19 +356,132 @@ export class Sandbox {
         if (!table) throw new JQLError(`table '${name}' not exists`)
         else content = content || []
       }
-      if (content.length === 0) return new ResultSet(new ResultSetTable())
+      if (content.length === 0) return new ResultSet(new ResultSetTable(''))
+
+      if ($join) {
+        for (const { operator, tableOrSubquery: { name, query: query_, $as }, $on } of $join) {
+          let table_: Table, content_: any[]
+          if (query_) {
+            const resultset = this.runQuery(query_)
+            table_ = new ResultSetTable($as as string, resultset.metadata)
+            content_ = resultset
+          }
+          else {
+            if (!name) throw new JQLError('[FATAL] missing table name')
+            table_ = this.database.metadata.table(name)
+            if ($as) table_ = table_.clone($as)
+            content_ = this.database.database[table_.symbol]
+            if (!table_) throw new JQLError(`table '${name}' not exists`)
+            else content_ = content_ || []
+          }
+
+          // prepare sandbox for join-preparation
+          const sandbox = new Sandbox(this.database, this)
+          sandbox.context[table.symbol] = content
+          sandbox.context[table_.symbol] = content_
+
+          // build joined table
+          const mergedContent_ = [] as any[]
+          const resultsetTable = table.merge(table_)
+          let tables_: Table[], cursor: ICursor
+          switch (operator.type) {
+            case 'INNER':
+              tables_ = [table, table_]
+              cursor = new IntermediateCursor(sandbox, tables_)
+              while (cursor.next()) {
+                if (!$on || sandbox.evaluateExpression(cursor, $on, tables_, sandbox)) {
+                  const row = {} as any
+                  for (const { symbol } of resultsetTable.columns) {
+                    row[symbol] = cursor.get(symbol)
+                  }
+                  mergedContent_.push(row)
+                }
+              }
+              break
+            case 'LEFT':
+              if (!$on) throw new JQLError('[FATAL] missing $on condition for LEFT JOIN')
+
+              cursor = new IntermediateCursor(sandbox, [table])
+              while (cursor.next()) {
+                const row = {} as any
+                for (const { symbol } of table.columns) {
+                  row[symbol] = cursor.get(symbol)
+                }
+
+                const sandbox_ = new Sandbox(sandbox.database, sandbox)
+                sandbox_.context[table.symbol] = [row]
+                sandbox_.context[table_.symbol] = content_
+
+                tables_ = [table, table_]
+                const cursor_ = new IntermediateCursor(sandbox_, tables_)
+                let flag = false
+                while (cursor_.next()) {
+                  if (sandbox.evaluateExpression(cursor_, $on, tables_, sandbox)) {
+                    const row = {} as any
+                    for (const { symbol } of resultsetTable.columns) {
+                      row[symbol] = cursor_.get(symbol)
+                    }
+                    mergedContent_.push(row)
+                    flag = true
+                  }
+                }
+
+                // in case no matched row
+                if (!flag) mergedContent_.push(row)
+              }
+              break
+            case 'RIGHT':
+              if (!$on) throw new JQLError('[FATAL] missing $on condition for RIGHT JOIN')
+
+              cursor = new IntermediateCursor(sandbox, [table_])
+              while (cursor.next()) {
+                const row = {} as any
+                for (const { symbol } of table_.columns) {
+                  row[symbol] = cursor.get(symbol)
+                }
+
+                const sandbox_ = new Sandbox(sandbox.database, sandbox)
+                sandbox_.context[table_.symbol] = [row]
+                sandbox_.context[table.symbol] = content
+
+                tables_ = [table_, table]
+                const cursor_ = new IntermediateCursor(sandbox_, tables_)
+                let flag = false
+                while (cursor_.next()) {
+                  if (sandbox.evaluateExpression(cursor_, $on, tables_, sandbox)) {
+                    const row = {} as any
+                    for (const { symbol } of resultsetTable.columns) {
+                      row[symbol] = cursor_.get(symbol)
+                    }
+                    mergedContent_.push(row)
+                    flag = true
+                  }
+                }
+
+                // in case no matched row
+                if (!flag) mergedContent_.push(row)
+              }
+              break
+            case 'FULL':
+              // TODO
+              break
+          }
+
+          content = mergedContent_
+          table = resultsetTable
+        }
+      }
+
       this.context[table.symbol] = content
       tables.push(table)
     }
-
-    // TODO $join
 
     return tables
   }
 
   private prepareResultSet(query: Query, tables: Table[]): IntermediateResultSet {
     // prepare result set
-    const resultsetTable = new ResultSetTable()
+    const resultsetTable = new ResultSetTable(query.toString())
     const sandbox = this
 
     function findColumn(expression: $column): Column|undefined {
@@ -406,8 +568,12 @@ export class Sandbox {
       // register columns
       if (column) {
         column = column.table ? new Column(column.table, $as, symbol, column.type) : new Column($as, symbol, column.type)
-        if (temporary) column['temporary'] = true
-        resultsetTable.addColumn(column)
+        if (temporary) {
+          resultsetTable.addTemporaryColumn(column)
+        }
+        else {
+          resultsetTable.addColumn(column)
+        }
       }
       else if (temporary) {
         resultsetTable.addTemporaryColumn($as, type, symbol)
@@ -466,7 +632,7 @@ export class Sandbox {
     for (let i = 0, length = args.length; i < length; i += 1) query.setParam(i, args[i])
 
     // cache tables to be used
-    const tables = sandbox.prepareTables(query.$from || [], query.$join)
+    const tables = sandbox.prepareTables(query)
 
     // create result set
     let resultset = sandbox.prepareResultSet(query, tables)

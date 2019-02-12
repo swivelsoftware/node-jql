@@ -1,8 +1,7 @@
+import moment = require('moment')
 import { Database } from '.'
 import { Table } from './metadata/table'
-import { Index } from './sandbox/resultset'
-import { $binary, $column, $value, Query, TableOrSubquery, $between } from './sql'
-import moment = require('moment');
+import { $between, $binary, $column, $value, Query } from './sql'
 
 let database: Database
 
@@ -15,7 +14,7 @@ test('Create Students', () => {
     new Table('Students')
       .addColumn('name', 'string')
       .addColumn('gender', 'string')
-      .addColumn('birthday', 'Date')
+      .addColumn('birthday', 'Date'),
   )
   database.insert('Students',
     { name: 'Kennys', gender: 'M', birthday: '1992-06-08' },
@@ -26,7 +25,7 @@ test('Create Students', () => {
     { name: 'Chris', gender: 'M', birthday: '1992-12-20' },
     { name: 'Amy', gender: 'F', birthday: '1992-10-03' },
   )
-  
+
   expect(database.metadata.table('Students').count).toBe(7)
 })
 
@@ -38,7 +37,7 @@ test('Query from Students', () => {
     $where: new $between({
       left: new $column({ name: 'birthday' }),
       start: new $value({ type: 'Date', value: '1992-06-01' }),
-      end: new $value({ type: 'Date', value: '1992-06-30' })
+      end: new $value({ type: 'Date', value: '1992-06-30' }),
     }),
   }))
 
@@ -85,11 +84,11 @@ test('Query from Marks with ordering', () => {
       expression: new $column({
         name: 'mark',
       }),
-      order: 'DESC'
+      order: 'DESC',
     },
     $limit: {
-      value: 3
-    }
+      value: 3,
+    },
   }))
 
   // test: 3 rows
@@ -99,4 +98,65 @@ test('Query from Marks with ordering', () => {
 
   // test: resultset[0].name = 'Donny'
   expect(resultset.get(resultset.columnIndexOf('name') as number)).toBe('Donny')
+})
+
+test('Query for each Student\'s mark', () => {
+  const resultset = database.query<any>(new Query({
+    $from: {
+      name: 'Students',
+      $join: {
+        tableOrSubquery: {
+          name: 'Marks',
+        },
+        $on: new $binary({
+          left: new $column({
+            table: 'Students',
+            name: 'name',
+          }),
+          operator: '=',
+          right: new $column({
+            table: 'Marks',
+            name: 'name',
+          }),
+        }),
+      },
+    },
+  }))
+
+  expect(resultset.length).toBe(7)
+})
+
+test('Query for each Student\'s birthday, ordered by mark', () => {
+  const resultset = database.query<any>(new Query({
+    $from: {
+      name: 'Marks',
+      $join: {
+        operator: {
+          type: 'LEFT',
+        },
+        tableOrSubquery: {
+          name: 'Students',
+        },
+        $on: new $binary({
+          left: new $column({
+            table: 'Students',
+            name: 'name',
+          }),
+          operator: '=',
+          right: new $column({
+            table: 'Marks',
+            name: 'name',
+          }),
+        }),
+      },
+    },
+    $order: {
+      expression: new $column({
+        name: 'mark',
+      }),
+      order: 'DESC',
+    },
+  }))
+
+  expect(resultset.length).toBe(10)
 })
