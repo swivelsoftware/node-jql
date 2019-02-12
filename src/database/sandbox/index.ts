@@ -385,11 +385,12 @@ export class Sandbox {
           const resultsetTable = table.merge(table_)
           let tables_: Table[], cursor: ICursor
           switch (operator.type) {
+            case 'CROSS':
             case 'INNER':
               tables_ = [table, table_]
               cursor = new IntermediateCursor(sandbox, tables_)
               while (cursor.next()) {
-                if (!$on || sandbox.evaluateExpression(cursor, $on, tables_, sandbox)) {
+                if (operator.type === 'CROSS' || !$on || sandbox.evaluateExpression(cursor, $on, tables_, sandbox)) {
                   const row = {} as any
                   for (const { symbol } of resultsetTable.columns) {
                     row[symbol] = cursor.get(symbol)
@@ -463,6 +464,7 @@ export class Sandbox {
               }
               break
             case 'FULL':
+              throw new JQLError('FULL JOIN is not yet supported')
               // TODO
               break
           }

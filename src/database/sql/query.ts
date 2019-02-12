@@ -196,9 +196,9 @@ export class Query extends Sql implements IQuery {
                 case 'FULL':
                   sql = sql.outer_join(table, $as, expression)
                   break
-                default:
-                  logger.warn(`'${type} JOIN' not supported. Fallback to 'LEFT JOIN'`)
-                  sql = sql.left_join(table, $as, expression)
+                case 'CROSS':
+                  sql = sql.from(table)
+                  break
               }
             }
           }
