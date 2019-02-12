@@ -2,7 +2,7 @@
 
 [![npm version](https://badge.fury.io/js/node-jql.svg)](https://badge.fury.io/js/node-jql)
 
-Note: It's still under development. Please wait for v0.1.x
+Note: It's still under development. Please wait for the stable version v1.x.x
 
 ## Install
 

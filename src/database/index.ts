@@ -1,61 +1,59 @@
 import _ = require('lodash')
-import { Metadata } from './metadata/index'
+import { JQLError } from '../utils/error'
+import { Metadata } from './metadata'
 import { Table } from './metadata/table'
 import { IDatabaseOptions } from './options'
-import { Sql } from './sql/index'
+import { Sandbox } from './sandbox'
+import { ResultSet } from './sandbox/resultset'
+import { Sql } from './sql'
 
-export interface IDatabase { [key: string]: any[] }
+export type IDatabase = {
+  [key in symbol]: any[]
+}
 
 export class Database {
   public readonly metadata: Metadata
-  private readonly database: IDatabase
+  public readonly database: IDatabase = {}
 
-  constructor(options?: IDatabaseOptions)
-  constructor(initialState?: IDatabase, options?: IDatabaseOptions)
-  constructor(...args: any[]) {
-    let initialState: IDatabase = {}, options: IDatabaseOptions
-    switch (args.length) {
-      case 1:
-        options = args[0]
-        break
-      case 2:
-      default:
-        initialState = args[0]
-        options = args[1]
-        break
-    }
-    this.database = initialState ? _.cloneDeep(initialState) : {}
-    this.metadata = new Metadata(options)
+  constructor(options?: IDatabaseOptions) {
+    this.metadata = new Metadata(this, options)
   }
 
-  public createTable(name: string, table: Table): Database {
-    this.metadata.registerTable(name, table)
-    this.database[name] = []
+  public createTable(table: Table): Database {
+    table = this.metadata.registerTable(table.name, table)
+    this.database[table.symbol] = []
     return this
   }
 
   public dropTable(name: string): Database {
-    this.metadata.unregisterTable(name)
-    delete this.database[name]
+    const table = this.metadata.unregisterTable(name)
+    delete this.database[table.symbol]
     return this
   }
 
-  public query<T>(sql: Sql): T|undefined {
-    // TODO
-    return undefined
+  public count(name: string): number {
+    const table = this.metadata.table(name)
+    // table checked. no need to check again
+    return table ? this.database[table.symbol].length : 0
+  }
+
+  public query<T>(sql: Sql): ResultSet<T> {
+    return new Sandbox(this).run(sql)
   }
 
   public insert(name: string, ...rows: any[]) {
+    const table = this.metadata.table(name)
     for (let i = 0, length = rows.length; i < length; i += 1) {
       const row = rows[i]
       try {
-        const table = this.metadata.table(name)
-        if (table) table.validate(row)
-        if (!this.database[name]) this.database[name] = []
-        this.database[name].push(...rows)
-      } catch (e) {
-        throw new Error(`fail to insert row '${JSON.stringify(row)}'. ${(e as Error).message}`)
+        table.validate(row)
+        rows[i] = table.normalize(row)
+      }
+      catch (e) {
+        throw new JQLError(`fail to insert row '${JSON.stringify(row)}'`, e)
       }
     }
+    if (!this.database[table.symbol]) this.database[table.symbol] = []
+    this.database[table.symbol].push(...rows)
   }
 }

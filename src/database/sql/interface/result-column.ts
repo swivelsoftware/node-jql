@@ -1,5 +1,6 @@
-import { create } from './expression/create'
-import { IExpression } from './expression/index'
+import { JQLError } from '../../../utils/error'
+import { Expression, IExpression } from './expression'
+import { create } from './expression/__create'
 
 export interface IResultColumn {
   expression: IExpression
@@ -7,19 +8,24 @@ export interface IResultColumn {
 }
 
 export class ResultColumn implements IResultColumn {
-  public expression: IExpression
+  public expression: Expression
   public $as?: string
 
-  constructor(resultColumn?: IResultColumn) {
-    switch (typeof resultColumn) {
+  constructor(json?: IResultColumn) {
+    switch (typeof json) {
       case 'object':
-        this.expression = create(resultColumn.expression)
-        this.$as = resultColumn.$as
+        try {
+          this.expression = create(json.expression)
+          this.$as = json.$as
+        }
+        catch (e) {
+          throw new JQLError('fail to create ResultColumn block', e)
+        }
         break
       case 'undefined':
         break
       default:
-        throw new Error(`invalid 'resultColumn' object`)
+        throw new JQLError(`invalid 'json' object`)
     }
   }
 }

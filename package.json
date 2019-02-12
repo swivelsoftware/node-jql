@@ -1,6 +1,6 @@
 {
   "name": "node-jql",
-  "version": "0.0.16",
+  "version": "0.1.0",
   "description": "In-memory SQL database in Node.js",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -9,11 +9,11 @@
   },
   "scripts": {
     "test": "jest",
+    "test:legacy": "ts-node scripts/test",
     "lint": "tslint -p tsconfig.json",
-    "lint:test": "tslint -p tsconfig.test.json",
     "build": "npm run lint && tsc",
-    "prepublishOnly": "npm run build",
-    "postpublish": "rimraf dist"
+    "prepublishOnly": "npm i && npm run build",
+    "postpublish": "rm package-lock.json && rimraf dist"
   },
   "repository": {
     "type": "git",
@@ -26,19 +26,23 @@
   },
   "homepage": "https://github.com/kennysng/node-jql#readme",
   "devDependencies": {
-    "@types/core-js": "^2.5.0",
-    "@types/jest": "^23.3.13",
+    "@types/jest": "^24.0.0",
     "@types/lodash": "^4.14.120",
-    "@types/node": "^10.12.18",
+    "@types/moment": "^2.13.0",
+    "@types/node": "^11.9.0",
+    "chalk": "^2.4.2",
     "jest": "^23.6.0",
+    "minimist": "^1.2.0",
     "rimraf": "^2.6.3",
     "ts-jest": "^23.10.5",
+    "ts-node": "^8.0.2",
     "tslint": "^5.12.1",
-    "typescript": "^3.2.4"
+    "typescript": "^3.3.1"
   },
   "dependencies": {
-    "core-js": "^2.6.2",
     "lodash": "^4.17.11",
-    "proxy-polyfill": "^0.3.0"
+    "moment": "^2.24.0",
+    "proxy-polyfill": "^0.3.0",
+    "squel": "^5.12.2"
   }
 }

@@ -1,27 +1,27 @@
-import { create } from './expression/create'
-import { IExpression } from './expression/index'
+import { JQLError } from '../../../utils/error'
+import { create } from './expression/__create'
 
 export interface ILimit {
-  expression: IExpression
-  $offset?: IExpression
+  value: number
+  $offset?: number
 }
 
 const allow = ['$case', '$function', '$value']
 
 export class Limit implements ILimit {
-  public expression: IExpression
-  public $offset?: IExpression
+  public value: number
+  public $offset?: number
 
-  constructor(limit?: ILimit) {
-    switch (typeof limit) {
+  constructor(json?: ILimit) {
+    switch (typeof json) {
       case 'object':
-        this.expression = create(limit.expression, { allow })
-        if (limit.$offset) this.$offset = create(limit.$offset, { allow })
+        this.value = json.value
+        if (json.$offset) this.$offset = json.$offset
         break
       case 'undefined':
         break
       default:
-        throw new Error(`invalid 'limit' object`)
+        throw new JQLError(`invalid 'json' object`)
     }
   }
 }

@@ -1,10 +1,12 @@
-import _ = require('lodash')
-
 export function createReadonly<T>(object: T): T {
-  object = _.cloneDeep(object)
   return new Proxy(object as any, {
-    set(): boolean {
-      return false
+    get<T>(target, p): T|undefined {
+      if (target[p] === undefined) return undefined
+      if (typeof target[p] === 'object') return createReadonly<T>(target[p])
+      return target[p]
+    },
+    set(target, p): boolean {
+      throw new Error(`this is a readonly object. you cannot change its properties`)
     },
   }) as T
 }

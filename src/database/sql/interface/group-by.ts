@@ -1,27 +1,33 @@
-import { create } from './expression/create'
-import { $and, IExpression } from './expression/index'
+import { JQLError } from '../../../utils/error'
+import { $and, Expression, IExpression } from './expression'
+import { create } from './expression/__create'
 
 export interface IGroupBy {
-  expressions: IExpression[] | IExpression
-  $having?: IExpression[] | IExpression
+  expressions: IExpression[]|IExpression
+  $having?: IExpression[]|IExpression
 }
 
 export class GroupBy implements IGroupBy {
-  public expressions: IExpression[]
-  public $having?: IExpression
+  public expressions: Expression[]
+  public $having?: Expression
 
-  constructor(groupBy?: IGroupBy) {
-    switch (typeof groupBy) {
+  constructor(json?: IGroupBy) {
+    switch (typeof json) {
       case 'object':
-        let expressions = groupBy.expressions
-        if (!Array.isArray(expressions)) expressions = [expressions]
-        this.expressions = expressions.map((expression) => create(expression))
-        if (groupBy.$having) this.$having = Array.isArray(groupBy.$having) ? new $and({ expressions: groupBy.$having }) : create(groupBy.$having)
+        try {
+          let expressions = json.expressions
+          if (!Array.isArray(expressions)) expressions = [expressions]
+          this.expressions = expressions.map((expression) => create(expression))
+          if (json.$having) this.$having = Array.isArray(json.$having) ? new $and({ expressions: json.$having }) : create(json.$having)
+        }
+        catch (e) {
+          throw new JQLError('fail to create GroupBy block', e)
+        }
         break
       case 'undefined':
         break
       default:
-        throw new Error(`invalid 'groupBy' object`)
+        throw new JQLError(`invalid 'json' object`)
     }
   }
 }

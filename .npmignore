@@ -1,0 +1,10 @@
+# internal scripts
+scripts
+
+# testing files
+test
+jest.config.js
+tsconfig.test.json
+
+# typescript config file
+tsconfig.json

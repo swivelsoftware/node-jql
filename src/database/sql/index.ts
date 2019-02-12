@@ -1,14 +1,29 @@
-export abstract class Sql {
-  public abstract validate(): boolean
+import squel = require('squel')
+import { JQLError } from '../../utils/error'
+
+export interface ISql {
 }
 
-export { DefineStatement } from './define'
-export { Query } from './query'
+export abstract class Sql implements ISql {
+  constructor(json?: ISql) {
+    switch (typeof json) {
+      case 'object':
+      case 'undefined':
+        break
+      default:
+        throw new JQLError(`invalid 'json' object`)
+    }
+  }
 
-export * from './interface/expression/index'
-export * from './interface/group-by'
-export * from './interface/join-clause'
-export * from './interface/limit'
-export * from './interface/ordering-term'
-export * from './interface/result-column'
-export * from './interface/table-or-subquery'
+  public abstract isValid(): boolean
+
+  public abstract toSquel(): squel.BaseBuilder
+
+  public toString(): string {
+    return this.toSquel().toString()
+  }
+}
+
+export { DefineStatement, IDefineStatement } from './define'
+export { Query, IQuery } from './query'
+export * from './interface/index'

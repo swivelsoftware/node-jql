@@ -1,4 +1,4 @@
-export function createFunction(function_: string) {
+export function createFunction(function_: string): Function {
   function_ = function_.trim()
   if (!function_.startsWith('function')) throw new Error(`invalid function '${function_}'`)
 

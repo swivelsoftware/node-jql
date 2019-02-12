@@ -1,7 +1,8 @@
-import { create } from './expression/create'
-import { IExpression } from './expression/index'
+import { JQLError } from '../../../utils/error'
+import { Expression, IExpression } from './expression'
+import { create } from './expression/__create'
 
-type Order = 'ASC' | 'DESC'
+type Order = 'ASC'|'DESC'
 
 export interface IOrderingTerm {
   expression: IExpression
@@ -9,19 +10,24 @@ export interface IOrderingTerm {
 }
 
 export class OrderingTerm implements IOrderingTerm {
-  public expression: IExpression
+  public expression: Expression
   public order?: Order
 
-  constructor(orderingTerm?: IOrderingTerm) {
-    switch (typeof orderingTerm) {
+  constructor(json?: IOrderingTerm) {
+    switch (typeof json) {
       case 'object':
-        this.expression = create(orderingTerm.expression)
-        if (orderingTerm.order) this.order = orderingTerm.order
+        try {
+          this.expression = create(json.expression)
+          if (json.order) this.order = json.order
+        }
+        catch (e) {
+          throw new JQLError('fail to create OrderingTerm block', e)
+        }
         break
       case 'undefined':
         break
       default:
-        throw new Error(`invalid 'orderingTerm' object`)
+        throw new JQLError(`invalid 'json' object`)
     }
   }
 }
