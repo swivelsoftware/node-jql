@@ -7,6 +7,7 @@
     "declaration": true,
     "esModuleInterop": true,
     "noImplicitAny": false,
+    "removeComments": true,
     "strictPropertyInitialization": false,
     "outDir": "dist"
   },
