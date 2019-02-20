@@ -1,11 +1,16 @@
 import { JQLError } from '../../utils/error'
-import { Sandbox } from '../sandbox'
-import { BindedColumn, RealTable } from '../schema'
-import { ICompileSqlOptions } from '../sql/query/base'
-import { CompiledJoinedTableOrSubquery } from '../sql/query/joinedTableOrSubquery'
+import { Row } from '../interface'
+import { BindedColumn } from '../schema/column'
+import { RealTable } from '../schema/table'
 import { CompiledTableOrSubquery } from '../sql/query/tableOrSubquery'
-import { ICursor } from './base'
+import { CompiledJoinedTableOrSubquery } from '../sql/query/tableOrSubquery/joined'
+import { Sandbox } from '../transaction'
+import { ICursor } from './interface'
 
+/**
+ * representing the table in a FROM statement
+ * handle JOIN clauses
+ */
 export class TableCursor implements ICursor {
   private currentIndex: number = -1
   private readonly tables: RealTable[]
@@ -13,7 +18,7 @@ export class TableCursor implements ICursor {
   // cache the computed current row
   private cacheIndex?: number
   private cacheIndices?: number[]
-  private cacheRow?: { [key in symbol]: any }
+  private cacheRow?: Row
 
   constructor(private readonly sandbox: Sandbox, private readonly tableOrSubquery: CompiledTableOrSubquery) {
     const tables: RealTable[] = this.tables = [tableOrSubquery.compiledSchema]
@@ -51,7 +56,7 @@ export class TableCursor implements ICursor {
     return indices
   }
 
-  private get currentRow(): { [key in symbol]: any } {
+  private get currentRow(): Row {
     // cached computed row
     if (this.cacheIndex === this.currentIndex && this.cacheRow) {
       return this.cacheRow
@@ -59,7 +64,7 @@ export class TableCursor implements ICursor {
 
     // compute the full row
     const indices = this.indices
-    const row = this.cacheRow = {} as { [key in symbol]: any }
+    const row = this.cacheRow = {} as Row
     for (let i = 0, length = this.tables.length; i < length; i += 1) {
       const table = this.tables[i]
       const index = indices[i]
@@ -118,16 +123,19 @@ export class TableCursor implements ICursor {
 
     // evaluate if row is valid
     if (this.tableOrSubquery instanceof CompiledJoinedTableOrSubquery) {
-      return this.tableOrSubquery.joinClauses.reduce((result, joinClause) => result || !joinClause.$on || this.sandbox.evaluate(joinClause.$on, this), false) || this.next()
+      return this.tableOrSubquery.joinClauses.reduce((result, joinClause) => result || !joinClause.$on || joinClause.$on.evaluate(this.sandbox, this), false) || this.next()
     }
 
     return true
   }
 }
 
-export class TablesCursor implements ICursor {
+/**
+ * representing the FROM statement
+ * cross join all the TableCursors
+ */
+export class FromCursor implements ICursor {
   private moveToFirst_: boolean = false
-  private currentIndex: number = -1
 
   constructor(private readonly tableCursors: TableCursor[]) {
   }
@@ -137,7 +145,7 @@ export class TablesCursor implements ICursor {
   }
 
   public get(p: string|number|symbol): any {
-    if (this.currentIndex === -1) throw new JQLError('The Cursor is pointed to -1. Call next() to move it to head')
+    if (!this.moveToFirst_) throw new JQLError('The Cursor is pointed to -1. Call next() to move it to head')
     else if (this.reachEnd()) throw new JQLError('The Cursor has reached the end')
 
     const errors: Error[] = []

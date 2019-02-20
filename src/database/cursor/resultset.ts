@@ -1,9 +1,15 @@
 import { JQLError } from '../../utils/error'
-import { Table } from '../schema'
-import { ILimit } from '../sql/query/limit'
-import { ICursor } from './base'
+import { Row } from '../interface'
+import { Table } from '../schema/table'
+import { ILimit } from '../sql/query/interface'
+import { ICursor } from './interface'
 
-export class IntermediateResultSet extends Array<{ [key in symbol]: any }> {
+/**
+ * intermediate result set for processing query
+ * 1) do GROUP BY ...
+ * 2) do LIMIT ... OFFSET ...
+ */
+export class IntermediateResultSet extends Array<Row> {
   public set(symbol: symbol, value: any) {
     this[this.length - 1][symbol] = value
   }
@@ -14,9 +20,9 @@ export class IntermediateResultSet extends Array<{ [key in symbol]: any }> {
 
   public commit(metadata: Table, limit: ILimit = { value: Number.MAX_SAFE_INTEGER }): ResultSet {
     const result = new ResultSet(metadata)
-    if (!limit.$offset) limit.$offset = 0
-    for (let i = 0, row = this[limit.$offset + i]; i < Math.min(limit.value, this.length); i += 1, row = this[limit.$offset + i]) {
-      const commitedRow = {} as { [key in symbol]: any }
+    const offset = limit.$offset || 0
+    for (let i = 0, row = this[offset + i]; i < Math.min(limit.value, this.length); i += 1, row = this[offset + i]) {
+      const commitedRow = {} as Row
       for (const { symbol } of metadata.columns) {
         commitedRow[symbol] = row[symbol]
       }
@@ -26,7 +32,11 @@ export class IntermediateResultSet extends Array<{ [key in symbol]: any }> {
   }
 }
 
-export class ResultSet extends Array<{ [key in symbol]: any }> implements ICursor {
+/**
+ * result set of query
+ * access in 1) ICursor mode, or 2) Array mode
+ */
+export class ResultSet extends Array<Row> implements ICursor {
   private currentIndex: number = -1
 
   constructor(readonly metadata: Table, ...args: any[]) {
