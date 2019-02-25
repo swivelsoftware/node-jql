@@ -4,14 +4,12 @@
     "module": "umd",
     "moduleResolution": "node",
     "strict": true,
-    "declaration": true,
     "esModuleInterop": true,
     "noImplicitAny": false,
     "strictPropertyInitialization": false
   },
   "include": [
-    "scripts/**/*.ts",
-    "test/**/*.ts"
+    "script/**/*.ts"
   ],
   "exclude": [
     "src",

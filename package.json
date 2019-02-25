@@ -1,6 +1,6 @@
 {
   "name": "node-jql",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "In-memory SQL database in Node.js",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -9,9 +9,9 @@
   },
   "scripts": {
     "test": "jest",
-    "test:legacy": "ts-node scripts/test",
     "lint": "tslint -p tsconfig.json",
-    "build": "npm run lint && tsc",
+    "lint:script": "tslint -p tsconfig.script.json",
+    "build": "npm run lint && tsc && ts-node script/remove-tsd",
     "prepublishOnly": "npm i && npm run build",
     "postpublish": "rm package-lock.json && rimraf dist"
   },
@@ -26,12 +26,15 @@
   },
   "homepage": "https://github.com/kennysng/node-jql#readme",
   "devDependencies": {
+    "@types/event-stream": "^3.3.34",
     "@types/jest": "^24.0.6",
     "@types/lodash": "^4.14.121",
     "@types/moment": "^2.13.0",
     "@types/node": "^11.9.4",
+    "@types/recursive-readdir": "^2.2.0",
     "@types/uuid": "^3.4.4",
     "chalk": "^2.4.2",
+    "event-stream": "^4.0.1",
     "jest": "^24.1.0",
     "rimraf": "^2.6.3",
     "ts-jest": "^24.0.0",
@@ -44,6 +47,7 @@
     "minimist": "^1.2.0",
     "moment": "^2.24.0",
     "proxy-polyfill": "^0.3.0",
+    "recursive-readdir": "^2.2.2",
     "squel": "^5.12.2",
     "uuid": "^3.3.2"
   }

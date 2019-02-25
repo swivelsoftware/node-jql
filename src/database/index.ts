@@ -1,7 +1,7 @@
 import { setEnv } from '../utils/env'
 import { JQLError } from '../utils/error'
 import { Logger } from '../utils/logger'
-import { DataSource, defaultOptions, defaultProdOptions, IDatebaseOptions, Row } from './interface'
+import { DataSource, defaultOptions, defaultProdOptions, IDatabaseOptions, Row } from './interface'
 import { Schema } from './schema'
 import { Transaction } from './transaction'
 
@@ -12,7 +12,7 @@ export class Database {
   private readonly schemas: { [key in symbol]: Schema } = {}
   private readonly datasource: DataSource = {}
 
-  constructor(options: IDatebaseOptions = {}) {
+  constructor(options: IDatabaseOptions = {}) {
     const baseOptions = process.env.NODE_ENV === 'production' ? defaultProdOptions : defaultOptions
     options = Object.assign({}, baseOptions, options)
     for (const key of Object.keys(options)) setEnv(key, options[key])
