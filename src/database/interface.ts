@@ -26,16 +26,16 @@ export class VariableDef {
 }
 
 // options for database
-export interface IDatebaseOptions {
+export interface IDatabaseOptions {
   logLevels?: string
 }
 
 // default options for database
-export const defaultOptions: IDatebaseOptions = {
+export const defaultOptions: IDatabaseOptions = {
   logLevels: 'DEBUG,INFO,WARN,ERROR',
 }
 
 // default options for database in production
-export const defaultProdOptions: IDatebaseOptions = {
+export const defaultProdOptions: IDatabaseOptions = {
   logLevels: 'WARN,ERROR',
 }
