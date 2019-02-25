@@ -1,3 +1,4 @@
+import _ = require('lodash')
 import { JQLError } from '../../utils/error'
 import { Row } from '../interface'
 import { Table } from '../schema/table'
@@ -5,17 +6,44 @@ import { ILimit } from '../sql/query/interface'
 import { ICursor } from './interface'
 
 /**
+ * cursor of a row
+ */
+export class IntermediateRow implements ICursor {
+  constructor(private readonly row: Row) {
+  }
+
+  public next(): boolean {
+    return true
+  }
+
+  public get(p: symbol): any {
+    return this.row[p]
+  }
+}
+
+/**
  * intermediate result set for processing query
  * 1) do GROUP BY ...
  * 2) do LIMIT ... OFFSET ...
  */
 export class IntermediateResultSet extends Array<Row> {
+  public addRow() {
+    this.push({})
+  }
+
+  public isUndefined(symbol: symbol) {
+    return this[this.length - 1][symbol] === undefined
+  }
+
   public set(symbol: symbol, value: any) {
     this[this.length - 1][symbol] = value
   }
 
-  public nextRow() {
-    this.push({})
+  public distinct(): IntermediateResultSet {
+    const rows = _.uniqWith(this, _.isEqual)
+    const result = new IntermediateResultSet()
+    result.push(...rows)
+    return result
   }
 
   public commit(metadata: Table, limit: ILimit = { value: Number.MAX_SAFE_INTEGER }): ResultSet {
@@ -37,7 +65,7 @@ export class IntermediateResultSet extends Array<Row> {
  * access in 1) ICursor mode, or 2) Array mode
  */
 export class ResultSet extends Array<Row> implements ICursor {
-  private currentIndex: number = -1
+  private currentIndex = -1
 
   constructor(readonly metadata: Table, ...args: any[]) {
     super(...args)
@@ -72,12 +100,7 @@ export class ResultSet extends Array<Row> implements ICursor {
   }
 
   public next(): boolean {
-    try {
-      this.jumpTo(this.currentIndex + 1)
-      return true
-    }
-    catch (e) {
-      return false
-    }
+    this.jumpTo(this.currentIndex + 1)
+    return this.currentIndex > -1 && this.currentIndex < this.length
   }
 }

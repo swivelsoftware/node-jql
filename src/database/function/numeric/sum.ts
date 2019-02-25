@@ -1,18 +1,11 @@
-import { JQLFunction } from '..'
+import { JQLFunction } from '../interface'
 
 export class SumFunction extends JQLFunction<number> {
   constructor() {
-    super('number', (...args: any[]): number => {
-      return args.reduce((result, arg) => {
-        if (typeof arg === 'string') arg = +arg
-        if (isNaN(arg)) return result
-        return result + arg
-      }, 0)
-    })
+    super('number', (...args: number[]) => args.reduce((total, value) => total + value, 0))
   }
 
-  // @override
-  public runGroupBy(...args: number[]): number {
+  public group(...args: number[]): number {
     return this.run(...args)
   }
 }

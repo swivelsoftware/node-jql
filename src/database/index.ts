@@ -1,9 +1,9 @@
+import { setEnv } from '../utils/env'
 import { JQLError } from '../utils/error'
 import { Logger } from '../utils/logger'
-import { DataSource, Row, IDatebaseOptions, defaultProdOptions, defaultOptions } from './interface'
+import { DataSource, defaultOptions, defaultProdOptions, IDatebaseOptions, Row } from './interface'
 import { Schema } from './schema'
 import { Transaction } from './transaction'
-import { setEnv } from '../utils/env'
 
 const logger = new Logger(__filename)
 
@@ -19,7 +19,7 @@ export class Database {
   }
 
   // create a new database
-  public createDatabase(name: string, ifNotExists: boolean = false) {
+  public createDatabase(name: string, ifNotExists = false) {
     try {
       this.getSchema(name)
       if (ifNotExists) return
@@ -33,7 +33,7 @@ export class Database {
   }
 
   // drop an existing database
-  public dropDatabase(name: string, ifExists: boolean = false) {
+  public dropDatabase(name: string, ifExists = false) {
     try {
       const schema = this.getSchema(name)
       delete this.schemas[schema.symbol]

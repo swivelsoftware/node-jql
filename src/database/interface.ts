@@ -1,5 +1,5 @@
 import { ResultSet } from './cursor/resultset'
-import { JQLFunction } from './function'
+import { JQLFunction } from './function/interface'
 
 // datarow structure
 export type RawRow = { [key in string]: any }
@@ -32,10 +32,10 @@ export interface IDatebaseOptions {
 
 // default options for database
 export const defaultOptions: IDatebaseOptions = {
-  logLevels: 'DEBUG,INFO,WARN,ERROR'
+  logLevels: 'DEBUG,INFO,WARN,ERROR',
 }
 
 // default options for database in production
 export const defaultProdOptions: IDatebaseOptions = {
-  logLevels: 'WARN,ERROR'
+  logLevels: 'WARN,ERROR',
 }

@@ -1,6 +1,6 @@
 import squel = require('squel')
 import { Schema } from '../schema'
-import { RealTable } from '../schema/table'
+import { RealTable, TemporaryTable } from '../schema/table'
 import { Transaction } from '../transaction'
 import { CompiledUnknownExpression } from './expression/unknown'
 
@@ -10,6 +10,9 @@ export interface ICompileOptions {
 
   // the tables involved
   tables?: RealTable[]
+
+  // the resultset schema
+  resultsetSchema?: TemporaryTable
 
   // the name used after compilation
   $as?: string

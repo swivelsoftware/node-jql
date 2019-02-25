@@ -17,8 +17,8 @@ import { ILimit, IQuery } from './interface'
 import { CompiledOrderingTerm, OrderingTerm } from './orderingTerm'
 import { CompiledResultColumn, ResultColumn } from './resultColumn'
 import { CompiledTableOrSubquery, TableOrSubquery } from './tableOrSubquery'
-import { JoinedTableOrSubquery } from './tableOrSubquery/joined'
-import { isJoinedTableOrSubquery } from './tableOrSubquery/interface';
+import { isJoinedTableOrSubquery } from './tableOrSubquery/interface'
+import { CompiledJoinedTableOrSubquery, JoinedTableOrSubquery } from './tableOrSubquery/joined'
 
 /**
  * query
@@ -263,11 +263,23 @@ export class CompiledQuery extends CompiledSql {
 
     // compile $from to get related tables
     if (options.parent.$from) {
-      this.$from = options.parent.$from.map((tableOrSubquery) => new CompiledTableOrSubquery(transaction, {
-        ...options,
-        parent: tableOrSubquery,
-      }))
-      this.tables = (options.tables || []).concat(this.$from.map((tableOrSubquery) => tableOrSubquery.compiledSchema))
+      this.$from = options.parent.$from.map((tableOrSubquery) => tableOrSubquery instanceof JoinedTableOrSubquery
+        ? new CompiledJoinedTableOrSubquery(transaction, {
+          ...options,
+          parent: tableOrSubquery,
+        })
+        : new CompiledTableOrSubquery(transaction, {
+          ...options,
+          parent: tableOrSubquery,
+        }),
+      )
+      this.tables = (options.tables || []).concat(this.$from.reduce<RealTable[]>((tables, tableOrSubquery) => {
+        tables.push(tableOrSubquery.compiledSchema)
+        if (tableOrSubquery instanceof CompiledJoinedTableOrSubquery) {
+          tables.push(...tableOrSubquery.joinClauses.map((joinClause) => joinClause.tableOrSubquery.compiledSchema))
+        }
+        return tables
+      }, []))
     }
     else {
       this.tables = options.tables || []
@@ -311,7 +323,7 @@ export class CompiledQuery extends CompiledSql {
 
       // register symbol for later use
       symbols[resultColumn.toString()] = resultColumn.symbol
-      if (resultColumn.$as) symbols[resultColumn.$as] = resultColumn.symbol
+      if (resultColumn.$as) symbols[`\`${resultColumn.$as}\``] = resultColumn.symbol
     }
 
     // get resultset schema
@@ -336,6 +348,7 @@ export class CompiledQuery extends CompiledSql {
       this.$where = options.parent.$where.compile(transaction, {
         ...options,
         tables: this.tables,
+        resultsetSchema: this.resultsetSchema,
       })
       this.$where.register(this.unknowns)
     }
@@ -345,11 +358,11 @@ export class CompiledQuery extends CompiledSql {
       this.$group = new CompiledGroupBy(transaction, {
         ...options,
         tables: this.tables,
+        resultsetSchema: this.resultsetSchema,
         parent: options.parent.$group,
       }, (expression) => {
         const key = expression.toString()
-        const symbol = symbols[key]
-        if (!symbol) throw new JQLError(`Grouping Column '${key}' must be a selected field`)
+        const symbol = symbols[key] || Symbol(expression.toString())
         return new SymbolExpression(expression, symbol)
       })
       this.$group.register(this.unknowns)
@@ -363,6 +376,7 @@ export class CompiledQuery extends CompiledSql {
         return new CompiledOrderingTerm(transaction, {
           ...options,
           tables: this.tables,
+          resultsetSchema: this.resultsetSchema,
           parent: orderingTerm,
         }, symbol)
       })

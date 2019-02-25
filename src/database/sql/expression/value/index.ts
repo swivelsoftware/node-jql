@@ -10,7 +10,7 @@ import { IValueExpression } from './interface'
  * representing an assigned value
  */
 export class ValueExpression extends Expression implements IValueExpression {
-  public readonly classname: string = 'ValueExpression'
+  public readonly classname = 'ValueExpression'
   public value: any
   public type: Type
 

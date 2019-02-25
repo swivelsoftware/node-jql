@@ -4,7 +4,7 @@ import { Logger } from '../../utils/logger'
 import { ResultSet } from '../cursor/resultset'
 import { RawRow, Row } from '../interface'
 import { Transaction } from '../transaction'
-import { BindedColumn, Column, InternalColumn, BindedInternalColumn } from './column'
+import { BindedColumn, BindedInternalColumn, Column, InternalColumn } from './column'
 
 const logger = new Logger(__filename)
 
@@ -86,7 +86,7 @@ export class Table {
     }
 
     const table = this.clone(newName)
-    for (const table of tables) for (const column of table.columns) table.addColumn(column, true)
+    for (const table_ of tables) for (const column of table_.columns) table.addColumn(column, true)
     return table
   }
 
@@ -135,7 +135,7 @@ export class TemporaryTable extends Table {
 export class BindedTable extends Table {
   constructor(readonly schema: Schema, table: Table) {
     super(table.name, table.symbol)
-    if (!table.columns.find(column => column instanceof BindedInternalColumn && column.name === '__index')) {
+    if (!table.columns.find((column) => column instanceof BindedInternalColumn && column.name === '__index')) {
       this.addColumn(new InternalColumn('__index', 'number'), true)
     }
     for (const column of table.columns) this.addColumn(column, true)

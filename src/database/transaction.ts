@@ -1,14 +1,15 @@
 import _ = require('lodash')
-import uuid = require('uuid/v4')
 import { Database } from '.'
 import { JQLError } from '../utils/error'
 import { Logger } from '../utils/logger'
-import { IntermediateResultSet, ResultSet } from './cursor/resultset'
+import { IntermediateResultSet, IntermediateRow, ResultSet } from './cursor/resultset'
 import { FromCursor, TableCursor } from './cursor/table'
-import { functions, JQLFunction } from './function'
+import { functions } from './function'
+import { JQLFunction } from './function/interface'
 import { DataSource, RawRow, Row, Variable, VariableDef } from './interface'
 import { Schema } from './schema'
 import { RealTable, Table } from './schema/table'
+import { CompiledFunctionExpression } from './sql/expression/function'
 import { Query } from './sql/query'
 import { CompiledQuery } from './sql/query'
 
@@ -19,7 +20,7 @@ import { CompiledQuery } from './sql/query'
 export class Transaction {
   public static count = 0
 
-  public readonly id: number = ++Transaction.count
+  public readonly id = ++Transaction.count
   protected readonly logger: Logger = new Logger(`[Transaction#${this.id}]`)
 
   // this is readonly context
@@ -117,7 +118,7 @@ export class Transaction {
   public createTable(table: Table, ifNotExists?: boolean): Transaction
   public createTable(schemaName: string, table: Table, ifNotExists?: boolean): Transaction
   public createTable(...args: any[]): Transaction {
-    let schemaName: string, table: Table, ifNotExists: boolean = false
+    let schemaName: string, table: Table, ifNotExists = false
     if (typeof args[0] === 'string') {
       schemaName = args[0]
       table = args[1]
@@ -150,7 +151,7 @@ export class Transaction {
   public dropTable(tableName: string, ifExists?: boolean): Transaction
   public dropTable(schemaName: string, tableName: string, ifExists?: boolean): Transaction
   public dropTable(...args: any[]): Transaction {
-    let schemaName: string, tableName: string, ifExists: boolean = false
+    let schemaName: string, tableName: string, ifExists = false
     if (typeof args[1] === 'string') {
       schemaName = args[0]
       tableName = args[1]
@@ -262,30 +263,35 @@ export class Sandbox extends Transaction {
     const cursor = new FromCursor(this.query.$from.map((tableOrSubquery) => new TableCursor(this, tableOrSubquery)))
 
     const $order = this.query.$order
-    const resultset = new IntermediateResultSet()
+    const $group = this.query.$group
+    let resultset = new IntermediateResultSet()
     while (cursor.next()) {
       if (!this.query.$where || this.query.$where.evaluate(this, cursor)) {
         // add row
-        resultset.nextRow()
+        resultset.addRow()
 
         // columns to be shown
         for (const { expression, symbol } of this.query.$select) {
           resultset.set(symbol, expression.evaluate(this, cursor))
         }
 
+        // columns for grouping
+        if ($group) {
+          for (const { expression, symbol } of $group.expressions) {
+            if (resultset.isUndefined(symbol)) resultset.set(symbol, expression.evaluate(this, cursor))
+          }
+        }
+
         // columns for ordering
         if ($order) {
           for (const { expression, symbol } of $order) {
-            // TODO check if symbol set
-            resultset.set(symbol, expression.evaluate(this, cursor))
+            if (resultset.isUndefined(symbol)) resultset.set(symbol, expression.evaluate(this, cursor))
           }
         }
       }
     }
 
-    // TODO group by
-
-    // order by
+    // order by before operations
     if ($order) {
       resultset.sort((l, r) => {
         for (const { order, symbol } of $order) {
@@ -296,6 +302,48 @@ export class Sandbox extends Transaction {
       })
     }
 
+    // group by
+    if ($group) {
+      const groupedResult = _.groupBy(resultset, (row) => {
+        const keys = [] as string[]
+        for (const { symbol } of $group.expressions) keys.push(row[symbol])
+        return keys.join(':')
+      })
+      resultset = new IntermediateResultSet()
+      for (const key of Object.keys(groupedResult)) {
+        const rows = groupedResult[key]
+
+        // compute grouped row
+        const row = {} as Row
+        for (const { expression, symbol } of this.query.$select) {
+          row[symbol] = expression instanceof CompiledFunctionExpression
+            ? expression.jqlFunction.group(...rows.map((row) => row[symbol]))
+            : rows[0][symbol]
+        }
+        const cursor = new IntermediateRow(row)
+
+        // check row valid, and push
+        if (!$group.$having || $group.$having.evaluate(this, cursor)) {
+          resultset.push(row)
+        }
+      }
+    }
+
+    // distinct
+    if (this.query.$distinct) resultset = resultset.distinct()
+
+    // order by after operations
+    if (($group || this.query.$distinct) && $order) {
+      resultset.sort((l, r) => {
+        for (const { order, symbol } of $order) {
+          if (l[symbol] < r[symbol]) return order === 'DESC' ? 1 : -1
+          if (l[symbol] > r[symbol]) return order === 'DESC' ? -1 : 1
+        }
+        return 0
+      })
+    }
+
+    // limit
     return resultset.commit(this.query.resultsetSchema, this.query.$limit)
   }
 }

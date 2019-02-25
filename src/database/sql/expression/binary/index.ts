@@ -12,7 +12,7 @@ import { BinaryOperator, IBinaryExpression } from './interface'
  * expression `? $operator ?`
  */
 export class BinaryExpression extends ConditionalExpression implements IBinaryExpression {
-  public readonly classname: string = 'BinaryExpression'
+  public readonly classname = 'BinaryExpression'
   public left: Expression
   public operator: BinaryOperator
   public right: Expression

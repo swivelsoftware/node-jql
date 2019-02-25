@@ -1,9 +1,7 @@
-import { JQLFunction } from '..'
+import { JQLFunction } from '../interface'
 
 export class ConcatFunction extends JQLFunction<string> {
   constructor() {
-    super('string', (...args: any[]): string => {
-      return args.join('')
-    })
+    super('string', (...args: string[]) => args.join(''))
   }
 }

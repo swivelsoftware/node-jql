@@ -11,7 +11,7 @@ import { IColumnExpression } from './interface'
  * expression `$table.$column`
  */
 export class ColumnExpression extends Expression implements IColumnExpression {
-  public readonly classname: string = 'ColumnExpression'
+  public readonly classname = 'ColumnExpression'
   public table?: string
   public name: string
 
@@ -60,21 +60,29 @@ export class CompiledColumnExpression extends CompiledExpression {
       // unknown columns
       if (!options.tables || !options.tables.length) throw new JQLError(`No tables specified for column '${options.parent.name}'`)
 
-      if (options.parent.table) {
+      // find column from resultset schema
+      let column: BindedColumn|undefined
+      if (options.resultsetSchema && !options.parent.table) {
+        column = options.resultsetSchema.columns.find((column) => column.name === options.parent.name)
+      }
+
+      if (!column) {
         // find column from table
-        const table = options.tables.find((table) => options.parent.table === table.name)
-        if (!table) throw new JQLError(`Unknown table '${options.parent.table}'`)
-        const column = table.getColumn(options.parent.name)
-        if (!column) throw new JQLError(`Unknown field '${options.parent.name}'`)
-        this.column = column
-      }
-      else {
+        if (options.parent.table) {
+          const table = options.tables.find((table) => options.parent.table === table.name)
+          if (!table) throw new JQLError(`Unknown table '${options.parent.table}'`)
+          column = table.getColumn(options.parent.name)
+          if (!column) throw new JQLError(`Unknown field '${options.parent.name}'`)
+        }
         // find column from tables
-        const tables = options.tables.filter((table) => !!table.getColumn(options.parent.name))
-        if (!tables.length) throw new JQLError(`Unknown column '${options.parent.name}'`)
-        if (tables.length > 1) throw new JQLError(`Ambiguous column '${options.parent.name}'`)
-        this.column = tables[0].getColumn(options.parent.name)
+        else {
+          const tables = options.tables.filter((table) => !!table.getColumn(options.parent.name))
+          if (!tables.length) throw new JQLError(`Unknown column '${options.parent.name}'`)
+          if (tables.length > 1) throw new JQLError(`Ambiguous column '${options.parent.name}'`)
+          column = tables[0].getColumn(options.parent.name)
+        }
       }
+      this.column = column
     }
     catch (e) {
       throw new JQLError('Fail to compile ColumnExpression', e)

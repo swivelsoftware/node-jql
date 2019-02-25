@@ -1,4 +1,4 @@
-import { JQLFunction } from '..'
+import { JQLFunction } from '../interface'
 
 export class AsciiFunction extends JQLFunction<number> {
   constructor() {

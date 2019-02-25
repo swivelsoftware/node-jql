@@ -10,7 +10,7 @@ import { IUnknownExpression } from './interface'
  * representing an unknown value
  */
 export class UnknownExpression extends Expression implements IUnknownExpression {
-  public readonly classname: string = 'UnknownExpression'
+  public readonly classname = 'UnknownExpression'
   public types?: Type[]
 
   constructor(json: IUnknownExpression) {

@@ -49,6 +49,7 @@ export class CompiledSymbolExpression extends CompiledExpression {
 
   constructor(transaction: Transaction, options: ICompileSqlOptions<SymbolExpression>) {
     super(transaction, options)
+    this.expression = options.parent.expression.compile(transaction, options)
     this.symbol = options.parent.symbol
   }
 

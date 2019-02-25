@@ -1,9 +1,9 @@
 /* tslint:disable:no-console */
 
 import chalk = require('chalk')
+import moment = require('moment')
 import { resolve, sep } from 'path'
-import { getEnv } from './env';
-import moment = require('moment');
+import { getEnv } from './env'
 
 const ROOT = resolve(__dirname, '..')
 

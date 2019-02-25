@@ -12,7 +12,7 @@ export interface IGroupedExpression extends IConditionalExpression {
  * a group of (conditional) expressions
  */
 export abstract class GroupedExpressions extends ConditionalExpression implements IGroupedExpression {
-  public readonly classname: string = 'GroupedExpressions'
+  public readonly classname = 'GroupedExpressions'
   public expressions: ConditionalExpression[]
 
   constructor(json: IGroupedExpression) {

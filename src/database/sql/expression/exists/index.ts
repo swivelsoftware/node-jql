@@ -12,7 +12,7 @@ import { IExistsExpression } from './interface'
  * expression `EXISTS $query`
  */
 export class ExistsExpression extends ConditionalExpression implements IExistsExpression {
-  public readonly classname: string = 'ExistsExpression'
+  public readonly classname = 'ExistsExpression'
   public $not?: boolean
   public query: Query
 

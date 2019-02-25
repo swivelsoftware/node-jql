@@ -13,7 +13,7 @@ import { IBetweenExpression } from './interface'
  * ignore type checking
  */
 export class BetweenExpression extends ConditionalExpression implements IBetweenExpression {
-  public readonly classname: string = 'BetweenExpression'
+  public readonly classname = 'BetweenExpression'
   public $not?: boolean
   public left: Expression
   public start: Expression

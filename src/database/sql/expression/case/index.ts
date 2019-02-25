@@ -13,7 +13,7 @@ import { ICaseExpression } from './interface'
  * expression `CASE $cases ELSE ?`
  */
 export class CaseExpression extends Expression implements ICaseExpression {
-  public readonly classname: string = 'CaseExpression'
+  public readonly classname = 'CaseExpression'
   public cases: Case[]
   public $else?: Expression
 

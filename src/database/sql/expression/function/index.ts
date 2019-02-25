@@ -2,7 +2,7 @@ import squel = require('squel')
 import { parseExpression } from '..'
 import { JQLError } from '../../../../utils/error'
 import { ICursor } from '../../../cursor/interface'
-import { JQLFunction } from '../../../function'
+import { JQLFunction } from '../../../function/interface'
 import { Transaction } from '../../../transaction'
 import { ICompileOptions, ICompileSqlOptions } from '../../interface'
 import { CompiledExpression, Expression } from '../interface'
@@ -13,14 +13,13 @@ import { IFunctionExpression } from './interface'
  * expression `$func(...$args)`
  */
 export class FunctionExpression extends Expression implements IFunctionExpression {
-  public readonly classname: string = 'FunctionExpression'
+  public readonly classname = 'FunctionExpression'
   public name: string
   public parameters: Expression[]
 
   constructor(json: IFunctionExpression) {
     super()
     this.name = json.name
-
     try {
       let parameters = json.parameters || []
       if (!Array.isArray(parameters)) parameters = [parameters]

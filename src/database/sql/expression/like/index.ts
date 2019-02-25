@@ -12,7 +12,7 @@ import { ValueExpression } from '../value'
 import { ILikeExpression } from './interface'
 
 export class LikeExpression extends ConditionalExpression implements ILikeExpression {
-  public readonly classname: string = 'LikeExpression'
+  public readonly classname = 'LikeExpression'
   public $not?: boolean
   public left: Expression
   public right?: string

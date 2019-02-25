@@ -39,19 +39,12 @@ export class JoinedTableOrSubquery extends TableOrSubquery implements IJoinedTab
  * compiled `JoinedTableOrSubquery`
  */
 export class CompiledJoinedTableOrSubquery extends CompiledTableOrSubquery {
-  public readonly compiledSchema: TemporaryTable
   public readonly joinClauses: CompiledJoinClause[]
 
   constructor(transaction: Transaction, options: ICompileSqlOptions<JoinedTableOrSubquery>) {
     super(transaction, options)
     try {
-      this.joinClauses = options.parent.joinClauses.map((joinClause) => new CompiledJoinClause(transaction, joinClause, super.compiledSchema, options))
-
-      // update compiled table schema
-      const tables = this.joinClauses.map((joinClause) => joinClause.tableOrSubquery.compiledSchema)
-      this.compiledSchema = this.$as
-        ? new TemporaryTable(transaction, super.compiledSchema.merge(this.$as, ...tables))
-        : new TemporaryTable(transaction, super.compiledSchema.merge(...tables))
+      this.joinClauses = options.parent.joinClauses.map((joinClause) => new CompiledJoinClause(transaction, joinClause, this.compiledSchema, options))
     }
     catch (e) {
       throw new JQLError('Fail to compile JoinedTableOrSubquery', e)

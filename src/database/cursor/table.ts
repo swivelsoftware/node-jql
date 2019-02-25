@@ -12,7 +12,7 @@ import { ICursor } from './interface'
  * handle JOIN clauses
  */
 export class TableCursor implements ICursor {
-  private currentIndex: number = -1
+  private currentIndex = -1
   private readonly tables: RealTable[]
 
   // cache the computed current row
@@ -29,11 +29,11 @@ export class TableCursor implements ICursor {
 
   // this is only possible maximum length, not the actual length
   private get length(): number {
-    let length = 0
-    length += this.tableOrSubquery.compiledSchema.count
+    let length = 1
+    length *= this.tableOrSubquery.compiledSchema.count
     if (this.tableOrSubquery instanceof CompiledJoinedTableOrSubquery) {
       for (const { tableOrSubquery } of this.tableOrSubquery.joinClauses) {
-        length += tableOrSubquery.compiledSchema.count
+        length *= tableOrSubquery.compiledSchema.count
       }
     }
     return length
@@ -123,7 +123,11 @@ export class TableCursor implements ICursor {
 
     // evaluate if row is valid
     if (this.tableOrSubquery instanceof CompiledJoinedTableOrSubquery) {
-      return this.tableOrSubquery.joinClauses.reduce((result, joinClause) => result || !joinClause.$on || joinClause.$on.evaluate(this.sandbox, this), false) || this.next()
+      return this.tableOrSubquery.joinClauses.reduce((result, joinClause) => {
+        if (!result) return false
+        if (!joinClause.$on) return true
+        return joinClause.$on.evaluate(this.sandbox, this)
+      }, true) || this.next()
     }
 
     return true
@@ -135,7 +139,7 @@ export class TableCursor implements ICursor {
  * cross join all the TableCursors
  */
 export class FromCursor implements ICursor {
-  private moveToFirst_: boolean = false
+  private moveToFirst_ = false
 
   constructor(private readonly tableCursors: TableCursor[]) {
   }

@@ -12,7 +12,7 @@ import { IIsNullExpression } from './interface'
  * expression `? IS NULL`
  */
 export class IsNullExpression extends ConditionalExpression implements IIsNullExpression {
-  public readonly classname: string = 'IsNullExpression'
+  public readonly classname = 'IsNullExpression'
   public $not?: boolean
   public left: Expression
 
