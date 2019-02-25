@@ -1,6 +1,6 @@
 {
   "name": "node-jql",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "description": "In-memory SQL database in Node.js",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
