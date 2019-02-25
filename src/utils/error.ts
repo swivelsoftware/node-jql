@@ -1,13 +1,7 @@
+// JQL general error that supports error hierarchy
 export class JQLError extends Error {
-  constructor(message?: string, error?: Error) {
+  constructor(message: string, error?: Error) {
     super(message)
-    if (error) {
-      if (this.stack) {
-        this.stack = `${this.stack}\n\n thrown by ${error.stack}`
-      }
-      else {
-        this.stack = error.stack
-      }
-    }
+    if (error) this.stack = `${this.stack}\n--------------------\nThrown by ${error.stack}`
   }
 }
