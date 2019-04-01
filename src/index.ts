@@ -1,3 +1,4 @@
+export { Type } from './Sql'
 export { AndExpressions, OrExpressions, IGroupedExpressions } from './expression/grouped'
 export { BetweenExpression, IBetweenExpression } from './expression/between'
 export { BinaryExpression, IBinaryExpression } from './expression/binary'
