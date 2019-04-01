@@ -2,20 +2,10 @@
 
 [![npm version](https://badge.fury.io/js/node-jql.svg)](https://badge.fury.io/js/node-jql)
 
-This is a in-memory SQL database mainly designed for providing an interface for JSON processing with the SQL syntax.
+This library defines only the JSON structure of SQL statements for the in-memory SQL database [node-jql-core](https://github.com/kennysng/node-jql-core). 
 
-Note: It's not optimized, and so may be slow. Please avoid doing intensive computation on this database
+If you are looking for the database core, please visit [node-jql-core](https://github.com/kennysng/node-jql-core). 
 
-Note: It's still under development. Please wait for the stable version v1.x.x
+If you are looking for the server-side application, please visit [node-jql-server](https://github.com/kennysng/node-jql-server). 
 
-## Install
-
-This is a [Node.js](https://nodejs.org/en/) module available through the [npm registry](https://www.npmjs.com/).
-
-Before installing, [download and install Node.js](https://nodejs.org/en/download/). Node.js v6.16.0 or higher (supporting ES6) is required.
-
-Installation is done using the [`npm install` command](https://docs.npmjs.com/getting-started/installing-npm-packages-locally):
-
-```sh
-$ npm install node-jql
-```
+If you are looking for the client-side API, please visit [node-jql-client](https://github.com/kennysng/node-jql-client). 

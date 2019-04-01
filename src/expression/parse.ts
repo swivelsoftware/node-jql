@@ -1,0 +1,54 @@
+import { Expression } from '.'
+import { getType } from '../Sql'
+import { JQLError } from '../utils/error'
+import { BetweenExpression } from './between'
+import { BinaryExpression } from './binary'
+import { CaseExpression } from './case'
+import { ColumnExpression } from './column'
+import { ExistsExpression } from './exists'
+import { FunctionExpression } from './function'
+import { AndExpressions, OrExpressions } from './grouped'
+import { InExpression } from './in'
+import { IsNullExpression } from './isNull'
+import { LikeExpression } from './like'
+import { Unknown } from './unknown'
+import { Value } from './value'
+
+const expressions = {
+  AndExpressions,
+  BetweenExpression,
+  BinaryExpression,
+  CaseExpression,
+  ColumnExpression,
+  ExistsExpression,
+  FunctionExpression,
+  InExpression,
+  IsNullExpression,
+  LikeExpression,
+  OrExpressions,
+  Unknown,
+  Value,
+}
+
+export function parse(value: any): Expression {
+  if (value instanceof Expression) {
+    return value
+  }
+  else if (value === undefined) {
+    return new Unknown()
+  }
+  else if (typeof value === 'object' && !Array.isArray(value)) {
+    if (!value.classname) throw new JQLError('ParseError: `classname` is not specified')
+    const CONSTRUCTOR = expressions[value.classname]
+    if (!CONSTRUCTOR) throw new JQLError(`ParseError: Unknown expression '${value.classname}'`)
+    try {
+      return new CONSTRUCTOR(value)
+    }
+    catch (e) {
+      throw new JQLError(`ParseError: Fail to parse expression '${value.classname}'`, e)
+    }
+  }
+  else {
+    return new Value({ value, type: getType(value) })
+  }
+}

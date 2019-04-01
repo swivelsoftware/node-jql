@@ -1,7 +1,10 @@
 import { mapSync, split } from 'event-stream'
-import { createReadStream, unlink } from 'fs'
+import { createReadStream, statSync, unlink } from 'fs'
+import minimist = require('minimist')
 import * as path from 'path'
-import recursive = require('recursive-readdir')
+import recursive from 'recursive-readdir'
+
+const argv = minimist(process.argv.slice(2))
 
 const tsdfiles = [] as string[]
 const checked = {} as { [key: string]: boolean }
@@ -28,7 +31,16 @@ function getTsdPaths(filepath) {
             filepath_ += substr.charAt(i)
           }
         }
-        files_.push(path.resolve(path.dirname(filepath), filepath_ + '.d.ts'))
+        let file = path.resolve(path.dirname(filepath), filepath_ + '.d.ts')
+        try {
+          statSync(file)
+          files_.push(file)
+        }
+        catch (e) {
+          file = path.resolve(path.dirname(filepath), filepath_ + '/index.d.ts')
+          statSync(file)
+          files_.push(file)
+        }
       }))
       .on('error', (e) => reject(e))
       .on('end', () => {
@@ -42,7 +54,7 @@ function getTsdPaths(filepath) {
 }
 
 const baseDir = path.resolve(__dirname, '..', 'dist')
-const baseFile = path.resolve(baseDir, 'index.d.ts')
+const baseFile = path.resolve(baseDir, argv._[0] || 'index.d.ts')
 getTsdPaths(baseFile)
   .then(() => {
     recursive(baseDir, ['*.js', baseFile, ...tsdfiles], (err, files) => {
