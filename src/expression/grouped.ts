@@ -1,6 +1,6 @@
 import squel = require('squel')
 import { ConditionalExpression, IConditionalExpression } from '.'
-import { JQLError } from '../utils/error'
+import { InstantiateError } from '../utils/error/InstantiateError'
 import { parse } from './parse'
 
 export interface IGroupedExpressions extends IConditionalExpression {
@@ -17,8 +17,13 @@ export abstract class GroupedExpressions extends ConditionalExpression implement
       this.expressions = json.expressions.map((expression) => parse(expression) as ConditionalExpression)
     }
     catch (e) {
-      throw new JQLError('InstantiateError: Fail to instantiate GroupedExpressions', e)
+      throw new InstantiateError('Fail to instantiate GroupedExpressions', e)
     }
+  }
+
+  // @override
+  get [Symbol.toStringTag]() {
+    return 'GroupedExpressions'
   }
 
   // @override
@@ -29,6 +34,11 @@ export abstract class GroupedExpressions extends ConditionalExpression implement
 
 export class AndExpressions extends GroupedExpressions {
   public readonly classname = 'AndExpressions'
+
+  // @override
+  get [Symbol.toStringTag]() {
+    return 'AndExpressions'
+  }
 
   // @override
   public toSquel(): squel.Expression {
@@ -43,6 +53,11 @@ export class AndExpressions extends GroupedExpressions {
 
 export class OrExpressions extends GroupedExpressions {
   public readonly classname = 'OrExpressions'
+
+  // @override
+  get [Symbol.toStringTag]() {
+    return 'OrExpressions'
+  }
 
   // @override
   public toSquel(): squel.Expression {

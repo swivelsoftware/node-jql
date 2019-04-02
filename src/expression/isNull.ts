@@ -1,6 +1,6 @@
 import squel = require('squel')
-import { ConditionalExpression, Expression, IConditionalExpression, IExpression } from '.'
-import { JQLError } from '../utils/error'
+import { ConditionalExpression, Expression, IConditionalExpression } from '.'
+import { InstantiateError } from '../utils/error/InstantiateError'
 import { parse } from './parse'
 
 export interface IIsNullExpression extends IConditionalExpression {
@@ -20,8 +20,13 @@ export class IsNullExpression extends ConditionalExpression implements IIsNullEx
       this.$not = json.$not
     }
     catch (e) {
-      throw new JQLError('InstantiateError: Fail to instantiate IsNullExpression', e)
+      throw new InstantiateError('Fail to instantiate IsNullExpression', e)
     }
+  }
+
+  // @override
+  get [Symbol.toStringTag]() {
+    return 'IsNullExpression'
   }
 
   get template(): string {

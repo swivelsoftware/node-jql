@@ -1,6 +1,6 @@
 import squel = require('squel')
-import { ConditionalExpression, Expression, IConditionalExpression, IExpression } from '.'
-import { JQLError } from '../utils/error'
+import { ConditionalExpression, Expression, IConditionalExpression } from '.'
+import { InstantiateError } from '../utils/error/InstantiateError'
 import { parse } from './parse'
 
 export type BinaryOperator = '='|'<>'|'<'|'<='|'>'|'>='
@@ -25,8 +25,13 @@ export class BinaryExpression extends ConditionalExpression implements IBinaryEx
       this.right = parse(expr.right)
     }
     catch (e) {
-      throw new JQLError('InstantiateError: Fail to instantiate BinaryExpression', e)
+      throw new InstantiateError('Fail to instantiate BinaryExpression', e)
     }
+  }
+
+  // @override
+  get [Symbol.toStringTag]() {
+    return 'BinaryExpression'
   }
 
   get template(): string {

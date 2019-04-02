@@ -1,9 +1,7 @@
 import { ConditionalExpression, IConditionalExpression } from '../expression'
-import { BinaryExpression } from '../expression/binary'
-import { ColumnExpression } from '../expression/column'
 import { AndExpressions } from '../expression/grouped'
 import { parse } from '../expression/parse'
-import { JQLError } from '../utils/error'
+import { InstantiateError } from '../utils/error/InstantiateError'
 import { ITableOrSubquery, TableOrSubquery } from './tableOrSubquery'
 
 export type JoinOperator = 'INNER'|'CROSS'|'LEFT'|'RIGHT'|'FULL'
@@ -27,7 +25,12 @@ export class JoinClause implements IJoinClause {
       if (json.$on) this.$on = Array.isArray(json.$on) ? new AndExpressions({ expressions: json.$on }) : parse(json.$on) as ConditionalExpression
     }
     catch (e) {
-      throw new JQLError('InstantiateError: Fail to instantiate JoinClause', e)
+      throw new InstantiateError('Fail to instantiate JoinClause', e)
     }
+  }
+
+  // @override
+  get [Symbol.toStringTag]() {
+    return 'JoinClause'
   }
 }

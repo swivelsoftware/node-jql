@@ -1,6 +1,6 @@
 import squel = require('squel')
 import { ConditionalExpression, Expression, IConditionalExpression, IExpression } from '.'
-import { JQLError } from '../utils/error'
+import { InstantiateError } from '../utils/error/InstantiateError'
 import { parse } from './parse'
 
 export interface ICase {
@@ -15,6 +15,11 @@ export class Case implements ICase {
   constructor(json: ICase) {
     this.$when = parse(json.$when) as ConditionalExpression
     this.$then = parse(json.$then)
+  }
+
+  // @override
+  get [Symbol.toStringTag]() {
+    return 'Case'
   }
 
   // @override
@@ -40,12 +45,17 @@ export class CaseExpression extends Expression implements ICaseExpression {
       let cases = json.cases
       if (!Array.isArray(cases)) cases = [cases]
       this.cases = cases.map((case_) => new Case(case_))
-      if (!cases.length) throw new JQLError('SyntaxError: There must be at least 1 case in CaseExpression')
+      if (!cases.length) throw new SyntaxError('There must be at least 1 case in CaseExpression')
       if (json.$else) this.$else = parse(json.$else)
     }
     catch (e) {
-      throw new JQLError('InstantiateError: Fail to instantiate CaseExpression', e)
+      throw new InstantiateError('Fail to instantiate CaseExpression', e)
     }
+  }
+
+  // @override
+  get [Symbol.toStringTag]() {
+    return 'CaseExpression'
   }
 
   get template(): string {

@@ -1,7 +1,7 @@
 import squel = require('squel')
-import { ConditionalExpression, Expression, IConditionalExpression, IExpression } from '.'
+import { ConditionalExpression, Expression, IConditionalExpression } from '.'
 import { IQuery, isQuery, Query } from '../query'
-import { JQLError } from '../utils/error'
+import { InstantiateError } from '../utils/error/InstantiateError'
 import { parse } from './parse'
 import { IValue, Value } from './value'
 
@@ -32,8 +32,13 @@ export class InExpression extends ConditionalExpression implements IInExpression
       }
     }
     catch (e) {
-      throw new JQLError('InstantiateError: Fail to instantiate InExpression', e)
+      throw new InstantiateError('Fail to instantiate InExpression', e)
     }
+  }
+
+  // @override
+  get [Symbol.toStringTag]() {
+    return 'InExpression'
   }
 
   get template(): string {

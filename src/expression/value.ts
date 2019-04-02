@@ -1,7 +1,7 @@
 import squel = require('squel')
 import { Expression, IExpression } from '.'
 import { Type } from '../Sql'
-import { JQLError } from '../utils/error'
+import { InstantiateError } from '../utils/error/InstantiateError'
 
 export interface IValue extends IExpression {
   value: any
@@ -18,14 +18,19 @@ export class Value extends Expression implements IValue {
     try {
       if (typeof json !== 'object') json = { value: json }
       const type = typeof json.value
-      if (type === 'bigint' || type === 'function') throw new JQLError(`TypeError: Invalid value type '${type}'`)
+      if (type === 'bigint' || type === 'function') throw new TypeError(`Invalid value type '${type}'`)
 
       this.value = json.value
       this.type = json.type || type
     }
     catch (e) {
-      throw new JQLError('InstantiateError: Fail to instantiate Value', e)
+      throw new InstantiateError('Fail to instantiate Value', e)
     }
+  }
+
+  // @override
+  get [Symbol.toStringTag]() {
+    return 'Value'
   }
 
   // @override

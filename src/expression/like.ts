@@ -1,6 +1,6 @@
 import squel = require('squel')
-import { ConditionalExpression, Expression, IConditionalExpression, IExpression } from '.'
-import { JQLError } from '../utils/error'
+import { ConditionalExpression, Expression, IConditionalExpression } from '.'
+import { InstantiateError } from '../utils/error/InstantiateError'
 import { parse } from './parse'
 
 export interface ILikeExpression extends IConditionalExpression {
@@ -23,8 +23,13 @@ export class LikeExpression extends ConditionalExpression implements ILikeExpres
       this.right = json.right
     }
     catch (e) {
-      throw new JQLError('InstantiateError: Fail to instantiate LikeExpression', e)
+      throw new InstantiateError('Fail to instantiate LikeExpression', e)
     }
+  }
+
+  // @override
+  get [Symbol.toStringTag]() {
+    return 'LikeExpression'
   }
 
   get template(): string {

@@ -1,7 +1,7 @@
 import squel = require('squel')
 import { ConditionalExpression, IConditionalExpression } from '.'
 import { IQuery, Query } from '../query'
-import { JQLError } from '../utils/error'
+import { InstantiateError } from '../utils/error/InstantiateError'
 
 export interface IExistsExpression extends IConditionalExpression {
   $not?: boolean
@@ -20,8 +20,17 @@ export class ExistsExpression extends ConditionalExpression implements IExistsEx
       this.query = new Query(json.query)
     }
     catch (e) {
-      throw new JQLError('InstantiateError: Fail to instantiate ExistsExpression', e)
+      throw new InstantiateError('Fail to instantiate ExistsExpression', e)
     }
+  }
+
+  // @override
+  get [Symbol.toStringTag]() {
+    return 'ExistsExpression'
+  }
+
+  get template(): string {
+    return `${this.$not ? 'NOT ' : ''}EXISTS ?`
   }
 
   // @override
@@ -33,7 +42,7 @@ export class ExistsExpression extends ConditionalExpression implements IExistsEx
   public toSquel(): squel.Expression {
     return squel.expr()
       .and(
-        `${this.$not ? 'NOT ' : ''}EXISTS ?`,
+        this.template,
         this.query.toSquel(),
       )
   }

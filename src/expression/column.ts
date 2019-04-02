@@ -1,6 +1,5 @@
 import squel = require('squel')
 import { Expression, IExpression } from '.'
-import { JQLError } from '../utils/error'
 
 export interface IColumnExpression extends IExpression {
   table?: string
@@ -28,9 +27,14 @@ export class ColumnExpression extends Expression implements IColumnExpression {
   }
 
   // @override
+  get [Symbol.toStringTag]() {
+    return 'ColumnExpression'
+  }
+
+  // @override
   public validate(availableTables: string[]) {
     if (this.table && availableTables.indexOf(this.table) === -1) {
-      throw new JQLError(`SyntaxError: Unknown table '${this.table}'`)
+      throw new SyntaxError(`Unknown table '${this.table}'`)
     }
   }
 

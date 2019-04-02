@@ -1,6 +1,6 @@
 import squel = require('squel')
-import { ConditionalExpression, Expression, IConditionalExpression, IExpression } from '.'
-import { JQLError } from '../utils/error'
+import { ConditionalExpression, Expression, IConditionalExpression } from '.'
+import { InstantiateError } from '../utils/error/InstantiateError'
 import { parse } from './parse'
 
 export interface IBetweenExpression extends IConditionalExpression {
@@ -26,8 +26,13 @@ export class BetweenExpression extends ConditionalExpression implements IBetween
       this.left = parse(expr.left)
     }
     catch (e) {
-      throw new JQLError('InstantiateError: Fail to instantiate BetweenExpression', e)
+      throw new InstantiateError('Fail to instantiate BetweenExpression', e)
     }
+  }
+
+  // @override
+  get [Symbol.toStringTag]() {
+    return 'BetweenExpression'
   }
 
   get template(): string {
