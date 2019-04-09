@@ -23,6 +23,11 @@ export abstract class Sql {
   public abstract toSquel(): squel.BaseBuilder
 
   // @override
+  get [Symbol.toStringTag]() {
+    return 'Sql'
+  }
+
+  // @override
   public toString(): string {
     return this.toSquel().toString()
   }

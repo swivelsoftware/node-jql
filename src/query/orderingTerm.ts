@@ -1,6 +1,6 @@
 import { Expression, IExpression } from '../expression'
 import { parse } from '../expression/parse'
-import { JQLError } from '../utils/error'
+import { InstantiateError } from '../utils/error/InstantiateError'
 
 export type Order = 'ASC'|'DESC'
 
@@ -19,7 +19,12 @@ export class OrderingTerm implements IOrderingTerm {
       this.order = json.order || 'ASC'
     }
     catch (e) {
-      throw new JQLError('InstantiateError: Fail to instantiate OrderingTerm', e)
+      throw new InstantiateError('Fail to instantiate OrderingTerm', e)
     }
+  }
+
+  // @override
+  get [Symbol.toStringTag]() {
+    return 'OrderingTerm'
   }
 }

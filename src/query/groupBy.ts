@@ -1,7 +1,7 @@
 import { ConditionalExpression, Expression, IConditionalExpression, IExpression } from '../expression'
 import { AndExpressions } from '../expression/grouped'
 import { parse } from '../expression/parse'
-import { JQLError } from '../utils/error'
+import { InstantiateError } from '../utils/error/InstantiateError'
 
 export interface IGroupBy {
   expressions: IExpression[]|IExpression
@@ -20,7 +20,12 @@ export class GroupBy implements IGroupBy {
       if (json.$having) this.$having = Array.isArray(json.$having) ? new AndExpressions({ expressions: json.$having }) : parse(json.$having) as ConditionalExpression
     }
     catch (e) {
-      throw new JQLError('InstantiateError: Fail to instantiate GroupBy', e)
+      throw new InstantiateError('Fail to instantiate GroupBy', e)
     }
+  }
+
+  // @override
+  get [Symbol.toStringTag]() {
+    return 'GroupBy'
   }
 }

@@ -16,6 +16,11 @@ export class Unknown extends Expression implements IUnknown {
   }
 
   // @override
+  get [Symbol.toStringTag]() {
+    return 'Unknown'
+  }
+
+  // @override
   public validate() { /* do nothing */ }
 
   // @override

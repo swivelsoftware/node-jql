@@ -38,14 +38,14 @@ export function parse(value: any): Expression {
     return new Unknown()
   }
   else if (typeof value === 'object' && !Array.isArray(value)) {
-    if (!value.classname) throw new JQLError('ParseError: `classname` is not specified')
+    if (!value.classname) throw new SyntaxError('`classname` is not specified')
     const CONSTRUCTOR = expressions[value.classname]
-    if (!CONSTRUCTOR) throw new JQLError(`ParseError: Unknown expression '${value.classname}'`)
+    if (!CONSTRUCTOR) throw new SyntaxError(`Unknown expression '${value.classname}'`)
     try {
       return new CONSTRUCTOR(value)
     }
     catch (e) {
-      throw new JQLError(`ParseError: Fail to parse expression '${value.classname}'`, e)
+      throw new JQLError('SyntaxError', `Fail to parse expression '${value.classname}'`, e)
     }
   }
   else {

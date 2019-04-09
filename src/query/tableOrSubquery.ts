@@ -1,15 +1,15 @@
 import { IQuery, Query } from '.'
-import { JQLError } from '../utils/error'
+import { InstantiateError } from '../utils/error/InstantiateError'
 import { IJoinClause, JoinClause } from './joinClause'
 
 export interface ITableOrSubquery {
-  schema?: string
+  database?: string
   table: string|IQuery
   $as?: string
 }
 
 export class TableOrSubquery implements ITableOrSubquery {
-  public schema?: string
+  public database?: string
   public table: string|Query
   public $as?: string
 
@@ -21,25 +21,30 @@ export class TableOrSubquery implements ITableOrSubquery {
           $as: json[1],
         }
       }
-      if (typeof json.table === 'string' && !json.schema) {
+      if (typeof json.table === 'string' && !json.database) {
         this.table = json.table
       }
       else {
-        if (!!json.$as) throw new JQLError(`SyntaxError: Missing alias for ${this.table}`)
-        this.schema = json.schema
+        if (!!json.$as) throw new SyntaxError(`Missing alias for ${this.table}`)
+        this.database = json.database
         this.table = typeof json.table === 'string' ? json.table : new Query(json.table)
       }
       this.$as = json.$as
     }
     catch (e) {
-      throw new JQLError('InstantiateError: Fail to instantiate TableOrSubquery', e)
+      throw new InstantiateError('Fail to instantiate TableOrSubquery', e)
     }
+  }
+
+  // @override
+  get [Symbol.toStringTag]() {
+    return 'TableOrSubquery'
   }
 
   public validate(availableTables: string[]): string[] {
     if (typeof this.table !== 'string') this.table.validate(availableTables)
     const table = this.$as ? this.$as : this.table as string
-    if (availableTables.indexOf(table) > -1) throw new JQLError(`SyntaxError: Ambiguous table '${table}'`)
+    if (availableTables.indexOf(table) > -1) throw new SyntaxError(`Ambiguous table '${table}'`)
     return [table]
   }
 }
@@ -63,8 +68,13 @@ export class JoinedTableOrSubquery extends TableOrSubquery implements IJoinedTab
       this.joinClauses = joinClauses.map((joinClause) => new JoinClause(joinClause))
     }
     catch (e) {
-      throw new JQLError('InstantiateError: Fail to instantiate JoinedTableOrSubquery', e)
+      throw new InstantiateError('Fail to instantiate JoinedTableOrSubquery', e)
     }
+  }
+
+  // @override
+  get [Symbol.toStringTag]() {
+    return 'JoinedTableOrSubquery'
   }
 
   // @override

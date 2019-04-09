@@ -8,12 +8,22 @@ export interface IExpression {
 
 export abstract class Expression extends Sql implements IExpression {
   public readonly classname: string
+
+  // @override
+  get [Symbol.toStringTag]() {
+    return 'Expression'
+  }
 }
 
 export interface IConditionalExpression extends IExpression {
 }
 
 export abstract class ConditionalExpression extends Expression implements IConditionalExpression {
+  // @override
+  get [Symbol.toStringTag]() {
+    return 'ConditionalExpression'
+  }
+
   // @override
   public abstract toSquel(): squel.Expression
 }

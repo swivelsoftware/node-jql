@@ -1,6 +1,6 @@
 import squel = require('squel')
 import { Expression, IExpression } from '.'
-import { JQLError } from '../utils/error'
+import { InstantiateError } from '../utils/error/InstantiateError'
 import { parse } from './parse'
 
 export interface IFunctionExpression extends IExpression {
@@ -22,8 +22,13 @@ export class FunctionExpression extends Expression implements IFunctionExpressio
       this.parameters = parameters.map((parameter) => parse(parameter))
     }
     catch (e) {
-      throw new JQLError('InstantiateError: Fail to instantiate FunctionExpression', e)
+      throw new InstantiateError('Fail to instantiate FunctionExpression', e)
     }
+  }
+
+  // @override
+  get [Symbol.toStringTag]() {
+    return 'FunctionExpression'
   }
 
   get template(): string {

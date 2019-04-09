@@ -1,6 +1,6 @@
 import { Expression, IExpression } from '../expression'
 import { parse } from '../expression/parse'
-import { JQLError } from '../utils/error'
+import { InstantiateError } from '../utils/error/InstantiateError'
 
 export interface IResultColumn {
   expression: IExpression
@@ -17,7 +17,12 @@ export class ResultColumn implements IResultColumn {
       this.$as = json.$as
     }
     catch (e) {
-      throw new JQLError('InstantiateError: Fail to instantiate ResultColumn', e)
+      throw new InstantiateError('Fail to instantiate ResultColumn', e)
     }
+  }
+
+  // @override
+  get [Symbol.toStringTag]() {
+    return 'ResultColumn'
   }
 }

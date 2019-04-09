@@ -4,7 +4,7 @@ import { ColumnExpression } from '../expression/column'
 import { AndExpressions } from '../expression/grouped'
 import { parse } from '../expression/parse'
 import { Sql } from '../Sql'
-import { JQLError } from '../utils/error'
+import { InstantiateError } from '../utils/error/InstantiateError'
 import { GroupBy, IGroupBy } from './groupBy'
 import { IOrderingTerm, OrderingTerm } from './orderingTerm'
 import { IResultColumn, ResultColumn } from './resultColumn'
@@ -91,8 +91,13 @@ export class Query extends Sql {
       this.$limit = typeof json.$limit === 'number' ? { value: json.$limit } : json.$limit
     }
     catch (e) {
-      throw new JQLError('InstantiateError: Fail to instantiate Query', e)
+      throw new InstantiateError('Fail to instantiate Query', e)
     }
+  }
+
+  // @override
+  get [Symbol.toStringTag]() {
+    return 'Query'
   }
 
   // @override
