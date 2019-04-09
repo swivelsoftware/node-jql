@@ -48,7 +48,7 @@ export class Query extends Sql {
         }
         $select = [$select]
       }
-      this.$select = $select.map((json) => new ResultColumn(json))
+      this.$select = $select.map(json => new ResultColumn(json))
 
       // $from
       let $from = json.$from
@@ -57,7 +57,7 @@ export class Query extends Sql {
           if (typeof $from === 'string') $from = { table: $from }
           $from = [$from]
         }
-        this.$from = $from.map((json) => isJoinedTableOrSubquery(json) ? new JoinedTableOrSubquery(json) : new TableOrSubquery(json))
+        this.$from = $from.map(json => isJoinedTableOrSubquery(json) ? new JoinedTableOrSubquery(json) : new TableOrSubquery(json))
       }
 
       // $where
@@ -84,7 +84,7 @@ export class Query extends Sql {
           }
           $order = [$order]
         }
-        this.$order = $order.map((json) => new OrderingTerm(json))
+        this.$order = $order.map(json => new OrderingTerm(json))
       }
 
       // $limit
@@ -104,7 +104,7 @@ export class Query extends Sql {
   public validate(availableTables: string[] = []) {
     // $from
     if (this.$from) {
-      const tablesArrays = this.$from.map((tableOrSubquery) => tableOrSubquery.validate(availableTables))
+      const tablesArrays = this.$from.map(tableOrSubquery => tableOrSubquery.validate(availableTables))
       availableTables = availableTables.concat(...tablesArrays)
     }
 

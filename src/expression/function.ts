@@ -19,7 +19,7 @@ export class FunctionExpression extends Expression implements IFunctionExpressio
       this.name = json.name
       let parameters = json.parameters || []
       if (!Array.isArray(parameters)) parameters = [parameters]
-      this.parameters = parameters.map((parameter) => parse(parameter))
+      this.parameters = parameters.map(parameter => parse(parameter))
     }
     catch (e) {
       throw new InstantiateError('Fail to instantiate FunctionExpression', e)
@@ -43,7 +43,7 @@ export class FunctionExpression extends Expression implements IFunctionExpressio
   // @override
   public toSquel(): squel.FunctionBlock {
     return squel.rstr(this.template,
-      ...this.parameters.map((parameter) => parameter.toSquel()),
+      ...this.parameters.map(parameter => parameter.toSquel()),
     )
   }
 }
