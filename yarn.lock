@@ -321,12 +321,22 @@
   dependencies:
     "@babel/types" "^7.3.0"
 
+"@types/deep-diff@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@types/deep-diff/-/deep-diff-1.0.0.tgz#7eba3202a99b3a207f758f351f7f86387269fc40"
+  integrity sha512-ENsJcujGbCU/oXhDfQ12mSo/mCBWodT2tpARZKmatoSrf8+cGRCPi0KVj3I0FORhYZfLXkewXu7AoIWqiBLkNw==
+
 "@types/event-stream@^3.3.34":
   version "3.3.34"
   resolved "https://registry.yarnpkg.com/@types/event-stream/-/event-stream-3.3.34.tgz#104bcedd5c61f90917b734bde04e61c6e64f03e1"
   integrity sha512-LLiivgWKii4JeMzFy3trrxqkRrVSdue8WmbXyHuSJLwNrhIQU5MTrc65jhxEPwMyh5HR1xevSdD+k2nnSRKw9g==
   dependencies:
     "@types/node" "*"
+
+"@types/is-regexp@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@types/is-regexp/-/is-regexp-2.0.0.tgz#5304a3136695923cf9d5a1326212d1b2396f8522"
+  integrity sha512-sF5hYmqQCk+E2s5HTjWYcw03wTkV+Fx5cng2jjMrWkcJwjG2seMz3EmonARFFl4HeF0pZstuDCjfwHwWMEcR+A==
 
 "@types/istanbul-lib-coverage@^2.0.0":
   version "2.0.0"
@@ -951,6 +961,11 @@ decode-uri-component@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/decode-uri-component/-/decode-uri-component-0.2.0.tgz#eb3913333458775cb84cd1a1fae062106bb87545"
   integrity sha1-6zkTMzRYd1y4TNGh+uBiEGu4dUU=
+
+deep-diff@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/deep-diff/-/deep-diff-1.0.2.tgz#afd3d1f749115be965e89c63edc7abb1506b9c26"
+  integrity sha512-aWS3UIVH+NPGCD1kki+DCU9Dua032iSsO43LqQpcs4R3+dVv7tX0qBGjiVHJHjplsoUM2XRO/KB92glqc68awg==
 
 deep-extend@^0.6.0:
   version "0.6.0"
@@ -1689,6 +1704,11 @@ is-regex@^1.0.4:
   integrity sha1-VRdIm1RwkbCTDglWVM7SXul+lJE=
   dependencies:
     has "^1.0.1"
+
+is-regexp@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/is-regexp/-/is-regexp-2.0.0.tgz#d669511d64a620c7a8dffa9a1e00710f9275ace0"
+  integrity sha512-B5NGyyvXTmppdR/g7ei6cu5DXhvzBLNcajOXJ3OR1tmW39iiF7444beL1lQjL393j8vDOTWGnSV2r/5cKuNqkg==
 
 is-stream@^1.1.0:
   version "1.1.0"
