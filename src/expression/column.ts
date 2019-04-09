@@ -26,6 +26,10 @@ export class ColumnExpression extends Expression implements IColumnExpression {
     this.name = json.name
   }
 
+  get isWildcard(): boolean {
+    return this.name === '*'
+  }
+
   // @override
   get [Symbol.toStringTag]() {
     return 'ColumnExpression'
