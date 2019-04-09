@@ -35,6 +35,12 @@ export function equals<T>(l: T, r: T): boolean {
   else if (isRegexp(l) && isRegexp(r)) {
     return String(l) === String(r)
   }
+  else if (Array.isArray(l) && Array.isArray(r)) {
+    for (const item of l) {
+      if (!r.find(item_ => equals(item_, item))) return false
+    }
+    return true
+  }
   else if (typeof l === 'object' && typeof r === 'object') {
     return !!diff(l, r)
   }
