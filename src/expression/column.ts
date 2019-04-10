@@ -2,12 +2,14 @@ import squel = require('squel')
 import { Expression, IExpression } from '.'
 
 export interface IColumnExpression extends IExpression {
+  $distinct?: boolean
   table?: string
   name: string
 }
 
 export class ColumnExpression extends Expression implements IColumnExpression {
   public readonly classname = 'ColumnExpression'
+  public $distinct?: boolean
   public table?: string
   public name: string
 
@@ -22,6 +24,7 @@ export class ColumnExpression extends Expression implements IColumnExpression {
         name: json[1],
       }
     }
+    this.$distinct = json.$distinct
     this.table = json.table
     this.name = json.name
   }
@@ -44,6 +47,6 @@ export class ColumnExpression extends Expression implements IColumnExpression {
 
   // @override
   public toSquel(): squel.FunctionBlock {
-    return squel.rstr(`${this.table ? `\`${this.table}\`.` : ''}\`${this.name}\``)
+    return squel.rstr(`${this.$distinct ? 'DISTINCT ' : ''}${this.table ? `\`${this.table}\`.` : ''}\`${this.name}\``)
   }
 }
