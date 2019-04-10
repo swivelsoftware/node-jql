@@ -1,8 +1,16 @@
 import { diff } from 'deep-diff'
-import isRegexp = require('is-regexp')
 import squel = require('squel')
 
-export type Type = 'any'|'string'|'number'|'boolean'|'object'|'Date'|'RegExp'
+export type Type = 'any'|'string'|'number'|'boolean'|'object'|'Date'
+
+export const defaults = {
+  any: undefined,
+  string: '',
+  number: 0,
+  boolean: false,
+  object: {},
+  Date: 0,
+}
 
 /**
  * Get type of value
@@ -10,7 +18,6 @@ export type Type = 'any'|'string'|'number'|'boolean'|'object'|'Date'|'RegExp'
  */
 export function getType(value: any): Type {
   if (value instanceof Date) return 'Date'
-  if (isRegexp(value)) return 'RegExp'
   const type = typeof value
   switch (type) {
     case 'string':
@@ -31,9 +38,6 @@ export function getType(value: any): Type {
 export function equals<T>(l: T, r: T): boolean {
   if (l instanceof Date && r instanceof Date) {
     return l.getTime() === r.getTime()
-  }
-  else if (isRegexp(l) && isRegexp(r)) {
-    return String(l) === String(r)
   }
   else if (Array.isArray(l) && Array.isArray(r)) {
     for (const item of l) {
