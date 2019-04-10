@@ -1,4 +1,4 @@
-export { Sql, Type, getType, equals } from './Sql'
+export { Sql, Type, getType, equals, defaults } from './Sql'
 export { Expression } from './expression'
 export { AndExpressions, OrExpressions, IGroupedExpressions } from './expression/grouped'
 export { BetweenExpression, IBetweenExpression } from './expression/between'
