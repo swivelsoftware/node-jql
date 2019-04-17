@@ -1,6 +1,6 @@
 {
   "name": "node-jql",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "The JSON structure of SQL statements for node-jql-core",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -29,7 +29,7 @@
     "@types/is-regexp": "^2.0.0",
     "@types/jest": "^24.0.11",
     "@types/minimist": "^1.2.0",
-    "@types/node": "^11.13.0",
+    "@types/node": "^11.13.4",
     "@types/recursive-readdir": "^2.2.0",
     "chalk": "^2.4.2",
     "event-stream": "^4.0.1",
@@ -38,9 +38,9 @@
     "recursive-readdir": "^2.2.2",
     "rimraf": "^2.6.3",
     "ts-jest": "^24.0.2",
-    "ts-node": "^8.0.3",
-    "tslint": "^5.15.0",
-    "typescript": "^3.4.2"
+    "ts-node": "^8.1.0",
+    "tslint": "^5.16.0",
+    "typescript": "^3.4.3"
   },
   "dependencies": {
     "deep-diff": "^1.0.2",
