@@ -14,7 +14,7 @@ export abstract class GroupedExpressions extends ConditionalExpression implement
   constructor(json: IGroupedExpressions) {
     super()
     try {
-      this.expressions = json.expressions.map((expression) => parse(expression) as ConditionalExpression)
+      this.expressions = json.expressions.map(expression => parse(expression) as ConditionalExpression)
     }
     catch (e) {
       throw new InstantiateError('Fail to instantiate GroupedExpressions', e)

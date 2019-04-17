@@ -65,7 +65,7 @@ export class JoinedTableOrSubquery extends TableOrSubquery implements IJoinedTab
     try {
       let joinClauses = json.joinClauses
       if (!Array.isArray(joinClauses)) joinClauses = [joinClauses]
-      this.joinClauses = joinClauses.map((joinClause) => new JoinClause(joinClause))
+      this.joinClauses = joinClauses.map(joinClause => new JoinClause(joinClause))
     }
     catch (e) {
       throw new InstantiateError('Fail to instantiate JoinedTableOrSubquery', e)

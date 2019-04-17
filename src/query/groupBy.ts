@@ -16,7 +16,7 @@ export class GroupBy implements IGroupBy {
     try {
       let expressions = json.expressions
       if (!Array.isArray(expressions)) expressions = [expressions]
-      this.expressions = expressions.map((expression) => parse(expression))
+      this.expressions = expressions.map(expression => parse(expression))
       if (json.$having) this.$having = Array.isArray(json.$having) ? new AndExpressions({ expressions: json.$having }) : parse(json.$having) as ConditionalExpression
     }
     catch (e) {

@@ -6,12 +6,14 @@ import { parse } from './parse'
 export interface IFunctionExpression extends IExpression {
   name: string
   parameters?: any[]|any
+  extra?: string
 }
 
 export class FunctionExpression extends Expression implements IFunctionExpression {
   public readonly classname = 'FunctionExpression'
   public name: string
   public parameters: Expression[]
+  public extra?: string
 
   constructor(json: IFunctionExpression) {
     super()
@@ -19,7 +21,8 @@ export class FunctionExpression extends Expression implements IFunctionExpressio
       this.name = json.name
       let parameters = json.parameters || []
       if (!Array.isArray(parameters)) parameters = [parameters]
-      this.parameters = parameters.map((parameter) => parse(parameter))
+      this.parameters = parameters.map(parameter => parse(parameter))
+      this.extra = json.extra
     }
     catch (e) {
       throw new InstantiateError('Fail to instantiate FunctionExpression', e)
@@ -43,7 +46,7 @@ export class FunctionExpression extends Expression implements IFunctionExpressio
   // @override
   public toSquel(): squel.FunctionBlock {
     return squel.rstr(this.template,
-      ...this.parameters.map((parameter) => parameter.toSquel()),
+      ...this.parameters.map(parameter => parameter.toSquel()),
     )
   }
 }

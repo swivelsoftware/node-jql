@@ -11,54 +11,58 @@ import { OrderingTerm } from './query/orderingTerm'
 import { ResultColumn } from './query/resultColumn'
 import { JoinedTableOrSubquery } from './query/tableOrSubquery'
 
-test('SELECT `*` FROM Students', () => {
-  const query = new Query({ $from: 'Students' })
+test('SELECT `*` FROM Student', () => {
+  const query = new Query({ $from: 'Student' })
   query.validate()
-  expect(query.toString()).toBe('SELECT `*` FROM Students')
+  expect(query.toString()).toBe('SELECT `*` FROM Student')
 })
 
-test('SELECT `*` FROM Students WHERE (`class` = \'7C\') ORDER BY `id` ASC', () => {
+test('SELECT `*` FROM Student WHERE (`gender` = \'F\') ORDER BY `id` ASC', () => {
   const query = new Query({
-    $from: 'Students',
+    $from: 'Student',
     $where: new BinaryExpression({
-      left: new ColumnExpression('class'),
+      left: new ColumnExpression('gender'),
       operator: '=',
-      right: '7C',
+      right: 'F',
     }),
     $order: new OrderingTerm({ expression: new ColumnExpression('id') }),
   })
   query.validate()
-  expect(query.toString()).toBe('SELECT `*` FROM Students WHERE (`class` = \'7C\') ORDER BY `id` ASC')
+  expect(query.toString()).toBe('SELECT `*` FROM Student WHERE (`gender` = \'F\') ORDER BY `id` ASC')
 })
 
-test('SELECT `mark` FROM Students `s` LEFT JOIN Marks `m` ON (`m`.`studentId` = `s`.`id`) WHERE (`name` = \'Kennys Ng\') LIMIT 1', () => {
+test('SELECT `c`.`name` FROM Student `s` LEFT JOIN Class `c` ON (`c`.`studentId` = `s`.`id`) WHERE (`s`.`name` = \'Kennys Ng\') ORDER BY `c`.`year` DESC LIMIT 1', () => {
   const query = new Query({
-    $select: 'mark',
+    $select: new ResultColumn({ expression: new ColumnExpression(['c', 'name']) }),
     $from: new JoinedTableOrSubquery({
-      table: 'Students',
+      table: 'Student',
       $as: 's',
       joinClauses: new JoinClause({
         operator: 'LEFT',
-        tableOrSubquery: ['Marks', 'm'],
+        tableOrSubquery: ['Class', 'c'],
         $on: new BinaryExpression({
-          left: new ColumnExpression(['m', 'studentId']),
+          left: new ColumnExpression(['c', 'studentId']),
           operator: '=',
           right: new ColumnExpression(['s', 'id']),
         }),
       }),
     }),
     $where: new BinaryExpression({
-      left: new ColumnExpression('name'),
+      left: new ColumnExpression(['s', 'name']),
       operator: '=',
       right: 'Kennys Ng',
+    }),
+    $order: new OrderingTerm({
+      expression: new ColumnExpression(['c', 'year']),
+      order: 'DESC',
     }),
     $limit: { value: 1 },
   })
   query.validate()
-  expect(query.toString()).toBe('SELECT `mark` FROM Students `s` LEFT JOIN Marks `m` ON (`m`.`studentId` = `s`.`id`) WHERE (`name` = \'Kennys Ng\') LIMIT 1')
+  expect(query.toString()).toBe('SELECT `c`.`name` FROM Student `s` LEFT JOIN Class `c` ON (`c`.`studentId` = `s`.`id`) WHERE (`s`.`name` = \'Kennys Ng\') ORDER BY `c`.`year` DESC LIMIT 1')
 })
 
-test('SELECT COUNT(`*`) FROM Students WHERE (`id` IN (SELECT `studentId` FROM ClubsStudents `cs` LEFT JOIN Clubs `c` ON (`cs`.`clubId` = `c`.`id`) WHERE (`c`.`name` = \'Science Club\')))', () => {
+test('SELECT COUNT(`*`) FROM Student WHERE (`id` IN (SELECT `studentId` FROM ClubStudent `cs` LEFT JOIN Club `c` ON (`c`.`id` = `cs`.`clubId`) WHERE (`c`.`name` = \'Science Club\')))', () => {
   const query = new Query({
     $select: new ResultColumn({
       expression: new FunctionExpression({
@@ -66,21 +70,21 @@ test('SELECT COUNT(`*`) FROM Students WHERE (`id` IN (SELECT `studentId` FROM Cl
         parameters: new ColumnExpression('*'),
       }),
     }),
-    $from: 'Students',
+    $from: 'Student',
     $where: new InExpression({
       left: new ColumnExpression('id'),
       right: new Query({
         $select: 'studentId',
         $from: new JoinedTableOrSubquery({
-          table: 'ClubsStudents',
+          table: 'ClubStudent',
           $as: 'cs',
           joinClauses: new JoinClause({
             operator: 'LEFT',
-            tableOrSubquery: ['Clubs', 'c'],
+            tableOrSubquery: ['Club', 'c'],
             $on: new BinaryExpression({
-              left: new ColumnExpression(['cs', 'clubId']),
+              left: new ColumnExpression(['c', 'id']),
               operator: '=',
-              right: new ColumnExpression(['c', 'id']),
+              right: new ColumnExpression(['cs', 'clubId']),
             }),
           }),
         }),
@@ -93,7 +97,7 @@ test('SELECT COUNT(`*`) FROM Students WHERE (`id` IN (SELECT `studentId` FROM Cl
     }),
   })
   query.validate()
-  expect(query.toString()).toBe('SELECT COUNT(`*`) FROM Students WHERE (`id` IN (SELECT `studentId` FROM ClubsStudents `cs` LEFT JOIN Clubs `c` ON (`cs`.`clubId` = `c`.`id`) WHERE (`c`.`name` = \'Science Club\')))')
+  expect(query.toString()).toBe('SELECT COUNT(`*`) FROM Student WHERE (`id` IN (SELECT `studentId` FROM ClubStudent `cs` LEFT JOIN Club `c` ON (`c`.`id` = `cs`.`clubId`) WHERE (`c`.`name` = \'Science Club\')))')
 })
 
 test('SELECT 1', () => {

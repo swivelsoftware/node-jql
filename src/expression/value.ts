@@ -1,6 +1,6 @@
 import squel = require('squel')
 import { Expression, IExpression } from '.'
-import { Type } from '../Sql'
+import { Type } from '../Type'
 import { InstantiateError } from '../utils/error/InstantiateError'
 
 export interface IValue extends IExpression {

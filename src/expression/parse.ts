@@ -1,5 +1,5 @@
 import { Expression } from '.'
-import { getType } from '../Sql'
+import { getType } from '../Type'
 import { JQLError } from '../utils/error'
 import { BetweenExpression } from './between'
 import { BinaryExpression } from './binary'
