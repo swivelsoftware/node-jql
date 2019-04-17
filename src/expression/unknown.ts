@@ -1,6 +1,6 @@
 import squel = require('squel')
 import { Expression, IExpression } from '.'
-import { Type } from '../Sql'
+import { Type } from '../Type'
 
 export interface IUnknown extends IExpression {
   type?: Type[]|Type
