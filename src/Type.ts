@@ -1,4 +1,5 @@
 import { diff } from 'deep-diff'
+import { isUndefined } from 'util'
 
 export type Type = 'any'|'string'|'number'|'boolean'|'object'|'Date'
 
@@ -8,7 +9,7 @@ export const defaults = {
   number: 0,
   boolean: false,
   object: {},
-  Date: 0,
+  Date: undefined,
 }
 
 /**
@@ -53,6 +54,7 @@ export function equals<T>(l: T, r: T): boolean {
 }
 
 export function normalize(value: any, type: Type = getType(value)): any {
+  if (isUndefined(value)) return value
   switch (type) {
     case 'Date':
       return (value as Date).getTime()
@@ -62,6 +64,7 @@ export function normalize(value: any, type: Type = getType(value)): any {
 }
 
 export function denormalize(value: any, type: Type): any {
+  if (isUndefined(value)) return value
   switch (type) {
     case 'Date':
       return new Date(value)
