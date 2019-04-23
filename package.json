@@ -29,7 +29,7 @@
     "@types/is-regexp": "^2.0.0",
     "@types/jest": "^24.0.11",
     "@types/minimist": "^1.2.0",
-    "@types/node": "^11.13.4",
+    "@types/node": "^11.13.7",
     "@types/recursive-readdir": "^2.2.0",
     "chalk": "^2.4.2",
     "event-stream": "^4.0.1",
@@ -40,7 +40,7 @@
     "ts-jest": "^24.0.2",
     "ts-node": "^8.1.0",
     "tslint": "^5.16.0",
-    "typescript": "^3.4.3"
+    "typescript": "^3.4.4"
   },
   "dependencies": {
     "deep-diff": "^1.0.2",
