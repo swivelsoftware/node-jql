@@ -23,7 +23,7 @@ export class BetweenExpression extends ConditionalExpression implements IBetween
       this.left = parse(expr.left)
       this.$not = expr.$not || false
       this.start = parse(expr.start)
-      this.left = parse(expr.left)
+      this.end = parse(expr.end)
     }
     catch (e) {
       throw new InstantiateError('Fail to instantiate BetweenExpression', e)
