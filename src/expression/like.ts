@@ -7,21 +7,21 @@ import { Unknown } from './unknown'
 export interface ILikeExpression extends IConditionalExpression {
   left: any
   $not?: boolean
-  right?: string
+  right?: Unknown|string
 }
 
 export class LikeExpression extends ConditionalExpression implements ILikeExpression {
   public readonly classname = 'LikeExpression'
   public left: Expression
   public $not?: boolean
-  public right?: string
+  public right: Unknown|string
 
   constructor(json: ILikeExpression) {
     super()
     try {
       this.$not = json.$not
       this.left = parse(json.left)
-      this.right = json.right
+      this.right = json.right || new Unknown()
     }
     catch (e) {
       throw new InstantiateError('Fail to instantiate LikeExpression', e)
@@ -45,7 +45,7 @@ export class LikeExpression extends ConditionalExpression implements ILikeExpres
   // @override
   public toSquel(): squel.Expression {
     const params = [this.left.toSquel()] as any[]
-    params.push(this.right === undefined ? new Unknown().toSquel() : this.right)
+    params.push(typeof this.right === 'string' ? this.right : this.right.toSquel())
     return squel.expr()
       .and(
         this.template,
