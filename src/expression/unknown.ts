@@ -8,6 +8,7 @@ export interface IUnknown extends IExpression {
 
 export class Unknown extends Expression implements IUnknown {
   public readonly classname = 'Unknown'
+  public value?: any
   public type?: Type[]
 
   constructor(json?: IUnknown) {
@@ -25,6 +26,6 @@ export class Unknown extends Expression implements IUnknown {
 
   // @override
   public toSquel(): squel.FunctionBlock {
-    return squel.rstr('?')
+    return squel.rstr('?', this.value)
   }
 }
