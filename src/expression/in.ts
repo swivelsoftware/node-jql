@@ -3,19 +3,20 @@ import { ConditionalExpression, Expression, IConditionalExpression } from '.'
 import { IQuery, isQuery, Query } from '../query'
 import { InstantiateError } from '../utils/error/InstantiateError'
 import { parse } from './parse'
+import { Unknown } from './unknown'
 import { IValue, Value } from './value'
 
 export interface IInExpression extends IConditionalExpression {
   left: any
   $not?: boolean
-  right: any[]|IValue|IQuery
+  right: Unknown|any[]|IValue|IQuery
 }
 
 export class InExpression extends ConditionalExpression implements IInExpression {
   public readonly classname = 'InExpression'
   public left: Expression
   public $not?: boolean
-  public right: Value|Query
+  public right: Unknown|Value|Query
 
   constructor(json: IInExpression) {
     super()
@@ -27,7 +28,7 @@ export class InExpression extends ConditionalExpression implements IInExpression
           this.right = new Query(json.right)
         }
         else {
-          this.right = parse(json.right) as Value
+          this.right = parse(json.right) as Unknown|Value
         }
       }
     }

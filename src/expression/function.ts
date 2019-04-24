@@ -45,7 +45,8 @@ export class FunctionExpression extends Expression implements IFunctionExpressio
 
   // @override
   public toSquel(): squel.FunctionBlock {
-    return squel.rstr(this.template,
+    return squel.rstr(
+      this.template,
       ...this.parameters.map(parameter => parameter.toSquel()),
     )
   }
