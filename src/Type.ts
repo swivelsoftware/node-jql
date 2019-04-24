@@ -1,7 +1,7 @@
 import { diff } from 'deep-diff'
 import { isUndefined } from 'util'
 
-export type Type = 'any'|'string'|'number'|'boolean'|'object'|'Date'
+export type Type = 'any'|'string'|'number'|'boolean'|'object'|'Date'|'Array'
 
 export const defaults = {
   any: undefined,
@@ -10,6 +10,7 @@ export const defaults = {
   boolean: false,
   object: {},
   Date: undefined,
+  Array: [],
 }
 
 /**
@@ -18,6 +19,7 @@ export const defaults = {
  */
 export function getType(value: any): Type {
   if (value instanceof Date) return 'Date'
+  if (Array.isArray(value)) return 'Array'
   const type = typeof value
   switch (type) {
     case 'string':
@@ -58,6 +60,9 @@ export function normalize(value: any, type: Type = getType(value)): any {
   switch (type) {
     case 'Date':
       return (value as Date).getTime()
+    case 'object':
+    case 'Array':
+      return JSON.stringify(value)
     default:
       return value
   }
@@ -68,6 +73,9 @@ export function denormalize(value: any, type: Type): any {
   switch (type) {
     case 'Date':
       return new Date(value)
+    case 'object':
+    case 'Array':
+      return JSON.parse(value)
     default:
       return value
   }
