@@ -2,6 +2,7 @@ import squel = require('squel')
 import { ConditionalExpression, Expression, IConditionalExpression } from '.'
 import { InstantiateError } from '../utils/error/InstantiateError'
 import { parse } from './parse'
+import { Unknown } from './unknown'
 
 export interface ILikeExpression extends IConditionalExpression {
   left: any
@@ -44,7 +45,7 @@ export class LikeExpression extends ConditionalExpression implements ILikeExpres
   // @override
   public toSquel(): squel.Expression {
     const params = [this.left.toSquel()] as any[]
-    if (this.right) params.push(this.right)
+    params.push(this.right === undefined ? new Unknown().toSquel() : this.right)
     return squel.expr()
       .and(
         this.template,
