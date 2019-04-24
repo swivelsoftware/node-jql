@@ -37,7 +37,7 @@ export function parse(value: any): Expression {
   else if (value === undefined) {
     return new Unknown()
   }
-  else if (typeof value === 'object' && !Array.isArray(value)) {
+  else if (typeof value === 'object' && !(value instanceof Date) && !Array.isArray(value)) {
     if (!value.classname) throw new SyntaxError('`classname` is not specified')
     const CONSTRUCTOR = expressions[value.classname]
     if (!CONSTRUCTOR) throw new SyntaxError(`Unknown expression '${value.classname}'`)
