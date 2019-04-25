@@ -138,6 +138,9 @@ export class Query extends Sql {
   public toSquel(): squel.QueryBuilder {
     let query = squel.select()
 
+    // $distinct
+    if (this.$distinct) query = query.distinct()
+
     // $select
     for (const { expression, $as } of this.$select) query = query.field(expression.toSquel(), $as)
 
