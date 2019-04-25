@@ -2,6 +2,7 @@ import squel = require('squel')
 import { ConditionalExpression, Expression, IConditionalExpression } from '.'
 import { IQuery, isQuery, Query } from '../query'
 import { InstantiateError } from '../utils/error/InstantiateError'
+import { ColumnExpression } from './column'
 import { parse } from './parse'
 import { Unknown } from './unknown'
 import { IValue, Value } from './value'
@@ -26,6 +27,9 @@ export class InExpression extends ConditionalExpression implements IInExpression
       if (json.right) {
         if (isQuery(json.right)) {
           this.right = new Query(json.right)
+          if (this.right.$select.length > 1 || (this.right.$select[0].expression instanceof ColumnExpression && this.right.$select[0].expression.isWildcard)) {
+            throw new SyntaxError('InExpression.right should contain 1 column only')
+          }
         }
         else {
           this.right = parse(json.right) as Unknown|Value
@@ -43,7 +47,7 @@ export class InExpression extends ConditionalExpression implements IInExpression
   }
 
   get template(): string {
-    return `? ${this.$not ? 'NOT ' : ''}IN ?`
+    return `? ${this.$not ? 'NOT ' : ''}IN (?)`
   }
 
   // @override
