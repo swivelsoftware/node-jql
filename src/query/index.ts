@@ -4,6 +4,7 @@ import { ColumnExpression } from '../expression/column'
 import { AndExpressions } from '../expression/grouped'
 import { parse } from '../expression/parse'
 import { Sql } from '../Sql'
+import { JQLError } from '../utils/error'
 import { InstantiateError } from '../utils/error/InstantiateError'
 import { GroupBy, IGroupBy } from './groupBy'
 import { IOrderingTerm, OrderingTerm } from './orderingTerm'
@@ -69,6 +70,7 @@ export class Query extends Sql {
       // $group
       let $group = json.$group
       if ($group) {
+        if (!json.$from) throw new SyntaxError('GROUP BY is useless as FROM is not specified')
         if (typeof $group === 'string') {
           $group = { expressions: new ColumnExpression($group) }
         }
@@ -78,6 +80,7 @@ export class Query extends Sql {
       // $order
       let $order = json.$order
       if ($order) {
+        if (!json.$from) throw new SyntaxError('ORDER BY is useless as FROM is not specified')
         if (!Array.isArray($order)) {
           if (typeof $order === 'string') {
             $order = { expression: new ColumnExpression($order) }
@@ -88,6 +91,7 @@ export class Query extends Sql {
       }
 
       // $limit
+      if (json.$limit && !json.$from) throw new SyntaxError('LIMIT ... (OFFSET ...) is useless as FROM is not specified')
       this.$limit = typeof json.$limit === 'number' ? { value: json.$limit } : json.$limit
     }
     catch (e) {
