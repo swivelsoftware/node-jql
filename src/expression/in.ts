@@ -47,7 +47,7 @@ export class InExpression extends ConditionalExpression implements IInExpression
   }
 
   get template(): string {
-    return `? ${this.$not ? 'NOT ' : ''}IN (?)`
+    return `? ${this.$not ? 'NOT ' : ''}IN ${this.right instanceof Query ? '' : '('}?${this.right instanceof Query ? '' : ')'}`
   }
 
   // @override
