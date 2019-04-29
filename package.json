@@ -1,6 +1,6 @@
 {
   "name": "node-jql",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "The JSON structure of SQL statements for node-jql-core",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
