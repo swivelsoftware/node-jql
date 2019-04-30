@@ -13,7 +13,7 @@ export interface IFunctionExpression extends IExpression {
 export class FunctionExpression extends Expression implements IFunctionExpression {
   public readonly classname = 'FunctionExpression'
   public name: string
-  public parameters: Array<ParameterExpression|Value>
+  public parameters: ParameterExpression[]
 
   constructor(json: IFunctionExpression) {
     super()
@@ -21,11 +21,11 @@ export class FunctionExpression extends Expression implements IFunctionExpressio
       this.name = json.name
       let parameters = json.parameters || []
       if (!Array.isArray(parameters)) parameters = [parameters]
-      this.parameters = parameters.map(parameter => parse(parameter))
-      const invalidExpression = this.parameters.find(expression => !(expression instanceof ParameterExpression || expression instanceof Value))
-      if (invalidExpression) {
-        throw new SyntaxError(`Parameter of FunctionExpression should be either ParameterExpression or Value. ${invalidExpression.classname} found`)
-      }
+      this.parameters = parameters.map(parameter => {
+        let expression = parse(parameter)
+        if (!(expression instanceof ParameterExpression)) expression = new ParameterExpression({ expression })
+        return expression
+      })
     }
     catch (e) {
       throw new InstantiateError('Fail to instantiate FunctionExpression', e)
