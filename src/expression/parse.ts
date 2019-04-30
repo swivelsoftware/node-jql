@@ -11,6 +11,8 @@ import { AndExpressions, OrExpressions } from './grouped'
 import { InExpression } from './in'
 import { IsNullExpression } from './isNull'
 import { LikeExpression } from './like'
+import { MathExpression } from './math'
+import { ParameterExpression } from './parameter'
 import { Unknown } from './unknown'
 import { Value } from './value'
 
@@ -25,7 +27,9 @@ const expressions = {
   InExpression,
   IsNullExpression,
   LikeExpression,
+  MathExpression,
   OrExpressions,
+  ParameterExpression,
   Unknown,
   Value,
 }
