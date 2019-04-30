@@ -1,5 +1,7 @@
 import squel = require('squel')
 import { Expression, IExpression } from '.'
+import { InstantiateError } from '../utils/error/InstantiateError'
+import { parse } from './parse'
 
 export interface IParameterExpression extends IExpression {
   prefix?: string
@@ -12,6 +14,16 @@ export class ParameterExpression extends Expression implements IParameterExpress
   public readonly prefix?: string
   public readonly expression: Expression
   public readonly suffix?: string
+
+  constructor(json: IParameterExpression) {
+    super()
+    try {
+      this.expression = parse(json.expression)
+    }
+    catch (e) {
+      throw new InstantiateError('Fail to instantiate ParameterExpression', e)
+    }
+  }
 
   // @override
   public validate(availableTables: string[]) {
