@@ -4,13 +4,13 @@ import { IQuery, isQuery, Query } from '../query'
 import { InstantiateError } from '../utils/error/InstantiateError'
 import { ColumnExpression } from './column'
 import { parse } from './parse'
-import { Unknown } from './unknown'
+import { IUnknown, Unknown } from './unknown'
 import { IValue, Value } from './value'
 
 export interface IInExpression extends IConditionalExpression {
   left: any
   $not?: boolean
-  right: Unknown|any[]|IValue|IQuery
+  right?: IUnknown|any[]|IValue|IQuery
 }
 
 export class InExpression extends ConditionalExpression implements IInExpression {
@@ -71,9 +71,9 @@ export class InExpression extends ConditionalExpression implements IInExpression
     const result: IInExpression = {
       classname: this.classname,
       left: this.left.toJson(),
-      right: this.right.toJson(),
     }
     if (this.$not) result.$not = this.$not
+    if (this.right) result.right = this.right.toJson()
     return result
   }
 }
