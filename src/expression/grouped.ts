@@ -30,6 +30,14 @@ export abstract class GroupedExpressions extends ConditionalExpression implement
   public validate(availableTables: string[]) {
     for (const expression of this.expressions) expression.validate(availableTables)
   }
+
+  // @override
+  public toJson(): IGroupedExpressions {
+    return {
+      classname: this.classname,
+      expressions: this.expressions.map(expression => expression.toJson()),
+    }
+  }
 }
 
 export class AndExpressions extends GroupedExpressions {

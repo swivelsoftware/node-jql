@@ -47,6 +47,13 @@ export class TableOrSubquery implements ITableOrSubquery {
     if (availableTables.indexOf(table) > -1) throw new SyntaxError(`Ambiguous table '${table}'`)
     return [table]
   }
+
+  public toJson(): ITableOrSubquery {
+    const result: ITableOrSubquery = { table: this.table }
+    if (this.database) result.database = this.database
+    if (this.$as) result.$as = this.$as
+    return result
+  }
 }
 
 export function isJoinedTableOrSubquery(value: ITableOrSubquery): value is IJoinedTableOrSubquery {
@@ -84,5 +91,13 @@ export class JoinedTableOrSubquery extends TableOrSubquery implements IJoinedTab
       tables = tables.concat(joinClause.tableOrSubquery.validate([...availableTables, ...tables]))
     }
     return tables
+  }
+
+  // @override
+  public toJson(): IJoinedTableOrSubquery {
+    return {
+      joinClauses: this.joinClauses.map(joinClause => joinClause.toJson()),
+      ...super.toJson(),
+    }
   }
 }

@@ -28,4 +28,10 @@ export class GroupBy implements IGroupBy {
   get [Symbol.toStringTag]() {
     return 'GroupBy'
   }
+
+  public toJson(): IGroupBy {
+    const result: IGroupBy = { expressions: this.expressions.map(expression => expression.toJson()) }
+    if (this.$having) result.$having = this.$having.toJson()
+    return result
+  }
 }

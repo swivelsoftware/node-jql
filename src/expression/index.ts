@@ -13,6 +13,9 @@ export abstract class Expression extends Sql implements IExpression {
   get [Symbol.toStringTag]() {
     return 'Expression'
   }
+
+  // @override
+  public abstract toJson(): IExpression
 }
 
 export interface IConditionalExpression extends IExpression {
@@ -26,4 +29,7 @@ export abstract class ConditionalExpression extends Expression implements ICondi
 
   // @override
   public abstract toSquel(): squel.Expression
+
+  // @override
+  public abstract toJson(): IConditionalExpression
 }

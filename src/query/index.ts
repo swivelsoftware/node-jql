@@ -4,7 +4,6 @@ import { ColumnExpression } from '../expression/column'
 import { AndExpressions } from '../expression/grouped'
 import { parse } from '../expression/parse'
 import { Sql } from '../Sql'
-import { JQLError } from '../utils/error'
 import { InstantiateError } from '../utils/error/InstantiateError'
 import { GroupBy, IGroupBy } from './groupBy'
 import { IOrderingTerm, OrderingTerm } from './orderingTerm'
@@ -201,6 +200,19 @@ export class Query extends Sql {
     }
 
     return query
+  }
+
+  // @override
+  public toJson(): IQuery {
+    const result: IQuery = {}
+    if (this.$distinct) result.$distinct = true
+    if (this.$select.length) result.$select = this.$select.map(resultColumn => resultColumn.toJson())
+    if (this.$from) result.$from = this.$from.map(tableOrSubquery => tableOrSubquery.toJson())
+    if (this.$where) result.$where = this.$where.toJson()
+    if (this.$group) result.$group = this.$group.toJson()
+    if (this.$order) result.$order = this.$order.map(orderingTerm => orderingTerm.toJson())
+    if (this.$limit) result.$limit = this.$limit
+    return result
   }
 
   private join(query: squel.Select, { table, $as, joinClauses }: JoinedTableOrSubquery): squel.Select {

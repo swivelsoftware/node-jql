@@ -27,4 +27,11 @@ export class OrderingTerm implements IOrderingTerm {
   get [Symbol.toStringTag]() {
     return 'OrderingTerm'
   }
+
+  public toJson(): IOrderingTerm {
+    return {
+      expression: this.expression.toJson(),
+      order: this.order,
+    }
+  }
 }

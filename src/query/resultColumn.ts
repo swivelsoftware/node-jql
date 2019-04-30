@@ -25,4 +25,10 @@ export class ResultColumn implements IResultColumn {
   get [Symbol.toStringTag]() {
     return 'ResultColumn'
   }
+
+  public toJson(): IResultColumn {
+    const result: IResultColumn = { expression: this.expression.toJson() }
+    if (this.$as) result.$as = this.$as
+    return result
+  }
 }

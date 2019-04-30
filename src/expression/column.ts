@@ -46,4 +46,14 @@ export class ColumnExpression extends Expression implements IColumnExpression {
   public toSquel(): squel.FunctionBlock {
     return squel.rstr(`${this.table ? `${this.table}.` : ''}${this.name}`)
   }
+
+  // @override
+  public toJson(): IColumnExpression {
+    const result: IColumnExpression = {
+      classname: this.classname,
+      name: this.name,
+    }
+    if (this.table) result.table = this.table
+    return result
+  }
 }

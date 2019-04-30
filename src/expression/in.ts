@@ -65,4 +65,15 @@ export class InExpression extends ConditionalExpression implements IInExpression
         this.right.toSquel(),
       )
   }
+
+  // @override
+  public toJson(): IInExpression {
+    const result: IInExpression = {
+      classname: this.classname,
+      left: this.left.toJson(),
+      right: this.right.toJson(),
+    }
+    if (this.$not) result.$not = this.$not
+    return result
+  }
 }

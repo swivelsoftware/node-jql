@@ -2,13 +2,14 @@ import squel = require('squel')
 import { Expression, IExpression } from '.'
 import { InstantiateError } from '../utils/error/InstantiateError'
 import { parse } from './parse'
+import { Unknown } from './unknown'
 
 export type MathOperator = '+'|'-'|'*'|'/'|'%'|'MOD'|'DIV'
 
 export interface IMathExpression extends IExpression {
   left: any
   operator: MathOperator
-  right: any
+  right?: any
 }
 
 export class MathExpression extends Expression implements IMathExpression {
@@ -51,5 +52,16 @@ export class MathExpression extends Expression implements IMathExpression {
       this.left.toSquel(),
       this.right.toSquel(),
     )
+  }
+
+  // @override
+  public toJson(): IMathExpression {
+    const result: IMathExpression = {
+      classname: this.classname,
+      left: this.left.toJson(),
+      operator: this.operator,
+    }
+    if (!(this.right instanceof Unknown)) result.right = this.right.toJson()
+    return result
   }
 }

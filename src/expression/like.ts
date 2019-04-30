@@ -52,4 +52,15 @@ export class LikeExpression extends ConditionalExpression implements ILikeExpres
         ...params,
       )
   }
+
+  // @override
+  public toJson(): ILikeExpression {
+    const result: ILikeExpression = {
+      classname: this.classname,
+      left: this.left.toJson(),
+    }
+    if (this.$not) result.$not = this.$not
+    if (typeof this.right === 'string') result.right = this.right
+    return result
+  }
 }
