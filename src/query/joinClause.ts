@@ -33,4 +33,13 @@ export class JoinClause implements IJoinClause {
   get [Symbol.toStringTag]() {
     return 'JoinClause'
   }
+
+  public toJson(): IJoinClause {
+    const result: IJoinClause = {
+      operator: this.operator,
+      tableOrSubquery: this.tableOrSubquery.toJson(),
+    }
+    if (this.$on) result.$on = this.$on.toJson()
+    return result
+  }
 }

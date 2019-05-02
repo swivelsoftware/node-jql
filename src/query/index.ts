@@ -69,6 +69,7 @@ export class Query extends Sql {
       // $group
       let $group = json.$group
       if ($group) {
+        if (!json.$from) throw new SyntaxError('GROUP BY is useless as FROM is not specified')
         if (typeof $group === 'string') {
           $group = { expressions: new ColumnExpression($group) }
         }
@@ -78,6 +79,7 @@ export class Query extends Sql {
       // $order
       let $order = json.$order
       if ($order) {
+        if (!json.$from) throw new SyntaxError('ORDER BY is useless as FROM is not specified')
         if (!Array.isArray($order)) {
           if (typeof $order === 'string') {
             $order = { expression: new ColumnExpression($order) }
@@ -88,6 +90,7 @@ export class Query extends Sql {
       }
 
       // $limit
+      if (json.$limit && !json.$from) throw new SyntaxError('LIMIT ... (OFFSET ...) is useless as FROM is not specified')
       this.$limit = typeof json.$limit === 'number' ? { value: json.$limit } : json.$limit
     }
     catch (e) {
@@ -137,6 +140,9 @@ export class Query extends Sql {
   // @override
   public toSquel(): squel.QueryBuilder {
     let query = squel.select()
+
+    // $distinct
+    if (this.$distinct) query = query.distinct()
 
     // $select
     for (const { expression, $as } of this.$select) query = query.field(expression.toSquel(), $as)
@@ -194,6 +200,19 @@ export class Query extends Sql {
     }
 
     return query
+  }
+
+  // @override
+  public toJson(): IQuery {
+    const result: IQuery = {}
+    if (this.$distinct) result.$distinct = true
+    if (this.$select.length) result.$select = this.$select.map(resultColumn => resultColumn.toJson())
+    if (this.$from) result.$from = this.$from.map(tableOrSubquery => tableOrSubquery.toJson())
+    if (this.$where) result.$where = this.$where.toJson()
+    if (this.$group) result.$group = this.$group.toJson()
+    if (this.$order) result.$order = this.$order.map(orderingTerm => orderingTerm.toJson())
+    if (this.$limit) result.$limit = this.$limit
+    return result
   }
 
   private join(query: squel.Select, { table, $as, joinClauses }: JoinedTableOrSubquery): squel.Select {

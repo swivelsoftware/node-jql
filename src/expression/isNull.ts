@@ -46,4 +46,14 @@ export class IsNullExpression extends ConditionalExpression implements IIsNullEx
         this.left.toSquel(),
       )
   }
+
+  // @override
+  public toJson(): IIsNullExpression {
+    const result: IIsNullExpression = {
+      classname: this.classname,
+      left: this.left.toJson(),
+    }
+    if (this.$not) result.$not = this.$not
+    return result
+  }
 }

@@ -40,4 +40,14 @@ export class Value extends Expression implements IValue {
   public toSquel(): squel.FunctionBlock {
     return squel.rstr('?', this.value)
   }
+
+  // @override
+  public toJson(): IValue {
+    const result: IValue = {
+      classname: this.classname,
+      value: this.value,
+    }
+    if (this.type) result.type = this.type
+    return result
+  }
 }

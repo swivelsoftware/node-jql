@@ -1,7 +1,5 @@
 import { Expression, IExpression } from '../expression'
 import { parse } from '../expression/parse'
-import { Unknown } from '../expression/unknown'
-import { JQLError } from '../utils/error'
 import { InstantiateError } from '../utils/error/InstantiateError'
 
 export interface IResultColumn {
@@ -16,7 +14,6 @@ export class ResultColumn implements IResultColumn {
   constructor(json: IResultColumn) {
     try {
       this.expression = parse(json.expression)
-      if (this.expression instanceof Unknown) throw new JQLError('A ResultColumn should not be Unknown')
       this.$as = json.$as
     }
     catch (e) {
@@ -27,5 +24,11 @@ export class ResultColumn implements IResultColumn {
   // @override
   get [Symbol.toStringTag]() {
     return 'ResultColumn'
+  }
+
+  public toJson(): IResultColumn {
+    const result: IResultColumn = { expression: this.expression.toJson() }
+    if (this.$as) result.$as = this.$as
+    return result
   }
 }

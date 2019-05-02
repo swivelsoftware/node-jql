@@ -28,4 +28,12 @@ export class Unknown extends Expression implements IUnknown {
   public toSquel(): squel.FunctionBlock {
     return squel.rstr('?', this.value)
   }
+
+  // @override
+  public toJson(): IUnknown {
+    return {
+      classname: this.classname,
+      type: this.type,
+    }
+  }
 }

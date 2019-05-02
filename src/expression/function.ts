@@ -1,19 +1,19 @@
 import squel = require('squel')
 import { Expression, IExpression } from '.'
 import { InstantiateError } from '../utils/error/InstantiateError'
+import { ParameterExpression } from './parameter'
 import { parse } from './parse'
+import { Value } from './value'
 
 export interface IFunctionExpression extends IExpression {
   name: string
   parameters?: any[]|any
-  extra?: string
 }
 
 export class FunctionExpression extends Expression implements IFunctionExpression {
   public readonly classname = 'FunctionExpression'
   public name: string
-  public parameters: Expression[]
-  public extra?: string
+  public parameters: ParameterExpression[]
 
   constructor(json: IFunctionExpression) {
     super()
@@ -21,8 +21,11 @@ export class FunctionExpression extends Expression implements IFunctionExpressio
       this.name = json.name
       let parameters = json.parameters || []
       if (!Array.isArray(parameters)) parameters = [parameters]
-      this.parameters = parameters.map(parameter => parse(parameter))
-      this.extra = json.extra
+      this.parameters = parameters.map(parameter => {
+        let expression = parse(parameter)
+        if (!(expression instanceof ParameterExpression)) expression = new ParameterExpression({ expression })
+        return expression
+      })
     }
     catch (e) {
       throw new InstantiateError('Fail to instantiate FunctionExpression', e)
@@ -49,5 +52,15 @@ export class FunctionExpression extends Expression implements IFunctionExpressio
       this.template,
       ...this.parameters.map(parameter => parameter.toSquel()),
     )
+  }
+
+  // @override
+  public toJson(): IFunctionExpression {
+    const result: IFunctionExpression = {
+      classname: this.classname,
+      name: this.name,
+    }
+    if (this.parameters.length > 0) result.parameters = this.parameters.map(expression => expression.toJson())
+    return result
   }
 }

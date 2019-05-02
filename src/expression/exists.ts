@@ -46,4 +46,14 @@ export class ExistsExpression extends ConditionalExpression implements IExistsEx
         this.query.toSquel(),
       )
   }
+
+  // @override
+  public toJson(): IExistsExpression {
+    const result: IExistsExpression = {
+      classname: this.classname,
+      query: this.query.toJson(),
+    }
+    if (this.$not) result.$not = true
+    return result
+  }
 }

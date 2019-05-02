@@ -27,6 +27,13 @@ export class Case implements ICase {
     this.$when.validate(availableTables)
     this.$then.validate(availableTables)
   }
+
+  public toJson(): ICase {
+    return {
+      $when: this.$when.toJson(),
+      $then: this.$then.toJson(),
+    }
+  }
 }
 
 export interface ICaseExpression extends IConditionalExpression {
@@ -74,5 +81,15 @@ export class CaseExpression extends Expression implements ICaseExpression {
     this.cases.forEach(({ $when, $then }) => params.push($when.toSquel(), $then.toSquel()))
     if (this.$else) params.push(this.$else.toSquel())
     return squel.expr().and(this.template, ...params)
+  }
+
+  // @override
+  public toJson(): ICaseExpression {
+    const result: ICaseExpression = {
+      classname: this.classname,
+      cases: this.cases.map(case_ => case_.toJson()),
+    }
+    if (this.$else) result.$else = this.$else.toJson()
+    return result
   }
 }

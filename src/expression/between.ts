@@ -2,6 +2,7 @@ import squel = require('squel')
 import { ConditionalExpression, Expression, IConditionalExpression } from '.'
 import { InstantiateError } from '../utils/error/InstantiateError'
 import { parse } from './parse'
+import { Unknown } from './unknown'
 
 export interface IBetweenExpression extends IConditionalExpression {
   left: any
@@ -55,5 +56,17 @@ export class BetweenExpression extends ConditionalExpression implements IBetween
         this.start.toSquel(),
         this.end.toSquel(),
       )
+  }
+
+  // @override
+  public toJson(): IBetweenExpression {
+    const result: IBetweenExpression = {
+      classname: this.classname,
+      left: this.left.toJson(),
+    }
+    if (this.$not) result.$not = true
+    if (!(this.start instanceof Unknown)) result.start = this.start.toJson()
+    if (!(this.end instanceof Unknown)) result.end = this.end.toJson()
+    return result
   }
 }

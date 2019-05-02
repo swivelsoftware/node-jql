@@ -2,13 +2,14 @@ import squel = require('squel')
 import { ConditionalExpression, Expression, IConditionalExpression } from '.'
 import { InstantiateError } from '../utils/error/InstantiateError'
 import { parse } from './parse'
+import { Unknown } from './unknown'
 
 export type BinaryOperator = '='|'<>'|'<'|'<='|'>'|'>='
 
 export interface IBinaryExpression extends IConditionalExpression {
   left: any
   operator: BinaryOperator
-  right: any
+  right?: any
 }
 
 export class BinaryExpression extends ConditionalExpression implements IBinaryExpression {
@@ -52,5 +53,16 @@ export class BinaryExpression extends ConditionalExpression implements IBinaryEx
         this.left.toSquel(),
         this.right.toSquel(),
       )
+  }
+
+  // @override
+  public toJson(): IBinaryExpression {
+    const result: IBinaryExpression = {
+      classname: this.classname,
+      left: this.left.toJson(),
+      operator: this.operator,
+    }
+    if (!(this.right instanceof Unknown)) result.right = this.right.toJson()
+    return result
   }
 }
