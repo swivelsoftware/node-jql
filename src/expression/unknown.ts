@@ -1,6 +1,7 @@
 import squel = require('squel')
 import { Expression, IExpression } from '.'
 import { Type } from '../Type'
+import { IValue } from './value'
 
 export interface IUnknown extends IExpression {
   type?: Type[]|Type
@@ -30,7 +31,14 @@ export class Unknown extends Expression implements IUnknown {
   }
 
   // @override
-  public toJson(): IUnknown {
+  public toJson(): IValue|IUnknown {
+    if (this.value !== undefined && this.value !== null) {
+      return {
+        classname: 'Value',
+        value: this.value,
+        type: this.type,
+      }
+    }
     return {
       classname: this.classname,
       type: this.type,
