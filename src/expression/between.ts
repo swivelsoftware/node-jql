@@ -65,8 +65,8 @@ export class BetweenExpression extends ConditionalExpression implements IBetween
       left: this.left.toJson(),
     }
     if (this.$not) result.$not = true
-    if (!(this.start instanceof Unknown)) result.start = this.start.toJson()
-    if (!(this.end instanceof Unknown)) result.end = this.end.toJson()
+    if (!(this.start instanceof Unknown) || this.start.value) result.start = this.start.toJson()
+    if (!(this.end instanceof Unknown) || this.end.value) result.end = this.end.toJson()
     return result
   }
 }

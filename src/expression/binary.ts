@@ -62,7 +62,7 @@ export class BinaryExpression extends ConditionalExpression implements IBinaryEx
       left: this.left.toJson(),
       operator: this.operator,
     }
-    if (!(this.right instanceof Unknown)) result.right = this.right.toJson()
+    if (!(this.right instanceof Unknown) || this.right.value) result.right = this.right.toJson()
     return result
   }
 }
