@@ -1,6 +1,8 @@
 import { IQuery, Query } from '.'
+import { ConditionalExpression, IConditionalExpression } from '../expression'
+import { AndExpressions } from '../expression/grouped'
+import { parse } from '../expression/parse'
 import { InstantiateError } from '../utils/error/InstantiateError'
-import { IJoinClause, JoinClause } from './joinClause'
 
 export interface ITableOrSubquery {
   database?: string
@@ -52,6 +54,46 @@ export class TableOrSubquery implements ITableOrSubquery {
     const result: ITableOrSubquery = { table: this.table }
     if (this.database) result.database = this.database
     if (this.$as) result.$as = this.$as
+    return result
+  }
+}
+
+export type JoinOperator = 'INNER'|'CROSS'|'LEFT'|'RIGHT'|'FULL'
+
+export interface IJoinClause {
+  operator?: JoinOperator
+  tableOrSubquery: ITableOrSubquery|[string, string]|string
+  $on?: IConditionalExpression[]|IConditionalExpression
+}
+
+export class JoinClause implements IJoinClause {
+  public operator: JoinOperator
+  public tableOrSubquery: TableOrSubquery
+  public $on?: ConditionalExpression
+
+  constructor(json: IJoinClause) {
+    try {
+      this.operator = json.operator || 'INNER'
+      if (typeof json.tableOrSubquery === 'string') json.tableOrSubquery = { table: json.tableOrSubquery }
+      this.tableOrSubquery = new TableOrSubquery(json.tableOrSubquery)
+      if (json.$on) this.$on = Array.isArray(json.$on) ? new AndExpressions({ expressions: json.$on }) : parse(json.$on) as ConditionalExpression
+    }
+    catch (e) {
+      throw new InstantiateError('Fail to instantiate JoinClause', e)
+    }
+  }
+
+  // @override
+  get [Symbol.toStringTag]() {
+    return 'JoinClause'
+  }
+
+  public toJson(): IJoinClause {
+    const result: IJoinClause = {
+      operator: this.operator,
+      tableOrSubquery: this.tableOrSubquery.toJson(),
+    }
+    if (this.$on) result.$on = this.$on.toJson()
     return result
   }
 }
