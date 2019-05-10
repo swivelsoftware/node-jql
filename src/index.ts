@@ -1,6 +1,3 @@
-// To avoid undefined due to recurrsive dependencies
-import './expression/expressions'
-
 export { Sql } from './Sql'
 export { Type, getType, equals, defaults, normalize, denormalize } from './Type'
 export { Expression } from './expression'
