@@ -6,10 +6,7 @@ import { FunctionExpression } from './expression/function'
 import { InExpression } from './expression/in'
 import { MathExpression } from './expression/math'
 import { Value } from './expression/value'
-import { Query } from './query'
-import { OrderingTerm } from './query/orderingTerm'
-import { ResultColumn } from './query/resultColumn'
-import { JoinClause, JoinedTableOrSubquery } from './query/tableOrSubquery'
+import { JoinClause, JoinedTableOrSubquery, OrderingTerm, Query, ResultColumn } from './query'
 
 test('SELECT * FROM Student', () => {
   const query = new Query({ $from: 'Student' })

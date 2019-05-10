@@ -1,14 +1,10 @@
 import squel = require('squel')
-import { ConditionalExpression, IConditionalExpression } from '../expression'
-import { ColumnExpression } from '../expression/column'
-import { AndExpressions } from '../expression/grouped'
-import { parse } from '../expression/parse'
-import { Sql } from '../Sql'
-import { InstantiateError } from '../utils/error/InstantiateError'
-import { GroupBy, IGroupBy } from './groupBy'
-import { IOrderingTerm, OrderingTerm } from './orderingTerm'
-import { IResultColumn, ResultColumn } from './resultColumn'
-import { IJoinedTableOrSubquery, isJoinedTableOrSubquery, ITableOrSubquery, JoinedTableOrSubquery, TableOrSubquery } from './tableOrSubquery'
+import { ConditionalExpression, Expression, IConditionalExpression, IExpression } from './expression'
+import { ColumnExpression } from './expression/column'
+import { AndExpressions } from './expression/grouped'
+import { parse } from './expression/parse'
+import { Sql } from './Sql'
+import { InstantiateError } from './utils/error/InstantiateError'
 
 export function isQuery(object: any): object is IQuery {
   return '$select' in object || '$from' in object
@@ -237,5 +233,243 @@ export class Query extends Sql {
       }
     }
     return query
+  }
+}
+
+export interface IResultColumn {
+  expression: IExpression
+  $as?: string
+}
+
+export class ResultColumn implements IResultColumn {
+  public expression: Expression
+  public $as?: string
+
+  constructor(json: IResultColumn) {
+    try {
+      this.expression = parse(json.expression)
+      this.$as = json.$as
+    }
+    catch (e) {
+      throw new InstantiateError('Fail to instantiate ResultColumn', e)
+    }
+  }
+
+  // @override
+  get [Symbol.toStringTag]() {
+    return 'ResultColumn'
+  }
+
+  public toJson(): IResultColumn {
+    const result: IResultColumn = { expression: this.expression.toJson() }
+    if (this.$as) result.$as = this.$as
+    return result
+  }
+}
+
+export interface ITableOrSubquery {
+  database?: string
+  table: string|IQuery
+  $as?: string
+}
+
+export class TableOrSubquery implements ITableOrSubquery {
+  public database?: string
+  public table: string|Query
+  public $as?: string
+
+  constructor(json: [string, string]|ITableOrSubquery) {
+    try {
+      if (Array.isArray(json)) {
+        json = {
+          table: json[0],
+          $as: json[1],
+        }
+      }
+      if (typeof json.table === 'string' && !json.database) {
+        this.table = json.table
+      }
+      else {
+        if (!!json.$as) throw new SyntaxError(`Missing alias for ${this.table}`)
+        this.database = json.database
+        this.table = typeof json.table === 'string' ? json.table : new Query(json.table)
+      }
+      this.$as = json.$as
+    }
+    catch (e) {
+      throw new InstantiateError('Fail to instantiate TableOrSubquery', e)
+    }
+  }
+
+  // @override
+  get [Symbol.toStringTag]() {
+    return 'TableOrSubquery'
+  }
+
+  public validate(availableTables: string[]): string[] {
+    if (typeof this.table !== 'string') this.table.validate(availableTables)
+    const table = this.$as ? this.$as : this.table as string
+    if (availableTables.indexOf(table) > -1) throw new SyntaxError(`Ambiguous table '${table}'`)
+    return [table]
+  }
+
+  public toJson(): ITableOrSubquery {
+    const result: ITableOrSubquery = { table: this.table }
+    if (this.database) result.database = this.database
+    if (this.$as) result.$as = this.$as
+    return result
+  }
+}
+
+export type JoinOperator = 'INNER'|'CROSS'|'LEFT'|'RIGHT'|'FULL'
+
+export interface IJoinClause {
+  operator?: JoinOperator
+  tableOrSubquery: ITableOrSubquery|[string, string]|string
+  $on?: IConditionalExpression[]|IConditionalExpression
+}
+
+export class JoinClause implements IJoinClause {
+  public operator: JoinOperator
+  public tableOrSubquery: TableOrSubquery
+  public $on?: ConditionalExpression
+
+  constructor(json: IJoinClause) {
+    try {
+      this.operator = json.operator || 'INNER'
+      if (typeof json.tableOrSubquery === 'string') json.tableOrSubquery = { table: json.tableOrSubquery }
+      this.tableOrSubquery = new TableOrSubquery(json.tableOrSubquery)
+      if (json.$on) this.$on = Array.isArray(json.$on) ? new AndExpressions({ expressions: json.$on }) : parse(json.$on) as ConditionalExpression
+    }
+    catch (e) {
+      throw new InstantiateError('Fail to instantiate JoinClause', e)
+    }
+  }
+
+  // @override
+  get [Symbol.toStringTag]() {
+    return 'JoinClause'
+  }
+
+  public toJson(): IJoinClause {
+    const result: IJoinClause = {
+      operator: this.operator,
+      tableOrSubquery: this.tableOrSubquery.toJson(),
+    }
+    if (this.$on) result.$on = this.$on.toJson()
+    return result
+  }
+}
+
+export function isJoinedTableOrSubquery(value: ITableOrSubquery): value is IJoinedTableOrSubquery {
+  return 'joinClauses' in value
+}
+
+export interface IJoinedTableOrSubquery extends ITableOrSubquery {
+  joinClauses: IJoinClause[]|IJoinClause
+}
+
+export class JoinedTableOrSubquery extends TableOrSubquery implements IJoinedTableOrSubquery {
+  public joinClauses: JoinClause[] = []
+
+  constructor(json: IJoinedTableOrSubquery) {
+    super(json)
+    try {
+      let joinClauses = json.joinClauses
+      if (!Array.isArray(joinClauses)) joinClauses = [joinClauses]
+      this.joinClauses = joinClauses.map(joinClause => new JoinClause(joinClause))
+    }
+    catch (e) {
+      throw new InstantiateError('Fail to instantiate JoinedTableOrSubquery', e)
+    }
+  }
+
+  // @override
+  get [Symbol.toStringTag]() {
+    return 'JoinedTableOrSubquery'
+  }
+
+  // @override
+  public validate(availableTables: string[] = []): string[] {
+    let tables = super.validate(availableTables)
+    for (const joinClause of this.joinClauses) {
+      tables = tables.concat(joinClause.tableOrSubquery.validate([...availableTables, ...tables]))
+    }
+    return tables
+  }
+
+  // @override
+  public toJson(): IJoinedTableOrSubquery {
+    return {
+      joinClauses: this.joinClauses.map(joinClause => joinClause.toJson()),
+      ...super.toJson(),
+    }
+  }
+}
+
+export interface IGroupBy {
+  expressions: IExpression[]|IExpression
+  $having?: IConditionalExpression[]|IConditionalExpression
+}
+
+export class GroupBy implements IGroupBy {
+  public expressions: Expression[]
+  public $having?: ConditionalExpression
+
+  constructor(json: IGroupBy) {
+    try {
+      let expressions = json.expressions
+      if (!Array.isArray(expressions)) expressions = [expressions]
+      this.expressions = expressions.map(expression => parse(expression))
+      if (json.$having) this.$having = Array.isArray(json.$having) ? new AndExpressions({ expressions: json.$having }) : parse(json.$having) as ConditionalExpression
+    }
+    catch (e) {
+      throw new InstantiateError('Fail to instantiate GroupBy', e)
+    }
+  }
+
+  // @override
+  get [Symbol.toStringTag]() {
+    return 'GroupBy'
+  }
+
+  public toJson(): IGroupBy {
+    const result: IGroupBy = { expressions: this.expressions.map(expression => expression.toJson()) }
+    if (this.$having) result.$having = this.$having.toJson()
+    return result
+  }
+}
+
+export type Order = 'ASC'|'DESC'
+
+export interface IOrderingTerm {
+  expression: IExpression
+  order?: Order
+}
+
+export class OrderingTerm implements IOrderingTerm {
+  public expression: Expression
+  public order: Order
+
+  constructor(json: IOrderingTerm) {
+    try {
+      this.expression = parse(json.expression)
+      this.order = json.order || 'ASC'
+    }
+    catch (e) {
+      throw new InstantiateError('Fail to instantiate OrderingTerm', e)
+    }
+  }
+
+  // @override
+  get [Symbol.toStringTag]() {
+    return 'OrderingTerm'
+  }
+
+  public toJson(): IOrderingTerm {
+    return {
+      expression: this.expression.toJson(),
+      order: this.order,
+    }
   }
 }

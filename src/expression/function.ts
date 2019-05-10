@@ -3,7 +3,6 @@ import { Expression, IExpression } from '.'
 import { InstantiateError } from '../utils/error/InstantiateError'
 import { ParameterExpression } from './parameter'
 import { parse } from './parse'
-import { Value } from './value'
 
 export interface IFunctionExpression extends IExpression {
   name: string
