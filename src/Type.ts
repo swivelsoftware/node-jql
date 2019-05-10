@@ -1,5 +1,5 @@
 import { diff } from 'deep-diff'
-import { isUndefined } from 'util'
+import isUndefined from './utils/isUndefined'
 
 export type Type = 'any'|'string'|'number'|'boolean'|'object'|'Date'|'Array'
 
