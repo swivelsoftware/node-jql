@@ -1,7 +1,6 @@
 import { Expression } from '.'
 import { getType } from '../Type'
 import { JQLError } from '../utils/error'
-import { expressions } from './expressions'
 import { Unknown } from './unknown'
 import { Value } from './value'
 
@@ -14,7 +13,7 @@ export function parse(value: any): Expression {
   }
   else if (typeof value === 'object' && !(value instanceof Date) && !Array.isArray(value)) {
     if (!value.classname) throw new SyntaxError('`classname` is not specified')
-    const CONSTRUCTOR = expressions[value.classname]
+    const CONSTRUCTOR = require(`./expressions/${value.classname}`).default
     if (!CONSTRUCTOR) throw new SyntaxError(`Unknown expression '${value.classname}'`)
     try {
       return new CONSTRUCTOR(value)

@@ -1,6 +1,3 @@
-// To avoid undefined due to recurrsive dependencies
-import './expression/expressions'
-
 export { Sql } from './Sql'
 export { Type, getType, equals, defaults, normalize, denormalize } from './Type'
 export { Expression } from './expression'
@@ -18,9 +15,4 @@ export { MathOperator, MathExpression, IMathExpression } from './expression/math
 export { ParameterExpression, IParameterExpression } from './expression/parameter'
 export { Unknown, IUnknown } from './expression/unknown'
 export { Value, IValue } from './expression/value'
-export { Query, IQuery } from './query'
-export { ResultColumn, IResultColumn } from './query/resultColumn'
-export { JoinOperator, JoinClause, IJoinClause } from './query/joinClause'
-export { TableOrSubquery, ITableOrSubquery, JoinedTableOrSubquery, IJoinedTableOrSubquery } from './query/tableOrSubquery'
-export { GroupBy, IGroupBy } from './query/groupBy'
-export { Order, OrderingTerm, IOrderingTerm } from './query/orderingTerm'
+export { Query, IQuery, ResultColumn, IResultColumn, TableOrSubquery, ITableOrSubquery, JoinOperator, JoinClause, IJoinClause, JoinedTableOrSubquery, IJoinedTableOrSubquery, GroupBy, IGroupBy, Order, OrderingTerm, IOrderingTerm } from './query'
