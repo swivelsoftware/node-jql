@@ -4,6 +4,7 @@ import { ColumnExpression } from './expression/column'
 import { AndExpressions } from './expression/grouped'
 import { parse } from './expression/parse'
 import { Sql } from './Sql'
+import { Type } from './Type'
 import { InstantiateError } from './utils/error/InstantiateError'
 
 export function isQuery(object: any): object is IQuery {
@@ -150,7 +151,7 @@ export class Query extends Sql {
 
       // no join
       if (noJoinedTable) {
-        for (const { table, $as } of this.$from) query = query.from(typeof table === 'string' ? table : table.toSquel(), $as)
+        for (const { table, $as } of this.$from) query = query.from(typeof table === 'string' ? table : isRemoteTable(table) ? squel.str(`url(?)`, table.url) : table.toSquel(), $as)
       }
       // join to one table
       else if (oneJoinedTable) {
@@ -164,7 +165,7 @@ export class Query extends Sql {
           }
           else {
             const { table, $as } = tableOrSubquery
-            query = query.from(typeof table === 'string' ? table : table.toSquel(), $as)
+            query = query.from(typeof table === 'string' ? table : isRemoteTable(table) ? squel.str(`url(?)`, table.url) : table.toSquel(), $as)
           }
         }
       }
@@ -212,23 +213,23 @@ export class Query extends Sql {
   }
 
   private join(query: squel.Select, { table, $as, joinClauses }: JoinedTableOrSubquery): squel.Select {
-    query = query.from(typeof table === 'string' ? table : table.toSquel(), $as)
+    query = query.from(typeof table === 'string' ? table : isRemoteTable(table) ? squel.str(`url(?)`, table.url) : table.toSquel(), $as)
     for (const { operator, tableOrSubquery: { table, $as }, $on } of joinClauses) {
       switch (operator) {
         case 'CROSS':
-          query = query.cross_join(typeof table === 'string' ? table : table.toSquel(), $as, $on ? $on.toSquel() : undefined)
+          query = query.cross_join(typeof table === 'string' ? table : isRemoteTable(table) ? squel.str(`url(?)`, table.url) : table.toSquel(), $as, $on ? $on.toSquel() : undefined)
           break
         case 'FULL':
-          query = query.outer_join(typeof table === 'string' ? table : table.toSquel(), $as, $on ? $on.toSquel() : undefined)
+          query = query.outer_join(typeof table === 'string' ? table : isRemoteTable(table) ? squel.str(`url(?)`, table.url) : table.toSquel(), $as, $on ? $on.toSquel() : undefined)
           break
         case 'INNER':
-          query = query.join(typeof table === 'string' ? table : table.toSquel(), $as, $on ? $on.toSquel() : undefined)
+          query = query.join(typeof table === 'string' ? table : isRemoteTable(table) ? squel.str(`url(?)`, table.url) : table.toSquel(), $as, $on ? $on.toSquel() : undefined)
           break
         case 'LEFT':
-          query = query.left_join(typeof table === 'string' ? table : table.toSquel(), $as, $on ? $on.toSquel() : undefined)
+          query = query.left_join(typeof table === 'string' ? table : isRemoteTable(table) ? squel.str(`url(?)`, table.url) : table.toSquel(), $as, $on ? $on.toSquel() : undefined)
           break
         case 'RIGHT':
-          query = query.right_join(typeof table === 'string' ? table : table.toSquel(), $as, $on ? $on.toSquel() : undefined)
+          query = query.right_join(typeof table === 'string' ? table : isRemoteTable(table) ? squel.str(`url(?)`, table.url) : table.toSquel(), $as, $on ? $on.toSquel() : undefined)
           break
       }
     }
@@ -267,15 +268,26 @@ export class ResultColumn implements IResultColumn {
   }
 }
 
+export interface IRemoteTable {
+  method?: string
+  url: string
+  body?: any
+  columns?: Array<{ name: string, type?: Type }>
+}
+
+function isRemoteTable(obj: any): obj is IRemoteTable {
+  return 'url' in obj
+}
+
 export interface ITableOrSubquery {
   database?: string
-  table: string|IQuery
+  table: string|IQuery|IRemoteTable
   $as?: string
 }
 
 export class TableOrSubquery implements ITableOrSubquery {
   public database?: string
-  public table: string|Query
+  public table: string|Query|IRemoteTable
   public $as?: string
 
   constructor(json: [string, string]|ITableOrSubquery) {
@@ -286,7 +298,7 @@ export class TableOrSubquery implements ITableOrSubquery {
           $as: json[1],
         }
       }
-      if (typeof json.table === 'string' && !json.database) {
+      if ((typeof json.table === 'string' && !json.database) || isRemoteTable(json.table)) {
         this.table = json.table
       }
       else {
@@ -307,7 +319,7 @@ export class TableOrSubquery implements ITableOrSubquery {
   }
 
   public validate(availableTables: string[]): string[] {
-    if (typeof this.table !== 'string') this.table.validate(availableTables)
+    if (typeof this.table !== 'string' && !isRemoteTable(this.table)) this.table.validate(availableTables)
     const table = this.$as ? this.$as : this.table as string
     if (availableTables.indexOf(table) > -1) throw new SyntaxError(`Ambiguous table '${table}'`)
     return [table]
