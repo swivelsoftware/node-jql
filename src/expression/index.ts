@@ -1,4 +1,4 @@
-import squel = require('squel')
+import squel from 'squel'
 import { Sql } from '../Sql'
 
 export interface IExpression {
