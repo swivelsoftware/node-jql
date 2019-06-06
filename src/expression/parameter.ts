@@ -1,4 +1,4 @@
-import squel = require('squel')
+import squel from 'squel'
 import { Expression, IExpression } from '.'
 import { InstantiateError } from '../utils/error/InstantiateError'
 import { parse } from './parse'

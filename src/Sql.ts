@@ -1,4 +1,4 @@
-import squel = require('squel')
+import squel from 'squel'
 
 export abstract class Sql {
   // @override
