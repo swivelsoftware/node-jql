@@ -270,7 +270,7 @@ export class ResultColumn implements IResultColumn {
 }
 
 export interface IRemoteTable extends AxiosRequestConfig {
-  columns?: Array<{ name: string, type?: Type }>
+  columns: Array<{ name: string, type?: Type }>
 }
 
 function isRemoteTable(obj: any): obj is IRemoteTable {
