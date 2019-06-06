@@ -1,4 +1,5 @@
-import squel = require('squel')
+import { AxiosRequestConfig } from 'axios'
+import squel from 'squel'
 import { ConditionalExpression, Expression, IConditionalExpression, IExpression } from './expression'
 import { ColumnExpression } from './expression/column'
 import { AndExpressions } from './expression/grouped'
@@ -268,10 +269,7 @@ export class ResultColumn implements IResultColumn {
   }
 }
 
-export interface IRemoteTable {
-  method?: string
-  url: string
-  body?: any
+export interface IRemoteTable extends AxiosRequestConfig {
   columns?: Array<{ name: string, type?: Type }>
 }
 
