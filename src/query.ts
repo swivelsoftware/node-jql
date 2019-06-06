@@ -152,7 +152,10 @@ export class Query extends Sql {
 
       // no join
       if (noJoinedTable) {
-        for (const { table, $as } of this.$from) query = query.from(typeof table === 'string' ? table : isRemoteTable(table) ? squel.str(`url(?)`, table.url) : table.toSquel(), $as)
+        for (const tableOrSubquery of this.$from) {
+          const { table, $as } = tableOrSubquery
+          query = query.from(typeof table === 'string' ? table : tableOrSubquery.toSquel(), $as)
+        }
       }
       // join to one table
       else if (oneJoinedTable) {
@@ -166,7 +169,7 @@ export class Query extends Sql {
           }
           else {
             const { table, $as } = tableOrSubquery
-            query = query.from(typeof table === 'string' ? table : isRemoteTable(table) ? squel.str(`url(?)`, table.url) : table.toSquel(), $as)
+            query = query.from(typeof table === 'string' ? table : tableOrSubquery.toSquel(), $as)
           }
         }
       }
@@ -213,24 +216,26 @@ export class Query extends Sql {
     return result
   }
 
-  private join(query: squel.Select, { table, $as, joinClauses }: JoinedTableOrSubquery): squel.Select {
-    query = query.from(typeof table === 'string' ? table : isRemoteTable(table) ? squel.str(`url(?)`, table.url) : table.toSquel(), $as)
-    for (const { operator, tableOrSubquery: { table, $as }, $on } of joinClauses) {
+  private join(query: squel.Select, tableOrSubquery: JoinedTableOrSubquery): squel.Select {
+    const { table, $as, joinClauses } = tableOrSubquery
+    query = query.from(typeof table === 'string' ? table : tableOrSubquery.toSquel(), $as)
+    for (const { operator, tableOrSubquery, $on } of joinClauses) {
+      const { table, $as } = tableOrSubquery
       switch (operator) {
         case 'CROSS':
-          query = query.cross_join(typeof table === 'string' ? table : isRemoteTable(table) ? squel.str(`url(?)`, table.url) : table.toSquel(), $as, $on ? $on.toSquel() : undefined)
+          query = query.cross_join(typeof table === 'string' ? table : tableOrSubquery.toSquel(), $as, $on ? $on.toSquel() : undefined)
           break
         case 'FULL':
-          query = query.outer_join(typeof table === 'string' ? table : isRemoteTable(table) ? squel.str(`url(?)`, table.url) : table.toSquel(), $as, $on ? $on.toSquel() : undefined)
+          query = query.outer_join(typeof table === 'string' ? table : tableOrSubquery.toSquel(), $as, $on ? $on.toSquel() : undefined)
           break
         case 'INNER':
-          query = query.join(typeof table === 'string' ? table : isRemoteTable(table) ? squel.str(`url(?)`, table.url) : table.toSquel(), $as, $on ? $on.toSquel() : undefined)
+          query = query.join(typeof table === 'string' ? table : tableOrSubquery.toSquel(), $as, $on ? $on.toSquel() : undefined)
           break
         case 'LEFT':
-          query = query.left_join(typeof table === 'string' ? table : isRemoteTable(table) ? squel.str(`url(?)`, table.url) : table.toSquel(), $as, $on ? $on.toSquel() : undefined)
+          query = query.left_join(typeof table === 'string' ? table : tableOrSubquery.toSquel(), $as, $on ? $on.toSquel() : undefined)
           break
         case 'RIGHT':
-          query = query.right_join(typeof table === 'string' ? table : isRemoteTable(table) ? squel.str(`url(?)`, table.url) : table.toSquel(), $as, $on ? $on.toSquel() : undefined)
+          query = query.right_join(typeof table === 'string' ? table : tableOrSubquery.toSquel(), $as, $on ? $on.toSquel() : undefined)
           break
       }
     }
@@ -298,7 +303,7 @@ export class TableOrSubquery implements ITableOrSubquery {
       }
 
       // MUST have a table name
-      if (typeof json.table !== 'string' && !this.$as) throw new SyntaxError(`Missing alias for ${this.table}`)
+      if (typeof json.table !== 'string' && !json.$as) throw new SyntaxError(`Missing alias for ${json.table}`)
 
       if (json.database) this.database = json.database
       this.table = typeof json.table === 'string' || isRemoteTable(json.table) ? json.table : new Query(json.table)
@@ -326,6 +331,12 @@ export class TableOrSubquery implements ITableOrSubquery {
     if (this.database) result.database = this.database
     if (this.$as) result.$as = this.$as
     return result
+  }
+
+  public toSquel(): squel.BaseBuilder {
+    if (typeof this.table === 'string') return squel.rstr(this.table)
+    if (this.table instanceof Query) return this.table.toSquel()
+    return squel.rstr(`URL(${(this.table.method || 'GET').toLocaleUpperCase()} ${this.table.url})`)
   }
 }
 
