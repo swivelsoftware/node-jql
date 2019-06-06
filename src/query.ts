@@ -296,14 +296,12 @@ export class TableOrSubquery implements ITableOrSubquery {
           $as: json[1],
         }
       }
-      if ((typeof json.table === 'string' && !json.database) || isRemoteTable(json.table)) {
-        this.table = json.table
-      }
-      else {
-        if (!!json.$as) throw new SyntaxError(`Missing alias for ${this.table}`)
-        this.database = json.database
-        this.table = typeof json.table === 'string' ? json.table : new Query(json.table)
-      }
+
+      // MUST have a table name
+      if (typeof json.table === 'string' && !this.$as) throw new SyntaxError(`Missing alias for ${this.table}`)
+
+      if (json.database) this.database = json.database
+      this.table = typeof json.table === 'string' || isRemoteTable(json.table) ? json.table : new Query(json.table)
       this.$as = json.$as
     }
     catch (e) {
