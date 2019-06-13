@@ -1,8 +1,18 @@
 import { AxiosRequestConfig } from 'axios'
 import squel from 'squel'
 import { ConditionalExpression, Expression, IConditionalExpression, IExpression } from './expression'
+import { BetweenExpression } from './expression/between'
+import { BinaryExpression } from './expression/binary'
+import { CaseExpression } from './expression/case'
 import { ColumnExpression } from './expression/column'
-import { AndExpressions } from './expression/grouped'
+import { ExistsExpression } from './expression/exists'
+import { FunctionExpression } from './expression/function'
+import { AndExpressions, OrExpressions } from './expression/grouped'
+import { InExpression } from './expression/in'
+import { IsNullExpression } from './expression/isNull'
+import { LikeExpression } from './expression/like'
+import { MathExpression } from './expression/math'
+import { ParameterExpression } from './expression/parameter'
 import { parse } from './expression/parse'
 import { Sql } from './Sql'
 import { Type } from './Type'
@@ -99,6 +109,11 @@ export class Query extends Sql {
   // @override
   get [Symbol.toStringTag]() {
     return 'Query'
+  }
+
+  public applyHeaders(headers: { [key: string]: string }) {
+    const remoteTables = this.getRemoteTables()
+    for (const remoteTable of remoteTables) remoteTable.headers = headers
   }
 
   // @override
@@ -240,6 +255,103 @@ export class Query extends Sql {
       }
     }
     return query
+  }
+
+  private getRemoteTables(): IRemoteTable[] {
+    const result: IRemoteTable[] = []
+
+    // $select
+    if (this.$select) {
+      for (const resultColumn of this.$select) {
+        result.push(...this.getRemoteTablesFromExpression(resultColumn.expression))
+      }
+    }
+
+    // $from
+    if (this.$from) {
+      for (const tableOrSubquery of this.$from) {
+        result.push(...this.getRemoteTablesFromTableOrSubquery(tableOrSubquery))
+      }
+    }
+
+    // $where
+    if (this.$where) {
+      result.push(...this.getRemoteTablesFromExpression(this.$where))
+    }
+
+    // $group
+    if (this.$group) {
+      for (const expression of this.$group.expressions) {
+        result.push(...this.getRemoteTablesFromExpression(expression))
+      }
+      if (this.$group.$having) result.push(...this.getRemoteTablesFromExpression(this.$group.$having))
+    }
+
+    // $order
+    if (this.$order) {
+      for (const orderingTerm of this.$order) {
+        result.push(...this.getRemoteTablesFromExpression(orderingTerm.expression))
+      }
+    }
+
+    return result
+  }
+
+  private getRemoteTablesFromTableOrSubquery(tableOrSubquery: TableOrSubquery): IRemoteTable[] {
+    const result: IRemoteTable[] = []
+    const { table } = tableOrSubquery
+    if (typeof table !== 'string' && !(table instanceof Query)) result.push(table)
+    if (tableOrSubquery instanceof JoinedTableOrSubquery) {
+      for (const joinClause of tableOrSubquery.joinClauses) {
+        result.push(...this.getRemoteTablesFromTableOrSubquery(joinClause.tableOrSubquery))
+        if (joinClause.$on) result.push(...this.getRemoteTablesFromExpression(joinClause.$on))
+      }
+    }
+    return result
+  }
+
+  private getRemoteTablesFromExpression(expression: Expression): IRemoteTable[] {
+    const result: IRemoteTable[] = []
+    if (expression instanceof AndExpressions || expression instanceof OrExpressions) {
+      for (const expression_ of expression.expressions) {
+        result.push(...this.getRemoteTablesFromExpression(expression_))
+      }
+    }
+    else if (expression instanceof BetweenExpression) {
+      result.push(...this.getRemoteTablesFromExpression(expression.left))
+      result.push(...this.getRemoteTablesFromExpression(expression.start))
+      result.push(...this.getRemoteTablesFromExpression(expression.end))
+    }
+    else if (expression instanceof BinaryExpression || expression instanceof MathExpression) {
+      result.push(...this.getRemoteTablesFromExpression(expression.left))
+      result.push(...this.getRemoteTablesFromExpression(expression.right))
+    }
+    else if (expression instanceof CaseExpression) {
+      for (const { $when, $then } of expression.cases) {
+        result.push(...this.getRemoteTablesFromExpression($when))
+        result.push(...this.getRemoteTablesFromExpression($then))
+      }
+      if (expression.$else) result.push(...this.getRemoteTablesFromExpression(expression.$else))
+    }
+    else if (expression instanceof ExistsExpression) {
+      result.push(...expression.query.getRemoteTables())
+    }
+    else if (expression instanceof FunctionExpression) {
+      for (const parameter of expression.parameters) {
+        result.push(...this.getRemoteTablesFromExpression(parameter))
+      }
+    }
+    else if (expression instanceof InExpression) {
+      result.push(...this.getRemoteTablesFromExpression(expression.left))
+      if (expression.right instanceof Query) result.push(...expression.right.getRemoteTables())
+    }
+    else if (expression instanceof IsNullExpression || expression instanceof LikeExpression) {
+      result.push(...this.getRemoteTablesFromExpression(expression.left))
+    }
+    else if (expression instanceof ParameterExpression) {
+      result.push(...this.getRemoteTablesFromExpression(expression.expression))
+    }
+    return result
   }
 }
 
