@@ -4,9 +4,12 @@ import { InstantiateError } from '../utils/error/InstantiateError'
 import { parse } from './parse'
 import { Unknown } from './unknown'
 
+export type LikeOperator = 'LIKE'|'REGEXP'
+
 export interface ILikeExpression extends IConditionalExpression {
   left: any
   $not?: boolean
+  operator?: LikeOperator
   right?: Unknown|string
 }
 
@@ -14,6 +17,7 @@ export class LikeExpression extends ConditionalExpression implements ILikeExpres
   public readonly classname = 'LikeExpression'
   public left: Expression
   public $not?: boolean
+  public operator: LikeOperator
   public right: Unknown|string
 
   constructor(json: ILikeExpression) {
@@ -21,6 +25,7 @@ export class LikeExpression extends ConditionalExpression implements ILikeExpres
     try {
       this.$not = json.$not
       this.left = parse(json.left)
+      this.operator = json.operator || 'LIKE'
       this.right = json.right || new Unknown()
     }
     catch (e) {
@@ -34,7 +39,7 @@ export class LikeExpression extends ConditionalExpression implements ILikeExpres
   }
 
   get template(): string {
-    return `? ${this.$not ? 'NOT ' : ''}LIKE ?`
+    return `? ${this.$not ? 'NOT ' : ''}${this.operator} ?`
   }
 
   // @override

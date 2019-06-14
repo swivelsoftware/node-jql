@@ -306,10 +306,11 @@ extends [IExpression](#IExpression)
 [IExpression](#IExpression)
 
 ```js
-// [left] [$not] LIKE [right]
+// [left] [$not] [operator] [right]
 {
   "left": IExpression|any,
   "$not": boolean|undefined,
+  "operator": 'LIKE'|'REGEXP'|undefined,
   "right": string|undefined
 }
 ```
