@@ -5,7 +5,7 @@ import { parse } from './parse'
 
 export interface IParameterExpression extends IExpression {
   prefix?: string
-  expression: IExpression
+  expression: any
   suffix?: string
 }
 

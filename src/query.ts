@@ -25,7 +25,7 @@ export function isQuery(object: any): object is IQuery {
 export interface IQuery {
   $distinct?: boolean
   $select?: IResultColumn[]|IResultColumn|string
-  $from?: Array<ITableOrSubquery|IJoinedTableOrSubquery>|IJoinedTableOrSubquery|ITableOrSubquery|string
+  $from?: Array<IJoinedTableOrSubquery|ITableOrSubquery>|IJoinedTableOrSubquery|ITableOrSubquery|string
   $where?: IConditionalExpression[]|IConditionalExpression
   $group?: IGroupBy|string
   $order?: IOrderingTerm[]|IOrderingTerm|string
@@ -456,7 +456,7 @@ export type JoinOperator = 'INNER'|'CROSS'|'LEFT'|'RIGHT'|'FULL'
 
 export interface IJoinClause {
   operator?: JoinOperator
-  tableOrSubquery: ITableOrSubquery|[string, string]|string
+  tableOrSubquery: ITableOrSubquery|string
   $on?: IConditionalExpression[]|IConditionalExpression
 }
 
