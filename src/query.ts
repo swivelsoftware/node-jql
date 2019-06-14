@@ -152,7 +152,7 @@ export class Query extends Sql {
 
   // @override
   public toSquel(): squel.QueryBuilder {
-    let query = squel.select()
+    let query = squel.select({ autoQuoteAliasNames: true, autoQuoteFieldNames: true, autoQuoteTableNames: true })
 
     // $distinct
     if (this.$distinct) query = query.distinct()
