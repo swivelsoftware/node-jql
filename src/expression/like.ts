@@ -26,7 +26,7 @@ export class LikeExpression extends ConditionalExpression implements ILikeExpres
       this.$not = json.$not
       this.left = parse(json.left)
       this.operator = json.operator || 'LIKE'
-      this.right = json.right || new Unknown()
+      this.right = json.right || new Unknown({ type: 'string' })
     }
     catch (e) {
       throw new InstantiateError('Fail to instantiate LikeExpression', e)
@@ -65,7 +65,13 @@ export class LikeExpression extends ConditionalExpression implements ILikeExpres
       left: this.left.toJson(),
     }
     if (this.$not) result.$not = this.$not
-    if (typeof this.right === 'string') result.right = this.right
+    result.operator = this.operator
+    if (typeof this.right === 'string') {
+      result.right = this.right
+    }
+    else if (this.right.assigned) {
+      result.right = this.right.value
+    }
     return result
   }
 }

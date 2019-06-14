@@ -22,6 +22,10 @@ export class Unknown extends Expression implements IUnknown {
     return 'Unknown'
   }
 
+  public assigned(): boolean {
+    return this.value !== undefined && this.value !== null
+  }
+
   // @override
   public validate() { /* do nothing */ }
 

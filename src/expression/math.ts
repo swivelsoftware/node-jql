@@ -61,7 +61,7 @@ export class MathExpression extends Expression implements IMathExpression {
       left: this.left.toJson(),
       operator: this.operator,
     }
-    if (!(this.right instanceof Unknown) || this.right.value) result.right = this.right.toJson()
+    if (!(this.right instanceof Unknown) || this.right.assigned) result.right = this.right.toJson()
     return result
   }
 }
