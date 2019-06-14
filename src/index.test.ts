@@ -6,7 +6,7 @@ import { FunctionExpression } from './expression/function'
 import { InExpression } from './expression/in'
 import { MathExpression } from './expression/math'
 import { Value } from './expression/value'
-import { JoinClause, JoinedTableOrSubquery, OrderingTerm, Query, ResultColumn } from './query'
+import { JoinClause, JoinedTableOrSubquery, OrderingTerm, Query, ResultColumn, TableOrSubquery } from './query'
 
 test('SELECT * FROM Student', () => {
   const query = new Query({ $from: 'Student' })
@@ -109,4 +109,18 @@ test('SELECT (1 + 1)', () => {
   })
   query.validate()
   expect(query.toString()).toBe('SELECT (1 + 1)')
+})
+
+test('SELECT * FROM URL(GET 127.0.0.1) `Test`', () => {
+  const query = new Query({
+    $from: new TableOrSubquery({
+      table: {
+        url: '127.0.0.1',
+        columns: [],
+      },
+      $as: 'Test',
+    }),
+  })
+  query.validate()
+  expect(query.toString()).toBe('SELECT * FROM URL(GET 127.0.0.1) `Test`')
 })
