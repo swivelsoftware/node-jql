@@ -1,5 +1,5 @@
 import { AxiosRequestConfig } from 'axios'
-import squel from 'squel'
+import squel, { CompleteQueryBuilderOptions } from 'squel'
 import { ConditionalExpression, Expression, IConditionalExpression, IExpression } from './expression'
 import { BetweenExpression } from './expression/between'
 import { BinaryExpression } from './expression/binary'
@@ -151,8 +151,8 @@ export class Query extends Sql {
   }
 
   // @override
-  public toSquel(): squel.QueryBuilder {
-    let query = squel.select({ autoQuoteAliasNames: true, autoQuoteFieldNames: true, autoQuoteTableNames: true })
+  public toSquel(options?: Partial<CompleteQueryBuilderOptions>): squel.QueryBuilder {
+    let query = squel.select(options)
 
     // $distinct
     if (this.$distinct) query = query.distinct()
