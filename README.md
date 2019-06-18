@@ -27,6 +27,8 @@ type Type = 'any'|'string'|'number'|'boolean'|'object'|'Date'|'Array'
 [IOrderingTerm](#IOrderingTerm)
 
 ``` js
+new Query(IQuery)
+
 {
   // SELECT ...
   "$select": Array<IResultColumn>|IResultColumn|'*'|string|undefined,
@@ -59,6 +61,8 @@ type Type = 'any'|'string'|'number'|'boolean'|'object'|'Date'|'Array'
 [IExpression](#IExpression)
 
 ``` js
+new ResultColumn(IResultColumn)
+
 // [expression] AS [$as]
 {
   "expression": IExpression,
@@ -73,6 +77,9 @@ type Type = 'any'|'string'|'number'|'boolean'|'object'|'Date'|'Array'
 [IJoinClause](#IJoinClause)
 
 ```js
+new TableOrSubquery([string, string]|ITableOrSubquery)
+new JoinedOrSubquery(IJoinedTableOrSubquery)
+
 // [database].[table] AS [$as]
 {
   "database": string|undefined,
@@ -99,6 +106,8 @@ extends [AxiosRequestConfig](https://github.com/axios/axios#request-config)
 [IConditionalExpression](#IConditionalExpression)
 
 ```js
+new JoinClause(IJoinClause)
+
 // [operator] JOIN [tableOrSubquery] AS [$on]
 {
   "operator": 'INNER'|'CROSS'|'LEFT'|'RIGHT'|'FULL'|undefined,
@@ -113,6 +122,8 @@ extends [AxiosRequestConfig](https://github.com/axios/axios#request-config)
 [IConditionalExpression](#IConditionalExpression)
 
 ```js
+new GroupBy(IGroupBy)
+
 // GROUP BY [expressions] HAVING [$having]
 {
   "expressions": Array<IExpression>|IExpression,
@@ -125,6 +136,8 @@ extends [AxiosRequestConfig](https://github.com/axios/axios#request-config)
 [IExpression](#IExpression)
 
 ```js
+new OrderingTerm(IOrderingTerm)
+
 // ORDER BY [expression] [order], [expression] [order], ...
 {
   "expression": IExpression,
@@ -135,11 +148,15 @@ extends [AxiosRequestConfig](https://github.com/axios/axios#request-config)
 ## IExpression
 ---
 
+** `classname` is a required field in `IExpression` that specifies the class of the Expression
+
 ### ICaseExpression
 
 [IExpression](#IExpression)
 
 ```js
+new CaseExpression(ICaseExpression)
+
 // CASE WHEN [$when] THEN [$then] WHEN [$when] THEN [$then] ... ELSE [$else]
 {
   "cases": Array<{ "$when": IConditionalExpression, "$then": IExpression }>|{ "$when": IConditionalExpression, "$then": IExpression },
@@ -150,6 +167,8 @@ extends [AxiosRequestConfig](https://github.com/axios/axios#request-config)
 ### IColumnExpression
 
 ```js
+new ColumnExpression(string|[string, string]|IColumnExpression)
+
 // [table].[name]
 {
   "table": string|undefined,
@@ -163,6 +182,8 @@ supports most of the SQL built-in functions and works similarly
 [IParameterExpression](#IParameterExpression)
 
 ```js
+new FunctionExpression(IFunctionExpression)
+
 // [name]([parameters])
 {
   "name": string,
@@ -175,6 +196,8 @@ supports most of the SQL built-in functions and works similarly
 [IExpression](#IExpression)
 
 ```js
+new MathExpression(IMathExpression)
+
 // [left] [operator] [right]
 {
   "left": IExpression|any,
@@ -186,6 +209,8 @@ supports most of the SQL built-in functions and works similarly
 ### IParameterExpression
 
 ```js
+new ParameterExpression(IParameterExpression)
+
 // [prefix] [expression] [suffix]
 // e.g. prefix is used for cases like `COUNT(DISTINCT id)`
 {
@@ -200,6 +225,8 @@ supports most of the SQL built-in functions and works similarly
 [Type](#Type)
 
 ```js
+new Unknown(IUnknown|undefined)
+
 // ?
 {
   "type": Array<Type>|Type|undefined
@@ -211,6 +238,8 @@ supports most of the SQL built-in functions and works similarly
 [Type](#Type)
 
 ```js
+new Value(IValue|any)
+
 // [value]
 {
   "value": any,
@@ -228,6 +257,8 @@ extends [IExpression](#IExpression)
 [IExpression](#IExpression)
 
 ```js
+new BetweenExpression(IBetweenExpression)
+
 // [left] [$not] BETWEEN [start] AND [end]
 {
   "left": IExpression|any,
@@ -242,6 +273,8 @@ extends [IExpression](#IExpression)
 [IExpression](#IExpression)
 
 ```js
+new BinaryExpression(IBinaryExpression)
+
 // [left] [operator] [right]
 {
   "left": IExpression|any,
@@ -255,6 +288,8 @@ extends [IExpression](#IExpression)
 [IQuery](#IQuery)
 
 ```js
+new ExistsExpression(IExistsExpression)
+
 // [$not] EXISTS [query]
 {
   "$not": boolean|undefined,
@@ -262,11 +297,14 @@ extends [IExpression](#IExpression)
 }
 ```
 
-### AndExpressions/OrExpressions
+### IGroupedExpressions
 
 [IConditionalExpression](#IConditionalExpression)
 
 ```js
+new AndExpressions(IGroupedExpressions)
+new OrExpressions(IGroupedExpressions)
+
 // ([expression] AND/OR [expression] ...)
 {
   "expressions": Array<IConditionalExpression>
@@ -281,6 +319,8 @@ extends [IExpression](#IExpression)
 [IValue](#IValue)
 
 ```js
+new InExpression(IInExpression)
+
 // [left] [$not] IN [right]
 {
   "left": IExpression|any,
@@ -294,6 +334,8 @@ extends [IExpression](#IExpression)
 [IExpression](#IExpression)
 
 ```js
+new IsNullExpression(IIsNullExpression)
+
 // [left] IS [$not] NULL
 {
   "left": IExpression|any,
@@ -306,6 +348,8 @@ extends [IExpression](#IExpression)
 [IExpression](#IExpression)
 
 ```js
+new LikeExpression(ILikeExpression)
+
 // [left] [$not] [operator] [right]
 {
   "left": IExpression|any,
