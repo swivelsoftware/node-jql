@@ -36,7 +36,7 @@ test('SELECT c.name FROM Student `s` LEFT JOIN Class `c` ON (c.studentId = s.id)
       $as: 's',
       joinClauses: new JoinClause({
         operator: 'LEFT',
-        tableOrSubquery: ['Class', 'c'],
+        tableOrSubquery: new TableOrSubquery(['Class', 'c']),
         $on: new BinaryExpression({
           left: new ColumnExpression(['c', 'studentId']),
           operator: '=',
@@ -77,7 +77,7 @@ test('SELECT COUNT(*) FROM Student WHERE (id IN (SELECT studentId FROM ClubStude
           $as: 'cs',
           joinClauses: new JoinClause({
             operator: 'LEFT',
-            tableOrSubquery: ['Club', 'c'],
+            tableOrSubquery: new TableOrSubquery(['Club', 'c']),
             $on: new BinaryExpression({
               left: new ColumnExpression(['c', 'id']),
               operator: '=',
@@ -114,10 +114,7 @@ test('SELECT (1 + 1)', () => {
 test('SELECT * FROM URL(GET 127.0.0.1) `Test`', () => {
   const query = new Query({
     $from: new TableOrSubquery({
-      table: {
-        url: '127.0.0.1',
-        columns: [],
-      },
+      table: { url: '127.0.0.1' },
       $as: 'Test',
     }),
   })

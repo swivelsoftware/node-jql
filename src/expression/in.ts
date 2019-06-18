@@ -31,10 +31,8 @@ export class InExpression extends ConditionalExpression implements IInExpression
             throw new SyntaxError('InExpression.right should contain 1 column only')
           }
         }
-        else {
-          this.right = parse(json.right) as Unknown|Value
-        }
       }
+      if (!this.right) this.right = parse(json.right) as Unknown|Value
     }
     catch (e) {
       throw new InstantiateError('Fail to instantiate InExpression', e)

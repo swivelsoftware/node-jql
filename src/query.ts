@@ -1,5 +1,5 @@
 import { AxiosRequestConfig } from 'axios'
-import squel from 'squel'
+import squel, { CompleteQueryBuilderOptions } from 'squel'
 import { ConditionalExpression, Expression, IConditionalExpression, IExpression } from './expression'
 import { BetweenExpression } from './expression/between'
 import { BinaryExpression } from './expression/binary'
@@ -25,7 +25,7 @@ export function isQuery(object: any): object is IQuery {
 export interface IQuery {
   $distinct?: boolean
   $select?: IResultColumn[]|IResultColumn|string
-  $from?: Array<ITableOrSubquery|IJoinedTableOrSubquery>|IJoinedTableOrSubquery|ITableOrSubquery|string
+  $from?: Array<IJoinedTableOrSubquery|ITableOrSubquery>|IJoinedTableOrSubquery|ITableOrSubquery|string
   $where?: IConditionalExpression[]|IConditionalExpression
   $group?: IGroupBy|string
   $order?: IOrderingTerm[]|IOrderingTerm|string
@@ -151,8 +151,8 @@ export class Query extends Sql {
   }
 
   // @override
-  public toSquel(): squel.QueryBuilder {
-    let query = squel.select()
+  public toSquel(options?: Partial<CompleteQueryBuilderOptions>): squel.QueryBuilder {
+    let query = squel.select(options)
 
     // $distinct
     if (this.$distinct) query = query.distinct()
@@ -387,7 +387,7 @@ export class ResultColumn implements IResultColumn {
 }
 
 export interface IRemoteTable extends AxiosRequestConfig {
-  columns: Array<{ name: string, type?: Type }>
+  columns?: Array<{ name: string, type?: Type }>
 }
 
 function isRemoteTable(obj: any): obj is IRemoteTable {
@@ -456,7 +456,7 @@ export type JoinOperator = 'INNER'|'CROSS'|'LEFT'|'RIGHT'|'FULL'
 
 export interface IJoinClause {
   operator?: JoinOperator
-  tableOrSubquery: ITableOrSubquery|[string, string]|string
+  tableOrSubquery: ITableOrSubquery|string
   $on?: IConditionalExpression[]|IConditionalExpression
 }
 
