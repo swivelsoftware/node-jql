@@ -114,7 +114,10 @@ test('SELECT (1 + 1)', () => {
 test('SELECT * FROM URL(GET 127.0.0.1) `Test`', () => {
   const query = new Query({
     $from: new TableOrSubquery({
-      table: { url: '127.0.0.1' },
+      table: {
+        url: '127.0.0.1',
+        columns: [],
+      },
       $as: 'Test',
     }),
   })
