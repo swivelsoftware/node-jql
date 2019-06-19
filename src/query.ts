@@ -192,7 +192,7 @@ export class Query extends Sql {
 
     // $where
     if (this.$where) {
-      query = query.where(this.$where.toSquel())
+      query = query.where(this.$where.toSquel(false))
     }
 
     // $group
