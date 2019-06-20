@@ -23,6 +23,7 @@ export function isQuery(object: any): object is IQuery {
 }
 
 export interface IQuery {
+  $createTempTable?: string
   $distinct?: boolean
   $select?: IResultColumn[]|IResultColumn|string
   $from?: Array<IJoinedTableOrSubquery|ITableOrSubquery>|IJoinedTableOrSubquery|ITableOrSubquery|string
@@ -33,6 +34,7 @@ export interface IQuery {
 }
 
 export class Query extends Sql {
+  public $createTempTable?: string
   public $distinct?: boolean
   public $select: ResultColumn[]
   public $from?: TableOrSubquery[]
