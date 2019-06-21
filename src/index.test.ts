@@ -156,3 +156,9 @@ test('SELECT * FROM URL(GET 127.0.0.1) `Test`', () => {
   query.validate()
   expect(query.toString()).toBe('SELECT * FROM URL(GET 127.0.0.1) `Test`')
 })
+
+test('CREATE TEMP TABLE test SELECT * FROM Student', () => {
+  const query = new Query({ $createTempTable: 'test', $from: 'Student' })
+  query.validate()
+  expect(query.toString()).toBe('CREATE TEMP TABLE test SELECT * FROM Student')
+})

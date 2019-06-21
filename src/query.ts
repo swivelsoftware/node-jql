@@ -1,5 +1,5 @@
 import { AxiosRequestConfig } from 'axios'
-import squel, { CompleteQueryBuilderOptions } from 'squel'
+import squel, { CompleteQueryBuilderOptions, QueryBuilderOptions } from 'squel'
 import { ConditionalExpression, Expression, IConditionalExpression, IExpression } from './expression'
 import { BetweenExpression } from './expression/between'
 import { BinaryExpression } from './expression/binary'
@@ -46,6 +46,9 @@ export class Query extends Sql {
   constructor(json: IQuery) {
     super()
     try {
+      // $createTempTable
+      this.$createTempTable = json.$createTempTable
+
       // $distinct
       this.$distinct = json.$distinct
 
@@ -217,12 +220,21 @@ export class Query extends Sql {
       if (this.$limit.$offset) query = query.offset(this.$limit.$offset)
     }
 
-    return query
+    if (!this.$createTempTable) return query
+
+    options = options || {}
+    const createTempTableQuery = new squel.cls.QueryBuilder(options, [
+      new squel.cls.StringBlock(options, 'CREATE TEMP TABLE'),
+      new squel.cls.UpdateTableBlock(options as QueryBuilderOptions),
+      ...query.blocks,
+    ])
+    return createTempTableQuery['table'](this.$createTempTable)
   }
 
   // @override
   public toJson(): IQuery {
     const result: IQuery = {}
+    if (this.$createTempTable) result.$createTempTable = this.$createTempTable
     if (this.$distinct) result.$distinct = true
     if (this.$select.length) result.$select = this.$select.map(resultColumn => resultColumn.toJson())
     if (this.$from) result.$from = this.$from.map(tableOrSubquery => tableOrSubquery.toJson())
