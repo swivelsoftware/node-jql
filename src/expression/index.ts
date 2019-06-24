@@ -28,7 +28,7 @@ export abstract class ConditionalExpression extends Expression implements ICondi
   }
 
   // @override
-  public abstract toSquel(): squel.Expression
+  public abstract toSquel(...values: any[]): squel.Expression
 
   // @override
   public abstract toJson(): IConditionalExpression

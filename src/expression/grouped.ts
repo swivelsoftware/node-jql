@@ -49,13 +49,14 @@ export class AndExpressions extends GroupedExpressions {
   }
 
   // @override
-  public toSquel(): squel.Expression {
+  public toSquel(parentheses: boolean = true): squel.Expression {
     let result = squel.expr()
     for (const expression of this.expressions) {
       const { text, values } = expression.toSquel().toParam()
       result = result.and(text, ...values)
     }
-    return result
+    const { text, values } = result.toParam()
+    return squel.expr().and(parentheses && this.expressions.length > 1 ? `(${text})` : text, ...values)
   }
 }
 
@@ -68,12 +69,13 @@ export class OrExpressions extends GroupedExpressions {
   }
 
   // @override
-  public toSquel(): squel.Expression {
+  public toSquel(parentheses: boolean = true): squel.Expression {
     let result = squel.expr()
     for (const expression of this.expressions) {
       const { text, values } = expression.toSquel().toParam()
       result = result.or(text, ...values)
     }
-    return result
+    const { text, values } = result.toParam()
+    return squel.expr().and(parentheses && this.expressions.length > 1 ? `(${text})` : text, ...values)
   }
 }

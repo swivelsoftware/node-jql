@@ -3,6 +3,7 @@
 import { BinaryExpression } from './expression/binary'
 import { ColumnExpression } from './expression/column'
 import { FunctionExpression } from './expression/function'
+import { AndExpressions, OrExpressions } from './expression/grouped'
 import { InExpression } from './expression/in'
 import { MathExpression } from './expression/math'
 import { Value } from './expression/value'
@@ -26,6 +27,37 @@ test('SELECT * FROM Student WHERE (gender = \'F\') ORDER BY id ASC', () => {
   })
   query.validate()
   expect(query.toString()).toBe('SELECT * FROM Student WHERE (gender = \'F\') ORDER BY id ASC')
+})
+
+test('SELECT * FROM Student WHERE (gender = \'M\' AND (id = \'ABC\' OR name = \'ABC\'))', () => {
+  const query = new Query({
+    $from: 'Student',
+    $where: new AndExpressions({
+      expressions: [
+        new BinaryExpression({
+          left: new ColumnExpression('gender'),
+          operator: '=',
+          right: 'M',
+        }),
+        new OrExpressions({
+          expressions: [
+            new BinaryExpression({
+              left: new ColumnExpression('id'),
+              operator: '=',
+              right: 'ABC',
+            }),
+            new BinaryExpression({
+              left: new ColumnExpression('name'),
+              operator: '=',
+              right: 'ABC',
+            }),
+          ],
+        }),
+      ],
+    }),
+  })
+  query.validate()
+  expect(query.toString()).toBe('SELECT * FROM Student WHERE (gender = \'M\' AND (id = \'ABC\' OR name = \'ABC\'))')
 })
 
 test('SELECT c.name FROM Student `s` LEFT JOIN Class `c` ON (c.studentId = s.id) WHERE (s.name = \'Kennys Ng\') ORDER BY c.year DESC LIMIT 1', () => {
@@ -114,10 +146,19 @@ test('SELECT (1 + 1)', () => {
 test('SELECT * FROM URL(GET 127.0.0.1) `Test`', () => {
   const query = new Query({
     $from: new TableOrSubquery({
-      table: { url: '127.0.0.1' },
+      table: {
+        url: '127.0.0.1',
+        columns: [],
+      },
       $as: 'Test',
     }),
   })
   query.validate()
   expect(query.toString()).toBe('SELECT * FROM URL(GET 127.0.0.1) `Test`')
+})
+
+test('CREATE TEMP TABLE test SELECT * FROM Student', () => {
+  const query = new Query({ $createTempTable: 'test', $from: 'Student' })
+  query.validate()
+  expect(query.toString()).toBe('CREATE TEMP TABLE test SELECT * FROM Student')
 })
