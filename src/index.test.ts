@@ -59,7 +59,7 @@ test('SELECT COUNT(*) FROM Student WHERE (id IN (SELECT studentId FROM ClubStude
     $select: new ResultColumn(new FunctionExpression('COUNT', new ColumnExpression('*'))),
     $from: 'Student',
     $where: new InExpression(new ColumnExpression('id'), false, new Query({
-      $select: new ResultColumn(new ColumnExpression('studentId')),
+      $select: new ResultColumn('studentId'),
       $from: new FromTable('ClubStudent', 'cs', new JoinClause('LEFT', new FromTable('Club', 'c'), new BinaryExpression(new ColumnExpression('c', 'id'), '=', new ColumnExpression('cs', 'clubId')))),
       $where: new BinaryExpression(new ColumnExpression('c', 'name'), '=', 'Science Club'),
     })),
