@@ -1,81 +1,75 @@
-import { diff } from 'deep-diff'
-import isUndefined from './utils/isUndefined'
+import { checkNull } from './utils/check'
 
-export type Type = 'any'|'string'|'number'|'boolean'|'object'|'Date'|'Array'
+/**
+ * Available types in node-jql
+ */
+export type Type = 'string'|'number'|'boolean'|'object'|'Date'|'Array'|'any'
 
+/**
+ * Default value for each type
+ */
 export const defaults = {
-  any: undefined,
   string: '',
   number: 0,
   boolean: false,
   object: {},
   Date: undefined,
   Array: [],
+  any: undefined,
 }
 
 /**
- * Get type of value
+ * Determine the data type of a value in node-jql
  * @param value [any]
  */
-export function getType(value: any): Type {
-  if (value instanceof Date) return 'Date'
-  if (Array.isArray(value)) return 'Array'
-  const type = typeof value
-  switch (type) {
+export function type(value: any): Type {
+  switch (typeof value) {
     case 'string':
+      return 'string'
     case 'number':
+      return 'number'
     case 'boolean':
+      return 'boolean'
     case 'object':
-      return type
+      if (value instanceof Date && Object.prototype.toString.call(value) === '[object Date]') return 'Date'
+      if (Array.isArray(value)) return 'Array'
+      return 'object'
     default:
       return 'any'
   }
 }
 
 /**
- * Compare 2 values for equality
- * @param l [T]
- * @param r [T]
+ * Normalize the value so that it can be stored in node-jql
+ * @param value [any]
+ * @param t [Type] optional
  */
-export function equals<T>(l: T, r: T): boolean {
-  if (l instanceof Date && r instanceof Date) {
-    return l.getTime() === r.getTime()
-  }
-  else if (Array.isArray(l) && Array.isArray(r)) {
-    for (const item of l) {
-      if (!r.find(item_ => equals(item_, item))) return false
-    }
-    return true
-  }
-  else if (typeof l === 'object' && typeof r === 'object') {
-    return !!diff(l, r)
-  }
-  else {
-    return l === r
-  }
-}
-
-export function normalize(value: any, type: Type = getType(value)): any {
-  if (isUndefined(value)) return value
-  switch (type) {
-    case 'Date':
-      return (value as Date).getTime()
+export function normalize(value: any, t = type(value)): any {
+  if (checkNull(value)) return null
+  switch (t) {
     case 'object':
     case 'Array':
       return JSON.stringify(value)
+    case 'Date':
+      return (value as Date).getTime()
     default:
       return value
   }
 }
 
-export function denormalize(value: any, type: Type): any {
-  if (isUndefined(value)) return value
-  switch (type) {
-    case 'Date':
-      return new Date(value)
+/**
+ * Denormalize the value retrieved from node-jql
+ * @param value [any]
+ * @param t [Type]
+ */
+export function denormalize(value: any, t: Type): any {
+  if (checkNull(value)) return null
+  switch (t) {
     case 'object':
     case 'Array':
       return JSON.parse(value)
+    case 'Date':
+      return new Date(value)
     default:
       return value
   }
