@@ -34,3 +34,6 @@ export { IJoinClause, JoinClause, IFromTable, FromTable } from './jql/query/From
 export { IGroupBy, GroupBy } from './jql/query/GroupBy'
 export { IOrderBy, OrderBy } from './jql/query/OrderBy'
 export { ILimitOffset, LimitOffset } from './jql/query/LimitOffset'
+
+// jql/create
+export { ICreateDatabaseJQL, CreateDatabaseJQL } from './jql/create/database'
