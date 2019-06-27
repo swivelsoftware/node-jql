@@ -1,8 +1,10 @@
 import squel = require('squel')
 import { ISql, Sql } from '..'
+import { checkNull } from '../../utils/check'
 import { ConditionalExpression, IConditionalExpression } from '../expr'
 import { AndExpressions } from '../expr/expressions/AndExpressions'
 import { ColumnExpression } from '../expr/expressions/ColumnExpression'
+import { FunctionExpression } from '../expr/expressions/FunctionExpression'
 import { parse } from '../expr/parse'
 import { FromTable, IFromTable } from './FromTable'
 import { GroupBy, IGroupBy } from './GroupBy'
@@ -134,6 +136,53 @@ export class Query extends Sql implements IQuery {
    */
   get isWildcard(): boolean {
     return this.$select.length === 1 && this.$select[0].expression instanceof ColumnExpression && this.$select[0].expression.isWildcard
+  }
+
+  /**
+   * Whether the query returns result length
+   */
+  get isCountWildcard(): boolean {
+    return (
+      this.$select.length === 1 && this.$select[0].expression instanceof FunctionExpression && this.$select[0].expression.name === 'COUNT' && // count function
+      this.$select[0].expression.parameters.length === 1 &&                                                                                   // one parameter
+      checkNull(this.$select[0].expression.parameters[0].prefix)                                                                              // no DISTINCT
+    )
+  }
+
+  /**
+   * Whether this should be a quick query
+   */
+  get isQuick(): boolean {
+    return (
+      this.isWildcard &&                                                                              // wildcard
+      !!this.$from && this.$from.length === 1 && !this.$from[0].isJoined &&                           // single table
+      !this.$where && !this.$group &&                                                                 // no WHERE and GROUP BY
+      (!this.$order || !this.$order.find(({ expression }) => expression instanceof ColumnExpression)) // simple ORDER BY
+    )
+  }
+
+  /**
+   * Whether this should be a quick COUNT query
+   */
+  get isQuickCount(): boolean {
+    return (
+      this.isCountWildcard &&                                                                         // count wildcard
+      !!this.$from && this.$from.length === 1 && !this.$from[0].isJoined &&                           // single table
+      !this.$where && !this.$group &&                                                                 // no WHERE and GROUP BY
+      (!this.$order || !this.$order.find(({ expression }) => expression instanceof ColumnExpression)) // simple ORDER BY
+    )
+  }
+
+  /**
+   * Whether some processes for this query can be skipped
+   */
+  get hasShortcut(): boolean {
+    return (
+      !this.$distinct &&  // no DISTINCT
+      !this.$group &&     // no GROUP BY
+      !this.$order &&     // no ORDER BY
+      !!this.$limit       // has LIMIT OFFSET
+    )
   }
 
   // @override

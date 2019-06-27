@@ -57,7 +57,7 @@ export class FunctionExpression extends Expression implements IFunctionExpressio
     if (!name) throw new SyntaxError('Missing function name')
 
     // set args
-    this.name = name
+    this.name = name.toLocaleUpperCase()
     this.parameters = parameters.map(parameter => {
       let expression = parse(parameter)
       if (!(expression instanceof ParameterExpression)) expression = new ParameterExpression({ expression })
