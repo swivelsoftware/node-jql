@@ -91,7 +91,7 @@ export class BinaryExpression extends ConditionalExpression implements IBinaryEx
   }
 
   // @override
-  public validate(availableTables: string[]) {
+  public validate(availableTables: string[]): void {
     this.left.validate(availableTables)
     if (!checkNull(this.right)) this.right.validate(availableTables)
   }

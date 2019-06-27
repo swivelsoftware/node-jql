@@ -20,7 +20,7 @@ export abstract class Expression extends Jql implements IExpression {
   public readonly classname: string
 
   // @override
-  get [Symbol.toStringTag]() {
+  get [Symbol.toStringTag](): string {
     return this.classname
   }
 

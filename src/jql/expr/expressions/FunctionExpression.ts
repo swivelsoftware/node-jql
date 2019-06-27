@@ -66,7 +66,7 @@ export class FunctionExpression extends Expression implements IFunctionExpressio
   }
 
   // @override
-  public validate(availableTables: string[]) {
+  public validate(availableTables: string[]): void {
     for (const parameter of this.parameters) parameter.validate(availableTables)
   }
 

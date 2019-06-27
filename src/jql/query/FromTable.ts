@@ -91,7 +91,7 @@ export class JoinClause extends Jql implements IJoinClause {
   }
 
   // @override
-  get [Symbol.toStringTag]() {
+  get [Symbol.toStringTag](): string {
     return FromTable.name
   }
 
@@ -113,7 +113,7 @@ export class JoinClause extends Jql implements IJoinClause {
   }
 
   // @override
-  public validate(availableTables: string[]) {
+  public validate(availableTables: string[]): void {
     this.table.validate([])
     this.$on.validate(availableTables)
   }
@@ -235,7 +235,7 @@ export class FromTable extends Jql implements IFromTable {
   }
 
   // @override
-  get [Symbol.toStringTag]() {
+  get [Symbol.toStringTag](): string {
     return FromTable.name
   }
 
@@ -258,7 +258,7 @@ export class FromTable extends Jql implements IFromTable {
   }
 
   // @override
-  public validate(availableTables: string[]) {
+  public validate(availableTables: string[]): void {
     if (typeof this.table !== 'string' && 'validate' in this.table) this.table.validate(availableTables)
     const table = this.$as ? this.$as : this.table as string
     if (availableTables.indexOf(table) > -1) throw new SyntaxError(`Ambiguous table '${table}'`)

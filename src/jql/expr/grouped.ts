@@ -49,7 +49,7 @@ export abstract class GroupedExpressions extends ConditionalExpression implement
   }
 
   // @override
-  public validate(availableTables: string[]) {
+  public validate(availableTables: string[]): void {
     for (const expression of this.expressions) expression.validate(availableTables)
   }
 

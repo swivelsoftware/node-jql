@@ -12,16 +12,49 @@ import { ILimitOffset, LimitOffset } from './LimitOffset'
 import { IOrderBy, OrderBy } from './OrderBy'
 import { IResultColumn, ResultColumn } from './ResultColumn'
 
+/**
+ * Raw JQL for SELECT query
+ */
 export interface IQuery extends IJql {
+  /**
+   * Use SELECT DISTINCT instead
+   */
   $distinct?: boolean
+
+  /**
+   * SELECT ...
+   */
   $select?: IResultColumn[]|IResultColumn|string
+
+  /**
+   * FROM ...
+   */
   $from?: IFromTable[]|IFromTable|string
+
+  /**
+   * WHERE ...
+   */
   $where?: IConditionalExpression[]|IConditionalExpression
+
+  /**
+   * GROUP BY ... HAVING ...
+   */
   $group?: IGroupBy|string
+
+  /**
+   * ORDER BY ...
+   */
   $order?: IOrderBy[]|IOrderBy|string
+
+  /**
+   * LIMIT ... OFFSET ...
+   */
   $limit?: ILimitOffset|number
 }
 
+/**
+ * JQL class for SELECT query
+ */
 export class Query extends Jql implements IQuery {
   public $distinct?: boolean
   public $select: ResultColumn[]
@@ -186,7 +219,7 @@ export class Query extends Jql implements IQuery {
   }
 
   // @override
-  public validate(availableTables: string[] = []) {
+  public validate(availableTables: string[] = []): void {
     if (this.$from) for (const table of this.$from) table.validate(availableTables)
     if (this.$select) for (const resultColumn of this.$select) resultColumn.validate(availableTables)
     if (this.$where) this.$where.validate(availableTables)

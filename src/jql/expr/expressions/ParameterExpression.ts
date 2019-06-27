@@ -67,7 +67,7 @@ export class ParameterExpression extends Expression implements IParameterExpress
   }
 
   // @override
-  public validate(availableTables: string[]) {
+  public validate(availableTables: string[]): void {
     this.expression.validate(availableTables)
   }
 

@@ -33,7 +33,7 @@ export class JQLError extends Error {
   }
 
   // @override
-  get [Symbol.toStringTag]() {
+  get [Symbol.toStringTag](): string {
     return this.name
   }
 }

@@ -72,7 +72,7 @@ export class ColumnExpression extends Expression implements IColumnExpression {
   }
 
   // @override
-  public validate(availableTables: string[]) {
+  public validate(availableTables: string[]): void {
     if (this.table && availableTables.indexOf(this.table) === -1) {
       throw new SyntaxError(`Unknown table ${this.table}`)
     }

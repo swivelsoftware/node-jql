@@ -60,7 +60,7 @@ export class ExistsExpression extends ConditionalExpression implements IExistsEx
   }
 
   // @override
-  public validate(availableTables: string[]) {
+  public validate(availableTables: string[]): void {
     this.query.validate(availableTables)
   }
 

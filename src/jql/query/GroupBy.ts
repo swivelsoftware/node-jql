@@ -71,7 +71,7 @@ export class GroupBy extends Jql implements IGroupBy {
   }
 
   // @override
-  get [Symbol.toStringTag]() {
+  get [Symbol.toStringTag](): string {
     return GroupBy.name
   }
 
@@ -86,7 +86,7 @@ export class GroupBy extends Jql implements IGroupBy {
   }
 
   // @override
-  public validate(availableTables: string[]) {
+  public validate(availableTables: string[]): void {
     for (const expression of this.expressions) expression.validate(availableTables)
     if (this.$having) this.$having.validate(availableTables)
   }

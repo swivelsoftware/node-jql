@@ -79,7 +79,7 @@ export class MathExpression extends Expression implements IMathExpression {
   }
 
   // @override
-  public validate(availableTables: string[]) {
+  public validate(availableTables: string[]): void {
     this.left.validate(availableTables)
     this.right.validate(availableTables)
   }

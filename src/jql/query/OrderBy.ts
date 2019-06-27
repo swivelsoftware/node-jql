@@ -58,12 +58,12 @@ export class OrderBy extends Jql implements IOrderBy {
   }
 
   // @override
-  get [Symbol.toStringTag]() {
+  get [Symbol.toStringTag](): string {
     return OrderBy.name
   }
 
   // @override
-  public validate(availableTables: string[]) {
+  public validate(availableTables: string[]): void {
     this.expression.validate(availableTables)
   }
 

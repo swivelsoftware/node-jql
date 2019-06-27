@@ -60,7 +60,7 @@ export class Unknown extends Expression implements IUnknown {
   }
 
   // @override
-  public validate() { /* do nothing */ }
+  public validate(): void { /* do nothing */ }
 
   // @override
   public toSquel(): squel.FunctionBlock {

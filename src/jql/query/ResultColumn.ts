@@ -58,12 +58,12 @@ export class ResultColumn extends Jql implements IResultColumn {
   }
 
   // @override
-  get [Symbol.toStringTag]() {
+  get [Symbol.toStringTag](): string {
     return ResultColumn.name
   }
 
   // @override
-  public validate(availableTables: string[]) {
+  public validate(availableTables: string[]): void {
     this.expression.validate(availableTables)
   }
 

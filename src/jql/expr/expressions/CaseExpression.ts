@@ -76,7 +76,7 @@ export class CaseExpression extends Expression implements ICaseExpression {
   }
 
   // @override
-  public validate(availableTables: string[]) {
+  public validate(availableTables: string[]): void {
     for (const { $when, $then } of this.cases) {
       $when.validate(availableTables)
       $then.validate(availableTables)

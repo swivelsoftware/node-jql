@@ -83,7 +83,7 @@ export class BetweenExpression extends ConditionalExpression implements IBetween
   }
 
   // @override
-  public validate(availableTables: string[]) {
+  public validate(availableTables: string[]): void {
     this.left.validate(availableTables)
     this.start.validate(availableTables)
     this.end.validate(availableTables)

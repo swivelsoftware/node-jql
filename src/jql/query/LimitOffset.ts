@@ -57,12 +57,12 @@ export class LimitOffset extends Jql implements ILimitOffset {
   }
 
   // @override
-  get [Symbol.toStringTag]() {
+  get [Symbol.toStringTag](): string {
     return LimitOffset.name
   }
 
   // @override
-  public validate(availableTables: string[]) {
+  public validate(availableTables: string[]): void {
     this.$limit.validate(availableTables)
     if (this.$offset) this.$offset.validate(availableTables)
   }

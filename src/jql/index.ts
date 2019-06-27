@@ -10,7 +10,7 @@ export interface IJql {}
  */
 export abstract class Jql implements IJql {
   // @override
-  get [Symbol.toStringTag]() {
+  get [Symbol.toStringTag](): string {
     return Jql.name
   }
 
