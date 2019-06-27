@@ -1,5 +1,5 @@
 import squel = require('squel')
-import { ISql, Sql } from '..'
+import { IJql, Jql } from '..'
 import { checkNull } from '../../utils/check'
 import { ConditionalExpression, IConditionalExpression } from '../expr'
 import { AndExpressions } from '../expr/expressions/AndExpressions'
@@ -12,7 +12,7 @@ import { ILimitOffset, LimitOffset } from './LimitOffset'
 import { IOrderBy, OrderBy } from './OrderBy'
 import { IResultColumn, ResultColumn } from './ResultColumn'
 
-export interface IQuery extends ISql {
+export interface IQuery extends IJql {
   $distinct?: boolean
   $select?: IResultColumn[]|IResultColumn|string
   $from?: IFromTable[]|IFromTable|string
@@ -22,7 +22,7 @@ export interface IQuery extends ISql {
   $limit?: ILimitOffset|number
 }
 
-export class Query extends Sql implements IQuery {
+export class Query extends Jql implements IQuery {
   public $distinct?: boolean
   public $select: ResultColumn[]
   public $from?: FromTable[]

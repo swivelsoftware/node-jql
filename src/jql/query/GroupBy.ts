@@ -1,5 +1,5 @@
 import squel = require('squel')
-import { ISql, Sql } from '..'
+import { IJql, Jql } from '..'
 import { ConditionalExpression, Expression, IConditionalExpression, IExpression } from '../expr'
 import { AndExpressions } from '../expr/expressions/AndExpressions'
 import { ColumnExpression } from '../expr/expressions/ColumnExpression'
@@ -8,7 +8,7 @@ import { parse } from '../expr/parse'
 /**
  * Raw JQL for `GROUP BY ... HAVING ...`
  */
-export interface IGroupBy extends ISql {
+export interface IGroupBy extends IJql {
   /**
    * Grouping criteria
    */
@@ -23,7 +23,7 @@ export interface IGroupBy extends ISql {
 /**
  * JQL class for `GROUP BY ... HAVING ...`
  */
-export class GroupBy extends Sql implements IGroupBy {
+export class GroupBy extends Jql implements IGroupBy {
   public expressions: Expression[]
   public $having?: ConditionalExpression
 

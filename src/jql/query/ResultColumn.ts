@@ -1,5 +1,5 @@
 import squel = require('squel')
-import { ISql, Sql } from '..'
+import { IJql, Jql } from '..'
 import { Expression, IExpression } from '../expr'
 import { ColumnExpression } from '../expr/expressions/ColumnExpression'
 import { parse } from '../expr/parse'
@@ -7,7 +7,7 @@ import { parse } from '../expr/parse'
 /**
  * Raw JQL defining selected columns in query
  */
-export interface IResultColumn extends ISql {
+export interface IResultColumn extends IJql {
   /**
    * Result column context
    */
@@ -22,7 +22,7 @@ export interface IResultColumn extends ISql {
 /**
  * JQL class defining selected columns in query
  */
-export class ResultColumn extends Sql implements IResultColumn {
+export class ResultColumn extends Jql implements IResultColumn {
   public expression: Expression
   public $as?: string
 

@@ -1,15 +1,15 @@
 /* tslint:disable:no-console */
 
-import { BinaryExpression } from './sql/expr/expressions/BinaryExpression'
-import { ColumnExpression } from './sql/expr/expressions/ColumnExpression'
-import { FunctionExpression } from './sql/expr/expressions/FunctionExpression'
-import { InExpression } from './sql/expr/expressions/InExpression'
-import { MathExpression } from './sql/expr/expressions/MathExpression'
-import { OrExpressions } from './sql/expr/expressions/OrExpressions'
-import { Query } from './sql/query'
-import { FromTable, JoinClause } from './sql/query/FromTable'
-import { OrderBy } from './sql/query/OrderBy'
-import { ResultColumn } from './sql/query/ResultColumn'
+import { BinaryExpression } from './jql/expr/expressions/BinaryExpression'
+import { ColumnExpression } from './jql/expr/expressions/ColumnExpression'
+import { FunctionExpression } from './jql/expr/expressions/FunctionExpression'
+import { InExpression } from './jql/expr/expressions/InExpression'
+import { MathExpression } from './jql/expr/expressions/MathExpression'
+import { OrExpressions } from './jql/expr/expressions/OrExpressions'
+import { Query } from './jql/query'
+import { FromTable, JoinClause } from './jql/query/FromTable'
+import { OrderBy } from './jql/query/OrderBy'
+import { ResultColumn } from './jql/query/ResultColumn'
 
 test('SELECT * FROM Student', () => {
   const query = new Query('Student')

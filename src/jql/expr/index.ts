@@ -1,10 +1,10 @@
 import squel = require('squel')
-import { ISql, Sql } from '../../sql'
+import { IJql, Jql } from '../../jql'
 
 /**
  * Raw JQL for expression
  */
-export interface IExpression extends ISql {
+export interface IExpression extends IJql {
   /**
    * The expresison class name
    */
@@ -16,7 +16,7 @@ export interface IExpression extends ISql {
 /**
  * Abstract expression class in JQL
  */
-export abstract class Expression extends Sql implements IExpression {
+export abstract class Expression extends Jql implements IExpression {
   public readonly classname: string
 
   // @override

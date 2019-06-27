@@ -3,15 +3,15 @@ import squel from 'squel'
 /**
  * Raw JQL
  */
-export interface ISql {}
+export interface IJql {}
 
 /**
  * Abstract JQL class
  */
-export abstract class Sql implements ISql {
+export abstract class Jql implements IJql {
   // @override
   get [Symbol.toStringTag]() {
-    return Sql.name
+    return Jql.name
   }
 
   // @override
@@ -20,7 +20,7 @@ export abstract class Sql implements ISql {
   }
 
   /**
-   * Check whether the SQL is valid
+   * Check whether the JQL is valid
    * @param availableTables [Array<string>]
    */
   public abstract validate(availableTables?: string[]): void
@@ -28,7 +28,7 @@ export abstract class Sql implements ISql {
   /**
    * Convert to raw JQL
    */
-  public abstract toJson(): ISql
+  public abstract toJson(): IJql
 
   /**
    * Convert to squel builder

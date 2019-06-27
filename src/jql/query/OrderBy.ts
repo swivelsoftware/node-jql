@@ -1,5 +1,5 @@
 import squel = require('squel')
-import { ISql, Sql } from '..'
+import { IJql, Jql } from '..'
 import { Expression, IExpression } from '../expr'
 import { ColumnExpression } from '../expr/expressions/ColumnExpression'
 import { parse } from '../expr/parse'
@@ -7,7 +7,7 @@ import { parse } from '../expr/parse'
 /**
  * Raw JQL for ordering terms in query
  */
-export interface IOrderBy extends ISql {
+export interface IOrderBy extends IJql {
   /**
    * Sorting context
    */
@@ -22,7 +22,7 @@ export interface IOrderBy extends ISql {
 /**
  * JQL class for ordering terms in query
  */
-export class OrderBy extends Sql implements IOrderBy {
+export class OrderBy extends Jql implements IOrderBy {
   public expression: Expression
   public order: 'ASC'|'DESC'
 
