@@ -6,7 +6,7 @@ import { AndExpressions } from '../expr/expressions/AndExpressions'
 import { ColumnExpression } from '../expr/expressions/ColumnExpression'
 import { FunctionExpression } from '../expr/expressions/FunctionExpression'
 import { parse } from '../expr/parse'
-import { IParseable } from '../parse';
+import { IParseable } from '../parse'
 import { FromTable, IFromTable } from './FromTable'
 import { GroupBy, IGroupBy } from './GroupBy'
 import { ILimitOffset, LimitOffset } from './LimitOffset'
@@ -67,9 +67,9 @@ export class Query extends Jql implements IQuery {
   public $limit?: LimitOffset
 
   /**
-   * @param json [IQuery]
+   * @param json [Partial<IQuery>]
    */
-  constructor(json: IQuery)
+  constructor(json: Partial<IQuery>)
 
   /**
    * @param $select [Array<IResultColumn>]
@@ -101,7 +101,7 @@ export class Query extends Jql implements IQuery {
     let $order: IOrderBy[]|IOrderBy|string|undefined
     let $limit: ILimitOffset|number|undefined
     if (typeof args[0] === 'object' && args[0] !== null) {
-      const json = args[0] as IQuery
+      const json = args[0] as Partial<IQuery>
       $distinct = json.$distinct
       $select = json.$select || '*'
       $from = json.$from

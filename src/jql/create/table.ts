@@ -21,9 +21,9 @@ export class CreateTableJQL extends CreateJql implements ICreateTableJQL {
   public options?: string[]
 
   /**
-   * @param json [ICreateTableJQL]
+   * @param json [Partial<ICreateTableJQL>]
    */
-  constructor(json: ICreateTableJQL)
+  constructor(json: Partial<ICreateTableJQL>)
 
   /**
    * @param name [string]
@@ -40,8 +40,8 @@ export class CreateTableJQL extends CreateJql implements ICreateTableJQL {
     // parse args
     let columns: IColumn[], constraints: string[]|string|undefined, options: string[]|string|undefined
     if (typeof args[0] === 'object') {
-      const json = args[0] as ICreateTableJQL
-      columns = json.columns
+      const json = args[0] as Partial<ICreateTableJQL>
+      columns = json.columns || []
       constraints = json.constraints
       options = json.options
     }
@@ -50,6 +50,9 @@ export class CreateTableJQL extends CreateJql implements ICreateTableJQL {
       constraints = args[3]
       options = args.slice(4)
     }
+
+    // check args
+    if (!columns.length) throw new SyntaxError('Table must have at least 1 column')
 
     // set args
     this.columns = columns.map(json => new Column(json))

@@ -28,10 +28,10 @@ export function isParseable(jql: IJql): jql is IParseable {
 
 /**
  * Parse JQL raw json to class instance
- * @param json [ICreateJql]
+ * @param json [IParseable]
  */
 export function parse<T extends CreateJql>(json: ICreateJql): T
-
+export function parse(json: IParseable): Jql
 export function parse(json: IParseable): Jql {
   if (!json.classname) throw new SyntaxError('Unknown expression: classname not defined')
   switch (json.classname) {

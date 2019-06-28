@@ -19,9 +19,9 @@ export class CreateDatabaseJQL extends CreateJql implements ICreateDatabaseJQL {
   public engine?: string
 
   /**
-   * @param json [ICreateDatabaseJQL]
+   * @param json [Partial<ICreateDatabaseJQL>]
    */
-  constructor(json: ICreateDatabaseJQL)
+  constructor(json: Partial<ICreateDatabaseJQL>)
 
   /**
    * @param name [string]
@@ -36,7 +36,7 @@ export class CreateDatabaseJQL extends CreateJql implements ICreateDatabaseJQL {
     // parse args
     let engine: string|undefined
     if (typeof args[0] === 'object') {
-      const json = args[0] as ICreateDatabaseJQL
+      const json = args[0] as Partial<ICreateDatabaseJQL>
       engine = json.engine
     }
     else {

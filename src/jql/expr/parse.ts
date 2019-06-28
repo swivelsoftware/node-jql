@@ -2,12 +2,12 @@ import { Expression, IExpression } from '.'
 import { Unknown } from './expressions/Unknown'
 import { Value } from './expressions/Value'
 
-export function parse<T extends Expression>(json: IExpression|any): T
-
 /**
  * Parse JQL raw json to class instance
  * @param json [IExpression]
  */
+export function parse<T extends Expression>(json: IExpression|any): T
+export function parse(json: IExpression|any): Expression
 export function parse(json: IExpression|any): Expression {
   if (json === undefined) {
     return new Unknown()

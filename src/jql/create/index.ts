@@ -25,9 +25,9 @@ export abstract class CreateJql extends Jql implements ICreateJql {
   public $ifNotExists: boolean
 
   /**
-   * @param json [ICreateJql]
+   * @param json [Partial<ICreateJql>]
    */
-  constructor(json: ICreateJql)
+  constructor(json: Partial<ICreateJql>)
 
   /**
    * @param name [string]
@@ -39,9 +39,9 @@ export abstract class CreateJql extends Jql implements ICreateJql {
     super()
 
     // parse args
-    let name: string, $ifNotExists: boolean|undefined
+    let name: string|undefined, $ifNotExists: boolean|undefined
     if (typeof args[0] === 'object') {
-      const json = args[0] as ICreateJql
+      const json = args[0] as Partial<ICreateJql>
       name = json.name
       $ifNotExists = json.$ifNotExists
     }
@@ -49,6 +49,9 @@ export abstract class CreateJql extends Jql implements ICreateJql {
       name = args[0]
       $ifNotExists = args[1]
     }
+
+    // check args
+    if (!name) throw new SyntaxError('Missing name')
 
     // set args
     this.name = name
