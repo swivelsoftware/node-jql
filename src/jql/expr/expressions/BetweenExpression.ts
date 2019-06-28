@@ -60,7 +60,7 @@ export class BetweenExpression extends ConditionalExpression implements IBetween
     let left: any, $not = false, start: any, end: any
     if (args.length === 1) {
       const json = args[0] as IBetweenExpression
-      left = json.json
+      left = json.left
       $not = json.$not || false
       start = json.start
       end = json.end
