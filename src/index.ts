@@ -1,3 +1,9 @@
+import squel = require('squel')
+import './jql/squel'
+
+// @ts-ignore
+squel.useFlavour('node-jql')
+
 // utils
 export { checkNull, equals } from './utils/check'
 export { JQLError } from './utils/error'
@@ -36,4 +42,7 @@ export { IOrderBy, OrderBy } from './jql/query/OrderBy'
 export { ILimitOffset, LimitOffset } from './jql/query/LimitOffset'
 
 // jql/create
+export { ICreateJql, CreateJql } from './jql/create'
+export { IColumn, Column } from './jql/create/column'
 export { ICreateDatabaseJQL, CreateDatabaseJQL } from './jql/create/database'
+export { ICreateTableJQL, CreateTableJQL } from './jql/create/table'
