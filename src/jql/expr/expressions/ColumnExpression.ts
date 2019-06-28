@@ -79,9 +79,10 @@ export class ColumnExpression extends Expression implements IColumnExpression {
   }
 
   // @override
-  public toSquel(): squel.FunctionBlock {
-    const builder = squel.select({}, [new squel.cls.GetFieldBlock()])['field'](`${this.table ? `${this.table}.` : ''}${this.name}`)
-    return squel.rstr(builder.toString())
+  public toSquel(): squel.GetFieldBlock {
+    const builder = new squel.cls.GetFieldBlock()
+    builder.field(`${this.table ? `${this.table}.` : ''}${this.name}`)
+    return builder
   }
 
   // @override

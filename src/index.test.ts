@@ -1,15 +1,6 @@
 /* tslint:disable:no-console */
 
-import { BinaryExpression } from './jql/expr/expressions/BinaryExpression'
-import { ColumnExpression } from './jql/expr/expressions/ColumnExpression'
-import { FunctionExpression } from './jql/expr/expressions/FunctionExpression'
-import { InExpression } from './jql/expr/expressions/InExpression'
-import { MathExpression } from './jql/expr/expressions/MathExpression'
-import { OrExpressions } from './jql/expr/expressions/OrExpressions'
-import { Query } from './jql/query'
-import { FromTable, JoinClause } from './jql/query/FromTable'
-import { OrderBy } from './jql/query/OrderBy'
-import { ResultColumn } from './jql/query/ResultColumn'
+import { BinaryExpression, ColumnExpression, FromTable, FunctionExpression, InExpression, JoinClause, MathExpression, OrderBy, OrExpressions, Query, ResultColumn } from '.'
 
 test('SELECT * FROM Student', () => {
   const query = new Query('Student')
