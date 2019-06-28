@@ -1,21 +1,21 @@
 import squel = require('squel')
-import { IJql, Jql } from '..'
-import { DatabaseBlock, IfNotExistsBlock } from '../blocks'
+import { CreateJql, ICreateJql } from '.'
 
 /**
  * Raw JQL for `CREATE DATABASE ...`
  */
-export interface ICreateDatabaseJQL extends IJql {
-  name: string
-  $ifNotExists?: boolean
+export interface ICreateDatabaseJQL extends ICreateJql {
+  /**
+   * Database engine
+   */
+  engine?: string
 }
 
 /**
  * JQL class for `CREATE DATABASE ...`
  */
-export class CreateDatabaseJQL extends Jql implements ICreateDatabaseJQL {
-  public name: string
-  public $ifNotExists: boolean
+export class CreateDatabaseJQL extends CreateJql implements ICreateDatabaseJQL {
+  public engine?: string
 
   /**
    * @param json [ICreateDatabaseJQL]
@@ -25,48 +25,43 @@ export class CreateDatabaseJQL extends Jql implements ICreateDatabaseJQL {
   /**
    * @param name [string]
    * @param $ifNotExists [boolean] optional
+   * @param engine [string] optional
    */
-  constructor(name: string, $ifNotExists?: boolean)
+  constructor(name: string, $ifNotExists?: boolean, engine?: string)
 
   constructor(...args: any) {
-    super()
+    super(args[0], args[1])
 
     // parse args
-    let name: string, $ifNotExists = false
+    let engine: string|undefined
     if (typeof args[0] === 'object') {
       const json = args[0] as ICreateDatabaseJQL
-      name = json.name
-      $ifNotExists = json.$ifNotExists || false
+      engine = json.engine
     }
     else {
-      name = args[0]
-      $ifNotExists = args[1] || false
+      engine = args[2]
     }
 
     // set args
-    this.name = name
-    this.$ifNotExists = $ifNotExists
+    this.engine = engine
   }
 
   // @override
   public validate(): void { /* do nothing */ }
 
   // @override
-  public toSquel(): squel.BaseBuilder {
-    const builder = new squel.cls.QueryBuilder({}, [
-      new squel.cls.StringBlock({}, 'CREATE DATABASE'),
-      new IfNotExistsBlock(),
-      new DatabaseBlock(),
-    ])
+  public toSquel(): squel.QueryBuilder {
+    const builder = squel['createDatabase']() as squel.QueryBuilder
     if (this.$ifNotExists) builder['ifNotExists']()
     builder['database'](this.name)
+    if (this.engine) builder['option'](`ENGINE = ${this.engine}`)
     return builder
   }
 
   // @override
   public toJson(): ICreateDatabaseJQL {
-    const result = { name: this.name } as ICreateDatabaseJQL
-    if (this.$ifNotExists) result.$ifNotExists = true
+    const result = super.toJson() as ICreateDatabaseJQL
+    if (this.engine) result.engine = this.engine
     return result
   }
 }
