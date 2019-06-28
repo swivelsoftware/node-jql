@@ -15,6 +15,7 @@ export interface ICreateDatabaseJQL extends ICreateJql {
  * JQL class for `CREATE DATABASE ...`
  */
 export class CreateDatabaseJQL extends CreateJql implements ICreateDatabaseJQL {
+  public readonly classname = CreateDatabaseJQL.name
   public engine?: string
 
   /**

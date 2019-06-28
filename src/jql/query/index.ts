@@ -1,5 +1,5 @@
 import squel = require('squel')
-import { IJql, Jql } from '..'
+import { IJql, IParseable, Jql } from '..'
 import { checkNull } from '../../utils/check'
 import { ConditionalExpression, IConditionalExpression } from '../expr'
 import { AndExpressions } from '../expr/expressions/AndExpressions'
@@ -15,7 +15,7 @@ import { IResultColumn, ResultColumn } from './ResultColumn'
 /**
  * Raw JQL for SELECT query
  */
-export interface IQuery extends IJql {
+export interface IQuery extends IJql, IParseable {
   /**
    * Use SELECT DISTINCT instead
    */
@@ -56,6 +56,7 @@ export interface IQuery extends IJql {
  * JQL class for SELECT query
  */
 export class Query extends Jql implements IQuery {
+  public readonly classname = Query.name
   public $distinct?: boolean
   public $select: ResultColumn[]
   public $from?: FromTable[]
@@ -247,7 +248,7 @@ export class Query extends Jql implements IQuery {
 
   // @override
   public toJson(): IQuery {
-    const result: IQuery = {}
+    const result: IQuery = { classname: this.classname }
     if (this.$distinct) result.$distinct = true
     if (this.$select.length) result.$select = this.$select.map(resultColumn => resultColumn.toJson())
     if (this.$from) result.$from = this.$from.map(fromTable => fromTable.toJson())

@@ -35,3 +35,13 @@ export abstract class Jql implements IJql {
    */
   public abstract toSquel(): squel.BaseBuilder
 }
+
+/**
+ * Parsealble JQL
+ */
+export interface IParseable {
+  /**
+   * The JQL class name
+   */
+  classname: string
+}

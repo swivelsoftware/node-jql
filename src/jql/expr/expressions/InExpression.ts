@@ -50,7 +50,7 @@ export class InExpression extends BinaryExpression implements IInExpression {
 
     // set args
     this.$not = $not
-    if (right && !Array.isArray(right) && !('classname' in right)) this.right = new Query(right as IQuery)
+    if (right && !Array.isArray(right) && right.classname === 'Query') this.right = new Query(right as IQuery)
     if (!this.right) this.right = parse<Unknown|Value>(right)
   }
 

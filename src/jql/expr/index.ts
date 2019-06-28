@@ -1,16 +1,10 @@
 import squel = require('squel')
-import { IJql, Jql } from '../../jql'
+import { IJql, IParseable, Jql } from '../../jql'
 
 /**
  * Raw JQL for expression
  */
-export interface IExpression extends IJql {
-  /**
-   * The expresison class name
-   */
-  classname: string
-
-  [key: string]: any
+export interface IExpression extends IJql, IParseable {
 }
 
 /**

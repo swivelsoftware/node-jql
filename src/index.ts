@@ -13,6 +13,7 @@ export { Type, defaults, type, normalize, denormalize } from './type'
 
 // jql
 export { IJql, Jql } from './jql'
+export { parse } from './jql/parse'
 
 // jql/expr
 export { IExpression, Expression, IConditionalExpression, ConditionalExpression } from './jql/expr'

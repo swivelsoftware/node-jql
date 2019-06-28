@@ -1,9 +1,9 @@
-import { IJql, Jql } from '..'
+import { IJql, IParseable, Jql } from '..'
 
 /**
  * Raw JQL defining CREATE statements
  */
-export interface ICreateJql extends IJql {
+export interface ICreateJql extends IJql, IParseable {
   /**
    * Entity name
    */
@@ -19,6 +19,7 @@ export interface ICreateJql extends IJql {
  * JQL class defining CREATE statements
  */
 export abstract class CreateJql extends Jql implements ICreateJql {
+  public readonly classname = CreateJql.name
   public name: string
   public $ifNotExists: boolean
 
@@ -54,8 +55,13 @@ export abstract class CreateJql extends Jql implements ICreateJql {
   }
 
   // @override
+  get [Symbol.toStringTag](): string {
+    return this.classname
+  }
+
+  // @override
   public toJson(): ICreateJql {
-    const result = { name: this.name } as ICreateJql
+    const result = { classname: this.classname, name: this.name } as ICreateJql
     if (this.$ifNotExists) result.$ifNotExists = true
     return result
   }

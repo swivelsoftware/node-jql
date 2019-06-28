@@ -15,6 +15,7 @@ export interface ICreateTableJQL extends ICreateJql {
  * JQL class for `CREATE TABLE ...`
  */
 export class CreateTableJQL extends CreateJql implements ICreateTableJQL {
+  public readonly classname = CreateTableJQL.name
   public columns: Column[]
   public constraints?: string[]
   public options?: string[]

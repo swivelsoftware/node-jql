@@ -41,7 +41,7 @@ export class ExistsExpression extends ConditionalExpression implements IExistsEx
 
     // parse args
     let query: IQuery, $not = false
-    if ('classname' in args[0] && !('$select' in args[0] || '$from' in args[0])) {
+    if (args[0].classname !== 'Query' && !('$select' in args[0] || '$from' in args[0])) {
       const json = args[0] as IExistsExpression
       $not = json.$not || false
       query = json.query
