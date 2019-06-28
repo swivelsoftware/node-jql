@@ -1,14 +1,37 @@
-import { IParseable, Jql } from '.'
+import { IJql, Jql } from '.'
 import { CreateJql, ICreateJql } from './create'
 import { CreateDatabaseJQL, ICreateDatabaseJQL } from './create/database'
 import { CreateTableJQL, ICreateTableJQL } from './create/table'
 
-export function parse<T extends CreateJql>(json: ICreateJql): T
+/**
+ * Parsealble JQL
+ */
+export interface IParseable {
+  /**
+   * The JQL class name
+   */
+  classname: string
+}
+
+/**
+ * Check whether the JQL is parseable
+ * @param jql [IJql]
+ */
+export function isParseable(jql: IJql): jql is IParseable {
+  return 'classname' in jql && typeof jql['classname'] === 'string' && [
+    'CreateDatabaseJQL',
+    'CreateTableJQL',
+    // TODO
+    'Query',
+  ].indexOf(jql['classname']) > -1
+}
 
 /**
  * Parse JQL raw json to class instance
  * @param json [ICreateJql]
  */
+export function parse<T extends CreateJql>(json: ICreateJql): T
+
 export function parse(json: IParseable): Jql {
   if (!json.classname) throw new SyntaxError('Unknown expression: classname not defined')
   switch (json.classname) {

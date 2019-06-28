@@ -1,11 +1,12 @@
 import squel = require('squel')
-import { IJql, IParseable, Jql } from '..'
+import { IJql, Jql } from '..'
 import { checkNull } from '../../utils/check'
 import { ConditionalExpression, IConditionalExpression } from '../expr'
 import { AndExpressions } from '../expr/expressions/AndExpressions'
 import { ColumnExpression } from '../expr/expressions/ColumnExpression'
 import { FunctionExpression } from '../expr/expressions/FunctionExpression'
 import { parse } from '../expr/parse'
+import { IParseable } from '../parse';
 import { FromTable, IFromTable } from './FromTable'
 import { GroupBy, IGroupBy } from './GroupBy'
 import { ILimitOffset, LimitOffset } from './LimitOffset'
