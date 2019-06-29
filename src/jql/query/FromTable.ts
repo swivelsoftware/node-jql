@@ -209,8 +209,8 @@ export class FromTable extends Jql implements IFromTable {
       joinClauses = Array.isArray(json.joinClauses) ? json.joinClauses : [json.joinClauses]
     }
     else if (typeof args[1] === 'string') {
-      database = Array.isArray(args[0]) && args[0].length === 2 ? args[0][0] : undefined
-      table = Array.isArray(args[0]) ? args[0].length === 2 ? args[0][1] : args[0][0] : args[0]
+      database = Array.isArray(args[0]) ? args[0][0] : undefined
+      table = Array.isArray(args[0]) ? args[0][1] : args[0]
       $as = args[1]
       joinClauses = args.slice(2)
     }
@@ -221,6 +221,7 @@ export class FromTable extends Jql implements IFromTable {
     }
 
     // check args
+    if (Array.isArray(table)) throw new SyntaxError(`Invalid table ${JSON.stringify(table)}`)
     if (typeof table !== 'string' && !$as) throw new SyntaxError('Missing alias name')
 
     // set args

@@ -196,8 +196,8 @@ squel.flavours['node-jql'] = _squel => {
   /**
    * squel.createTable function
    */
-  _squel['createTable'] = (options: Partial<squel.CompleteQueryBuilderOptions> = {}, blocks?: squel.Block[]) => new squel.cls.QueryBuilder(options, blocks || [
-    new squel.cls.StringBlock(options, 'CREATE TABLE'),
+  _squel['createTable'] = (options: Partial<squel.CompleteQueryBuilderOptions> & { temporary?: boolean } = {}, blocks?: squel.Block[]) => new squel.cls.QueryBuilder(options, blocks || [
+    new squel.cls.StringBlock(options, `CREATE${options.temporary ? ' TEMPORARY' : ''} TABLE`),
     new IfNotExistsBlock(options),
     new squel.cls.UpdateTableBlock(options),
     new ColumnsBlock(options),

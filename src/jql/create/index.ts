@@ -52,6 +52,7 @@ export abstract class CreateJql extends Jql implements ICreateJql {
 
     // check args
     if (!name) throw new SyntaxError('Missing name')
+    if (typeof name !== 'string') throw new SyntaxError(`Invalid name ${name}`)
 
     // set args
     this.name = name

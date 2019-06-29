@@ -6,6 +6,8 @@ import { Column, IColumn } from './column'
  * Raw JQL for `CREATE TABLE ...`
  */
 export interface ICreateTableJQL extends ICreateJql {
+  $temporary?: boolean
+  database?: string
   columns: IColumn[]
   constraints?: string[]|string
   options?: string[]|string
@@ -16,6 +18,8 @@ export interface ICreateTableJQL extends ICreateJql {
  */
 export class CreateTableJQL extends CreateJql implements ICreateTableJQL {
   public readonly classname = CreateTableJQL.name
+  public $temporary: boolean
+  public database?: string
   public columns: Column[]
   public constraints?: string[]
   public options?: string[]
@@ -26,26 +30,49 @@ export class CreateTableJQL extends CreateJql implements ICreateTableJQL {
   constructor(json: Partial<ICreateTableJQL>)
 
   /**
-   * @param name [string]
+   * @param name [Array<string>|string]
    * @param columns [Array<Column>]
    * @param $ifNotExists [boolean] optional
    * @param constraints [Array<string>|string] optional
-   * @param options [Array<string>] optional
+   * @param options [Array<string] optional
    */
-  constructor(name: string, columns: Column[], $ifNotExists?: boolean, constraints?: string[]|string, ...options: string[])
+  constructor(name: [string, string]|string, columns: Column[], $ifNotExists?: boolean, constraints?: string[]|string, ...options: string[])
+
+  /**
+   * @param $temporary [boolean]
+   * @param name [Array<string>|string]
+   * @param columns [Array<Column>]
+   * @param $ifNotExists [boolean] optional
+   * @param constraints [Array<string>|string] optional
+   * @param options [Array<string] optional
+   */
+  constructor($temporary: true, name: [string, string]|string, columns: Column[], $ifNotExists?: boolean, constraints?: string[]|string, ...options: string[])
 
   constructor(...args: any) {
-    super(args[0], args[2])
+    super(
+      typeof args[0] === 'boolean' ? (Array.isArray(args[1]) ? args[1][1] : args[1]) : (Array.isArray(args[0]) ? args[0][1] : args[0]),
+      typeof args[0] === 'boolean' ? args[3] : args[2],
+    )
 
     // parse args
-    let columns: IColumn[], constraints: string[]|string|undefined, options: string[]|string|undefined
+    let $temporary: boolean|undefined, database: string|undefined, columns: IColumn[], constraints: string[]|string|undefined, options: string[]|string|undefined
     if (typeof args[0] === 'object') {
       const json = args[0] as Partial<ICreateTableJQL>
+      $temporary = json.$temporary
+      database = json.database
       columns = json.columns || []
       constraints = json.constraints
       options = json.options
     }
+    else if (typeof args[0] === 'boolean') {
+      $temporary = true
+      if (Array.isArray(args[1])) database = args[1][0]
+      columns = args[2]
+      constraints = args[4]
+      options = args.slice(5)
+    }
     else {
+      if (Array.isArray(args[0])) database = args[0][0]
       columns = args[1]
       constraints = args[3]
       options = args.slice(4)
@@ -55,6 +82,8 @@ export class CreateTableJQL extends CreateJql implements ICreateTableJQL {
     if (!columns.length) throw new SyntaxError('Table must have at least 1 column')
 
     // set args
+    this.$temporary = $temporary || false
+    this.database = database
     this.columns = columns.map(json => new Column(json))
     if (constraints) {
       if (!Array.isArray(constraints)) constraints = [constraints]
@@ -71,7 +100,7 @@ export class CreateTableJQL extends CreateJql implements ICreateTableJQL {
 
   // @override
   public toSquel(): squel.QueryBuilder {
-    const builder = squel['createTable']() as squel.QueryBuilder
+    const builder = squel['createTable']({ temporary: this.$temporary }) as squel.QueryBuilder
     if (this.$ifNotExists) builder['ifNotExists']()
     builder['table'](this.name)
     for (const column of this.columns) builder['column'](column.toSquel())
