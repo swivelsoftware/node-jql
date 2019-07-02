@@ -6,10 +6,29 @@ import { Column, IColumn } from './column'
  * Raw JQL for `CREATE TABLE ...`
  */
 export interface ICreateTableJQL extends ICreateJQL {
+  /**
+   * Whether it is a temporary table
+   */
   $temporary?: boolean
+
+  /**
+   * Related database
+   */
   database?: string
+
+  /**
+   * Table columns
+   */
   columns: IColumn[]
+
+  /**
+   * Column constraints
+   */
   constraints?: string[]|string
+
+  /**
+   * Table options
+   */
   options?: string[]|string
 }
 
@@ -46,7 +65,7 @@ export class CreateTableJQL extends CreateJQL implements ICreateTableJQL {
    * @param constraints [Array<string>|string] optional
    * @param options [Array<string] optional
    */
-  constructor($temporary: true, name: [string, string]|string, columns: Column[], $ifNotExists?: boolean, constraints?: string[]|string, ...options: string[])
+  constructor($temporary: boolean, name: [string, string]|string, columns: Column[], $ifNotExists?: boolean, constraints?: string[]|string, ...options: string[])
 
   constructor(...args: any) {
     super(
@@ -65,7 +84,7 @@ export class CreateTableJQL extends CreateJQL implements ICreateTableJQL {
       options = json.options
     }
     else if (typeof args[0] === 'boolean') {
-      $temporary = true
+      $temporary = args[0]
       if (Array.isArray(args[1])) database = args[1][0]
       columns = args[2]
       constraints = args[4]
@@ -96,13 +115,10 @@ export class CreateTableJQL extends CreateJQL implements ICreateTableJQL {
   }
 
   // @override
-  public validate(): void { /* do nothing */ }
-
-  // @override
   public toSquel(): squel.QueryBuilder {
     const builder = squel['createTable']({ temporary: this.$temporary }) as squel.QueryBuilder
     if (this.$ifNotExists) builder['ifNotExists']()
-    builder['table'](this.database ? `${this.database}.${this.name}` : this.name)
+    builder['table'](`${this.database ? `${this.database}.` : ''}${this.name}`)
     for (const column of this.columns) builder['column'](column.toSquel())
     if (this.options) for (const option of this.options) builder['option'](option)
     return builder

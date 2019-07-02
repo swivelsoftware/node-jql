@@ -24,19 +24,21 @@ export class DropTableJQL extends DropJQL implements IDropTableJQL {
 
   /**
    * @param name [Array<string>|string]
+   * @param $ifExists [boolean] optional
    */
-  constructor(name: [string, string]|string)
+  constructor(name: [string, string]|string, $ifExists?: boolean)
 
   /**
    * @param $temporary [boolean]
    * @param name [Array<string>|string]
+   * @param $ifExists [boolean] optional
    */
-  constructor($temporary: true, name: [string, string]|string)
+  constructor($temporary: true, name: [string, string]|string, $ifExists?: boolean)
 
   constructor(...args: any) {
     super(
       typeof args[0] === 'boolean' ? (Array.isArray(args[1]) ? args[1][1] : args[1]) : (Array.isArray(args[0]) ? args[0][1] : args[0]),
-      typeof args[0] === 'boolean' ? args[3] : args[2],
+      typeof args[0] === 'boolean' ? args[2] : args[1],
     )
 
     // parse args
@@ -66,7 +68,7 @@ export class DropTableJQL extends DropJQL implements IDropTableJQL {
   public toSquel(): squel.QueryBuilder {
     const builder = squel['dropTable']({ temporary: this.$temporary }) as squel.QueryBuilder
     if (this.$ifExists) builder['ifExists']()
-    builder['table'](this.database ? `${this.database}.${this.name}` : this.name)
+    builder['table'](`${this.database ? `${this.database}.` : ''}${this.name}`)
     return builder
   }
 

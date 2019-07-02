@@ -65,6 +65,9 @@ export abstract class CreateJQL extends JQL implements ICreateJQL {
   }
 
   // @override
+  public validate(): void { /* do nothing */ }
+
+  // @override
   public toJson(): ICreateJQL {
     const result = { classname: this.classname, name: this.name } as ICreateJQL
     if (this.$ifNotExists) result.$ifNotExists = true

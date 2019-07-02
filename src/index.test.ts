@@ -1,6 +1,37 @@
 /* tslint:disable:no-console */
 
-import { BinaryExpression, ColumnExpression, FromTable, FunctionExpression, InExpression, JoinClause, MathExpression, OrderBy, OrExpressions, Query, ResultColumn } from '.'
+import { BinaryExpression, Column, ColumnExpression, CreateDatabaseJQL, CreateTableJQL, DropDatabaseJQL, DropTableJQL, FromTable, FunctionExpression, InExpression, JoinClause, MathExpression, OrderBy, OrExpressions, Query, ResultColumn, Type } from '.'
+
+test('CREATE DATABASE IF NOT EXISTS School', () => {
+  const query = new CreateDatabaseJQL('School', true)
+  query.validate()
+  console.log(query.toString())
+})
+
+test('DROP DATABASE IF EXISTS School', () => {
+  const query = new DropDatabaseJQL('School', true)
+  query.validate()
+  console.log(query.toString())
+})
+
+test('CREATE TABLE IF NOT EXISTS Student (...)', () => {
+  const query = new CreateTableJQL('Student', [
+    new Column<Type>('id', 'number', false, 'PRIMARY KEY'),
+    new Column<Type>('name', 'string', false),
+    new Column<Type>('gender', 'string', false),
+    new Column<Type>('birthday', 'Date', false),
+    new Column<Type>('admittedAt', 'Date', false),
+    new Column<Type>('graduatedAt', 'Date', true),
+  ], true)
+  query.validate()
+  console.log(query.toString())
+})
+
+test('DROP TABLE IF EXISTS Student', () => {
+  const query = new DropTableJQL('Student', true)
+  query.validate()
+  console.log(query.toString())
+})
 
 test('SELECT * FROM Student', () => {
   const query = new Query('Student')

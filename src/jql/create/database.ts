@@ -48,9 +48,6 @@ export class CreateDatabaseJQL extends CreateJQL implements ICreateDatabaseJQL {
   }
 
   // @override
-  public validate(): void { /* do nothing */ }
-
-  // @override
   public toSquel(): squel.QueryBuilder {
     const builder = squel['createDatabase']() as squel.QueryBuilder
     if (this.$ifNotExists) builder['ifNotExists']()

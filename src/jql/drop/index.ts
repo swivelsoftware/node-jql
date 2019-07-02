@@ -31,9 +31,9 @@ export abstract class DropJQL extends JQL implements IDropJQL {
 
   /**
    * @param name [string]
-   * @param $ifNotExists [boolean] optionsl
+   * @param $ifExists [boolean] optionsl
    */
-  constructor(name: string, $ifNotExists?: boolean)
+  constructor(name: string, $ifExists?: boolean)
 
   constructor(...args: any[]) {
     super()

@@ -56,7 +56,7 @@ squel.flavours['node-jql'] = _squel => {
 
     // @override
     public _toParamString(): squel.ParamString {
-      if (!checkNull(this._database)) throw new SyntaxError('Missing database')
+      if (checkNull(this._database)) throw new SyntaxError('Missing database')
       return {
         text: this._formatTableName(this._database),
         values: [],
@@ -186,7 +186,7 @@ squel.flavours['node-jql'] = _squel => {
   /**
    * squel.createDatabase function
    */
-  _squel['createDatabase'] = (options: Partial<squel.CompleteQueryBuilderOptions> = {}, blocks?: squel.Block[]) => new squel.cls.QueryBuilder(options, blocks || [
+  squel['createDatabase'] = (options: Partial<squel.CompleteQueryBuilderOptions> = {}, blocks?: squel.Block[]) => new squel.cls.QueryBuilder(options, blocks || [
     new squel.cls.StringBlock(options, 'CREATE DATABASE'),
     new IfNotExistsBlock(options),
     new DatabaseBlock(options),
@@ -196,7 +196,7 @@ squel.flavours['node-jql'] = _squel => {
   /**
    * squel.createTable function
    */
-  _squel['createTable'] = (options: Partial<squel.CompleteQueryBuilderOptions> & { temporary?: boolean } = {}, blocks?: squel.Block[]) => new squel.cls.QueryBuilder(options, blocks || [
+  squel['createTable'] = (options: Partial<squel.CompleteQueryBuilderOptions> & { temporary?: boolean } = {}, blocks?: squel.Block[]) => new squel.cls.QueryBuilder(options, blocks || [
     new squel.cls.StringBlock(options, `CREATE${options.temporary ? ' TEMPORARY' : ''} TABLE`),
     new IfNotExistsBlock(options),
     new squel.cls.UpdateTableBlock(options),
@@ -207,7 +207,7 @@ squel.flavours['node-jql'] = _squel => {
   /**
    * squel.dropDatabase function
    */
-  _squel['dropDatabase'] = (options: Partial<squel.CompleteQueryBuilderOptions> = {}, blocks?: squel.Block[]) => new squel.cls.QueryBuilder(options, blocks || [
+  squel['dropDatabase'] = (options: Partial<squel.CompleteQueryBuilderOptions> = {}, blocks?: squel.Block[]) => new squel.cls.QueryBuilder(options, blocks || [
     new squel.cls.StringBlock(options, 'DROP DATABASE'),
     new IfExistsBlock(options),
     new DatabaseBlock(options),
@@ -216,7 +216,7 @@ squel.flavours['node-jql'] = _squel => {
   /**
    * squel.dropTable function
    */
-  _squel['dropTable'] = (options: Partial<squel.CompleteQueryBuilderOptions> & { temporary?: boolean } = {}, blocks?: squel.Block[]) => new squel.cls.QueryBuilder(options, blocks || [
+  squel['dropTable'] = (options: Partial<squel.CompleteQueryBuilderOptions> & { temporary?: boolean } = {}, blocks?: squel.Block[]) => new squel.cls.QueryBuilder(options, blocks || [
     new squel.cls.StringBlock(options, `DROP${options.temporary ? ' TEMPORARY' : ''} TABLE`),
     new IfExistsBlock(options),
     new squel.cls.UpdateTableBlock(options),
