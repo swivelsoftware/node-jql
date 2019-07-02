@@ -52,3 +52,6 @@ export { ICreateTableJQL, CreateTableJQL } from './jql/create/table'
 export { IDropJQL, DropJQL } from './jql/drop'
 export { IDropDatabaseJQL, DropDatabaseJQL } from './jql/drop/database'
 export { IDropTableJQL, DropTableJQL } from './jql/drop/table'
+
+// jql/insert
+export { IInsertJQL, InsertJQL } from './jql/insert'

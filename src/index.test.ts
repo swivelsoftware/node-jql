@@ -1,6 +1,7 @@
 /* tslint:disable:no-console */
 
-import { BinaryExpression, Column, ColumnExpression, CreateDatabaseJQL, CreateTableJQL, DropDatabaseJQL, DropTableJQL, FromTable, FunctionExpression, InExpression, JoinClause, MathExpression, OrderBy, OrExpressions, Query, ResultColumn, Type } from '.'
+import moment from 'moment'
+import { BinaryExpression, Column, ColumnExpression, CreateDatabaseJQL, CreateTableJQL, DropDatabaseJQL, DropTableJQL, FromTable, FunctionExpression, InExpression, InsertJQL, JoinClause, MathExpression, OrderBy, OrExpressions, Query, ResultColumn, Type } from '.'
 
 test('CREATE DATABASE IF NOT EXISTS School', () => {
   const query = new CreateDatabaseJQL('School', true)
@@ -29,6 +30,15 @@ test('CREATE TABLE IF NOT EXISTS Student (...)', () => {
 
 test('DROP TABLE IF EXISTS Student', () => {
   const query = new DropTableJQL('Student', true)
+  query.validate()
+  console.log(query.toString())
+})
+
+test('INSERT INTO Student VALUES (...)', () => {
+  const query = new InsertJQL(['School', 'Student'],
+    { name: 'Kennys Ng', gender: 'M', birthday: moment('1992-04-21').toDate(), admittedAt: new Date() },
+    { name: 'Kirino Chiba', gender: 'F', birthday: moment('1992-06-08').toDate(), admittedAt: new Date() },
+  )
   query.validate()
   console.log(query.toString())
 })

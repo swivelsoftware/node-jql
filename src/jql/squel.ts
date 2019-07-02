@@ -1,5 +1,11 @@
+import moment from 'moment'
 import squel from 'squel'
 import { checkNull } from '../utils/check'
+
+/**
+ * Register Date type
+ */
+squel.registerValueHandler(Date, (date: Date) => moment(date).format())
 
 /**
  * Column definition block
