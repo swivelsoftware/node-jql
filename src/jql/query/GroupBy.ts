@@ -1,4 +1,4 @@
-import squel = require('squel')
+import squel from 'squel'
 import { IJQL, JQL } from '..'
 import { ConditionalExpression, Expression, IConditionalExpression, IExpression } from '../expr'
 import { AndExpressions } from '../expr/expressions/AndExpressions'

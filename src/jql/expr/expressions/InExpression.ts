@@ -1,4 +1,4 @@
-import squel = require('squel')
+import squel from 'squel'
 import { IQuery, Query } from '../../query'
 import { parse } from '../parse'
 import { BinaryExpression, IBinaryExpression } from './BinaryExpression'

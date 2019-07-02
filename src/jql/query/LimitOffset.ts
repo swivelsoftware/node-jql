@@ -1,4 +1,4 @@
-import squel = require('squel')
+import squel from 'squel'
 import { IJQL, JQL } from '..'
 import { Expression, IExpression } from '../expr'
 import { parse } from '../expr/parse'

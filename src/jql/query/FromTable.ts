@@ -1,5 +1,5 @@
 import { AxiosRequestConfig } from 'axios'
-import squel = require('squel')
+import squel from 'squel'
 import { IQuery, Query } from '.'
 import { IJQL, JQL } from '..'
 import { Type } from '../../type'

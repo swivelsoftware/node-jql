@@ -1,4 +1,4 @@
-import squel = require('squel')
+import squel from 'squel'
 import { ConditionalExpression, IConditionalExpression } from '..'
 import { IQuery, Query } from '../../query'
 

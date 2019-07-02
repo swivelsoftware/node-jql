@@ -1,4 +1,4 @@
-import squel = require('squel')
+import squel from 'squel'
 import { checkNull } from '../../../utils/check'
 import { ConditionalExpression, Expression, IConditionalExpression, IExpression } from '../../expr'
 import { parse } from '../parse'
