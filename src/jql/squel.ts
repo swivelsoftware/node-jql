@@ -203,4 +203,22 @@ squel.flavours['node-jql'] = _squel => {
     new ColumnsBlock(options),
     new OptionsBlock(options),
   ])
+
+  /**
+   * squel.dropDatabase function
+   */
+  _squel['dropDatabase'] = (options: Partial<squel.CompleteQueryBuilderOptions> = {}, blocks?: squel.Block[]) => new squel.cls.QueryBuilder(options, blocks || [
+    new squel.cls.StringBlock(options, 'DROP DATABASE'),
+    new IfExistsBlock(options),
+    new DatabaseBlock(options),
+  ])
+
+  /**
+   * squel.dropTable function
+   */
+  _squel['dropTable'] = (options: Partial<squel.CompleteQueryBuilderOptions> & { temporary?: boolean } = {}, blocks?: squel.Block[]) => new squel.cls.QueryBuilder(options, blocks || [
+    new squel.cls.StringBlock(options, `DROP${options.temporary ? ' TEMPORARY' : ''} TABLE`),
+    new IfExistsBlock(options),
+    new squel.cls.UpdateTableBlock(options),
+  ])
 }

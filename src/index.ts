@@ -44,6 +44,7 @@ export { ILimitOffset, LimitOffset } from './jql/query/LimitOffset'
 
 // jql/create
 export { ICreateJQL, CreateJQL } from './jql/create'
+export { IDropJQL, DropJQL } from './jql/drop'
 export { IColumn, Column } from './jql/create/column'
 export { ICreateDatabaseJQL, CreateDatabaseJQL } from './jql/create/database'
 export { ICreateTableJQL, CreateTableJQL } from './jql/create/table'
