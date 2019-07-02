@@ -1,11 +1,11 @@
 import squel = require('squel')
-import { CreateJql, ICreateJql } from '.'
+import { CreateJQL, ICreateJQL } from '.'
 import { Column, IColumn } from './column'
 
 /**
  * Raw JQL for `CREATE TABLE ...`
  */
-export interface ICreateTableJQL extends ICreateJql {
+export interface ICreateTableJQL extends ICreateJQL {
   $temporary?: boolean
   database?: string
   columns: IColumn[]
@@ -16,7 +16,7 @@ export interface ICreateTableJQL extends ICreateJql {
 /**
  * JQL class for `CREATE TABLE ...`
  */
-export class CreateTableJQL extends CreateJql implements ICreateTableJQL {
+export class CreateTableJQL extends CreateJQL implements ICreateTableJQL {
   public readonly classname = CreateTableJQL.name
   public $temporary: boolean
   public database?: string
@@ -102,7 +102,7 @@ export class CreateTableJQL extends CreateJql implements ICreateTableJQL {
   public toSquel(): squel.QueryBuilder {
     const builder = squel['createTable']({ temporary: this.$temporary }) as squel.QueryBuilder
     if (this.$ifNotExists) builder['ifNotExists']()
-    builder['table'](this.name)
+    builder['table'](this.database ? `${this.database}.${this.name}` : this.name)
     for (const column of this.columns) builder['column'](column.toSquel())
     if (this.options) for (const option of this.options) builder['option'](option)
     return builder
@@ -111,6 +111,8 @@ export class CreateTableJQL extends CreateJql implements ICreateTableJQL {
   // @override
   public toJson(): ICreateTableJQL {
     const result = super.toJson() as ICreateTableJQL
+    result.$temporary = this.$temporary
+    if (this.database) result.database = this.database
     result.columns = this.columns.map(column => column.toJson())
     if (this.options) result.options = this.options
     return result

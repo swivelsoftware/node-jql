@@ -1,5 +1,5 @@
 import squel = require('squel')
-import { IJql, Jql } from '..'
+import { IJQL, JQL } from '..'
 import { checkNull } from '../../utils/check'
 import { ConditionalExpression, IConditionalExpression } from '../expr'
 import { AndExpressions } from '../expr/expressions/AndExpressions'
@@ -16,7 +16,7 @@ import { IResultColumn, ResultColumn } from './ResultColumn'
 /**
  * Raw JQL for SELECT query
  */
-export interface IQuery extends IJql, IParseable {
+export interface IQuery extends IJQL, IParseable {
   /**
    * Use SELECT DISTINCT instead
    */
@@ -56,7 +56,7 @@ export interface IQuery extends IJql, IParseable {
 /**
  * JQL class for SELECT query
  */
-export class Query extends Jql implements IQuery {
+export class Query extends JQL implements IQuery {
   public readonly classname = Query.name
   public $distinct?: boolean
   public $select: ResultColumn[]

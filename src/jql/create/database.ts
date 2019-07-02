@@ -1,10 +1,10 @@
 import squel = require('squel')
-import { CreateJql, ICreateJql } from '.'
+import { CreateJQL, ICreateJQL } from '.'
 
 /**
  * Raw JQL for `CREATE DATABASE ...`
  */
-export interface ICreateDatabaseJQL extends ICreateJql {
+export interface ICreateDatabaseJQL extends ICreateJQL {
   /**
    * Database engine
    */
@@ -14,7 +14,7 @@ export interface ICreateDatabaseJQL extends ICreateJql {
 /**
  * JQL class for `CREATE DATABASE ...`
  */
-export class CreateDatabaseJQL extends CreateJql implements ICreateDatabaseJQL {
+export class CreateDatabaseJQL extends CreateJQL implements ICreateDatabaseJQL {
   public readonly classname = CreateDatabaseJQL.name
   public engine?: string
 

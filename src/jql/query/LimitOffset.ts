@@ -1,12 +1,12 @@
 import squel = require('squel')
-import { IJql, Jql } from '..'
+import { IJQL, JQL } from '..'
 import { Expression, IExpression } from '../expr'
 import { parse } from '../expr/parse'
 
 /**
  * Raw JQL for `LIMIT {$limit} OFFSET {$offset}`
  */
-export interface ILimitOffset extends IJql {
+export interface ILimitOffset extends IJQL {
   /**
    * Limit result count
    */
@@ -21,7 +21,7 @@ export interface ILimitOffset extends IJql {
 /**
  * JQL class defining selected columns in query
  */
-export class LimitOffset extends Jql implements ILimitOffset {
+export class LimitOffset extends JQL implements ILimitOffset {
   public $limit: Expression
   public $offset?: Expression
 

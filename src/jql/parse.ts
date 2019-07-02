@@ -1,5 +1,5 @@
-import { IJql, Jql } from '.'
-import { CreateJql, ICreateJql } from './create'
+import { IJQL, JQL } from '.'
+import { CreateJQL, ICreateJQL } from './create'
 import { CreateDatabaseJQL, ICreateDatabaseJQL } from './create/database'
 import { CreateTableJQL, ICreateTableJQL } from './create/table'
 import { IQuery, Query } from './query'
@@ -16,9 +16,9 @@ export interface IParseable {
 
 /**
  * Check whether the JQL is parseable
- * @param jql [IJql]
+ * @param jql [IJQL]
  */
-export function isParseable(jql: IJql): jql is IParseable {
+export function isParseable(jql: IJQL): jql is IParseable {
   return 'classname' in jql && typeof jql['classname'] === 'string' && [
     'CreateDatabaseJQL',
     'CreateTableJQL',
@@ -31,16 +31,17 @@ export function isParseable(jql: IJql): jql is IParseable {
  * Parse JQL raw json to class instance
  * @param json [IParseable]
  */
-export function parse<T extends CreateJql>(json: ICreateJql): T
+export function parse<T extends CreateJQL>(json: ICreateJQL): T
 export function parse(json: IQuery): Query
-export function parse(json: IParseable): Jql
-export function parse(json: IParseable): Jql {
+export function parse(json: IParseable): JQL
+export function parse(json: IParseable): JQL {
   if (!json.classname) throw new SyntaxError('Unknown expression: classname not defined')
   switch (json.classname) {
     case CreateDatabaseJQL.name:
       return new CreateDatabaseJQL(json as ICreateDatabaseJQL)
     case CreateTableJQL.name:
       return new CreateTableJQL(json as ICreateTableJQL)
+    // TODO
     case Query.name:
       return new Query(json as IQuery)
     default:

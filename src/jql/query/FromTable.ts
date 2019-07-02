@@ -1,7 +1,7 @@
 import { AxiosRequestConfig } from 'axios'
 import squel = require('squel')
 import { IQuery, Query } from '.'
-import { IJql, Jql } from '..'
+import { IJQL, JQL } from '..'
 import { Type } from '../../type'
 import { ConditionalExpression, IConditionalExpression } from '../expr'
 import { AndExpressions } from '../expr/expressions/AndExpressions'
@@ -15,7 +15,7 @@ export type JoinOperator = 'INNER'|'CROSS'|'LEFT'|'RIGHT'|'FULL'
 /**
  * Raw JQL defining join clause
  */
-export interface IJoinClause extends IJql {
+export interface IJoinClause extends IJQL {
   /**
    * Join operator
    */
@@ -35,7 +35,7 @@ export interface IJoinClause extends IJql {
 /**
  * JQL class defining join clause
  */
-export class JoinClause extends Jql implements IJoinClause {
+export class JoinClause extends JQL implements IJoinClause {
   public operator: JoinOperator
   public table: FromTable
   public $on: ConditionalExpression
@@ -136,7 +136,7 @@ export class JoinClause extends Jql implements IJoinClause {
 /**
  * Raw JQL defining tables for query
  */
-export interface IFromTable extends IJql {
+export interface IFromTable extends IJQL {
   /**
    * Database where the table is in
    */
@@ -171,7 +171,7 @@ export interface IRemoteTable extends AxiosRequestConfig {
 /**
  * JQL class defining tables for query
  */
-export class FromTable extends Jql implements IFromTable {
+export class FromTable extends JQL implements IFromTable {
   public database?: string
   public table: string|Query|IRemoteTable
   public $as?: string

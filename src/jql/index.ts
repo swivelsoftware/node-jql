@@ -3,15 +3,15 @@ import squel from 'squel'
 /**
  * Raw JQL
  */
-export interface IJql {}
+export interface IJQL {}
 
 /**
  * Abstract JQL class
  */
-export abstract class Jql implements IJql {
+export abstract class JQL implements IJQL {
   // @override
   get [Symbol.toStringTag](): string {
-    return Jql.name
+    return JQL.name
   }
 
   // @override
@@ -28,7 +28,7 @@ export abstract class Jql implements IJql {
   /**
    * Convert to raw JQL
    */
-  public abstract toJson(): IJql
+  public abstract toJson(): IJQL
 
   /**
    * Convert to squel builder

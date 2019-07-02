@@ -1,12 +1,12 @@
 import squel = require('squel')
 import { ConditionalExpression, Expression, IConditionalExpression, IExpression } from '..'
-import { IJql } from '../..'
+import { IJQL } from '../..'
 import { parse } from '../parse'
 
 /**
  * Raw JQL for `WHEN {$when} THEN {$then}`
  */
-export interface ICase extends IJql {
+export interface ICase extends IJQL {
   /**
    * Condition check
    */

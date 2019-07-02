@@ -1,17 +1,17 @@
 import squel = require('squel')
-import { IJql, Jql } from '../../jql'
+import { IJQL, JQL } from '../../jql'
 import { IParseable } from '../parse'
 
 /**
  * Raw JQL for expression
  */
-export interface IExpression extends IJql, IParseable {
+export interface IExpression extends IJQL, IParseable {
 }
 
 /**
  * Abstract expression class in JQL
  */
-export abstract class Expression extends Jql implements IExpression {
+export abstract class Expression extends JQL implements IExpression {
   public readonly classname: string
 
   // @override

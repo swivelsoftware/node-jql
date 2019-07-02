@@ -1,10 +1,10 @@
-import { IJql, Jql } from '..'
+import { IJQL, JQL } from '..'
 import { ColumnBlock } from '../squel'
 
 /**
  * Raw JQL defining column
  */
-export interface IColumn<Type = any> extends IJql {
+export interface IColumn<Type = any> extends IJQL {
   /**
    * Column name
    */
@@ -29,7 +29,7 @@ export interface IColumn<Type = any> extends IJql {
 /**
  * JQL class defining column
  */
-export class Column<Type = any> extends Jql implements IColumn<Type> {
+export class Column<Type = any> extends JQL implements IColumn<Type> {
   public name: string
   public type: Type
   public nullable: boolean

@@ -1,10 +1,10 @@
-import { IJql, Jql } from '..'
+import { IJQL, JQL } from '..'
 import { IParseable } from '../parse'
 
 /**
  * Raw JQL defining CREATE statements
  */
-export interface ICreateJql extends IJql, IParseable {
+export interface ICreateJQL extends IJQL, IParseable {
   /**
    * Entity name
    */
@@ -19,15 +19,15 @@ export interface ICreateJql extends IJql, IParseable {
 /**
  * JQL class defining CREATE statements
  */
-export abstract class CreateJql extends Jql implements ICreateJql {
-  public readonly classname = CreateJql.name
+export abstract class CreateJQL extends JQL implements ICreateJQL {
+  public readonly classname = CreateJQL.name
   public name: string
   public $ifNotExists: boolean
 
   /**
-   * @param json [Partial<ICreateJql>]
+   * @param json [Partial<ICreateJQL>]
    */
-  constructor(json: Partial<ICreateJql>)
+  constructor(json: Partial<ICreateJQL>)
 
   /**
    * @param name [string]
@@ -41,7 +41,7 @@ export abstract class CreateJql extends Jql implements ICreateJql {
     // parse args
     let name: string|undefined, $ifNotExists: boolean|undefined
     if (typeof args[0] === 'object') {
-      const json = args[0] as Partial<ICreateJql>
+      const json = args[0] as Partial<ICreateJQL>
       name = json.name
       $ifNotExists = json.$ifNotExists
     }
@@ -65,8 +65,8 @@ export abstract class CreateJql extends Jql implements ICreateJql {
   }
 
   // @override
-  public toJson(): ICreateJql {
-    const result = { classname: this.classname, name: this.name } as ICreateJql
+  public toJson(): ICreateJQL {
+    const result = { classname: this.classname, name: this.name } as ICreateJQL
     if (this.$ifNotExists) result.$ifNotExists = true
     return result
   }

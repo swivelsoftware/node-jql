@@ -12,7 +12,7 @@ export { JQLError } from './utils/error'
 export { Type, defaults, type, normalize, denormalize } from './type'
 
 // jql
-export { IJql, Jql } from './jql'
+export { IJQL, JQL } from './jql'
 export { parse, isParseable } from './jql/parse'
 
 // jql/expr
@@ -43,7 +43,7 @@ export { IOrderBy, OrderBy } from './jql/query/OrderBy'
 export { ILimitOffset, LimitOffset } from './jql/query/LimitOffset'
 
 // jql/create
-export { ICreateJql, CreateJql } from './jql/create'
+export { ICreateJQL, CreateJQL } from './jql/create'
 export { IColumn, Column } from './jql/create/column'
 export { ICreateDatabaseJQL, CreateDatabaseJQL } from './jql/create/database'
 export { ICreateTableJQL, CreateTableJQL } from './jql/create/table'
