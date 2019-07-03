@@ -1,10 +1,12 @@
 import { IJQL, JQL } from '..'
+import { defaults } from '../../type'
+import { checkNull } from '../../utils/check'
 import { ColumnBlock } from '../squel'
 
 /**
  * Raw JQL defining column
  */
-export interface IColumn<Type = any> extends IJQL {
+export interface IColumn<Type = any, Default = any> extends IJQL {
   /**
    * Column name
    */
@@ -21,6 +23,11 @@ export interface IColumn<Type = any> extends IJQL {
   nullable?: boolean
 
   /**
+   * Default value
+   */
+  defValue?: Default
+
+  /**
    * Extra options
    */
   options?: string[]|string
@@ -29,10 +36,11 @@ export interface IColumn<Type = any> extends IJQL {
 /**
  * JQL class defining column
  */
-export class Column<Type = any> extends JQL implements IColumn<Type> {
+export class Column<Type = any, Default = any> extends JQL implements IColumn<Type, Default> {
   public name: string
   public type: Type
   public nullable: boolean
+  public defValue?: Default
   public options?: string[]
 
   /**
@@ -71,6 +79,7 @@ export class Column<Type = any> extends JQL implements IColumn<Type> {
     this.name = name
     this.type = type
     this.nullable = nullable || false
+    this.defValue = defaults[String(type)] || undefined
     if (options) {
       if (!Array.isArray(options)) options = [options]
       this.options = options

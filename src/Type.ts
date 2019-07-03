@@ -8,15 +8,21 @@ export type Type = 'string'|'number'|'boolean'|'object'|'Date'|'Array'|'any'
 /**
  * Default value for each type
  */
-export const defaults = {
+export const defaults: { [key: string]: any } = {
   string: '',
   number: 0,
   boolean: false,
-  object: {},
-  Date: undefined,
-  Array: [],
   any: undefined,
 }
+Object.defineProperty(defaults, 'object', {
+  get: () => ({}),
+})
+Object.defineProperty(defaults, 'Date', {
+  get: () => new Date(0),
+})
+Object.defineProperty(defaults, 'Array', {
+  get: () => [],
+})
 
 /**
  * Determine the data type of a value in node-jql
