@@ -36,8 +36,8 @@ test('DROP TABLE IF EXISTS Student', () => {
 
 test('INSERT INTO Student VALUES (...)', () => {
   const query = new InsertJQL(['School', 'Student'],
-    { name: 'Kennys Ng', gender: 'M', birthday: moment('1992-04-21').toDate(), admittedAt: new Date() },
-    { name: 'Kirino Chiba', gender: 'F', birthday: moment('1992-06-08').toDate(), admittedAt: new Date() },
+    { id: 1, name: 'Kennys Ng', gender: 'M', birthday: moment('1992-04-21').toDate(), admittedAt: new Date() },
+    { id: 2, name: 'Kirino Chiba', gender: 'F', birthday: moment('1992-06-08').toDate(), admittedAt: new Date() },
   )
   query.validate()
   console.log(query.toString())

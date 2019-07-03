@@ -5,6 +5,7 @@ import { CreateTableJQL, ICreateTableJQL } from './create/table'
 import { DropJQL, IDropJQL } from './drop'
 import { DropDatabaseJQL, IDropDatabaseJQL } from './drop/database'
 import { DropTableJQL, IDropTableJQL } from './drop/table'
+import { IInsertJQL, InsertJQL } from './insert'
 import { IQuery, Query } from './query'
 
 /**
@@ -27,6 +28,7 @@ export function isParseable(jql: IJQL): jql is IParseable {
     'CreateTableJQL',
     'DropDatabaseJQL',
     'DropTableJQL',
+    'InsertJQL',
     // TODO
     'Query',
   ].indexOf(jql['classname']) > -1
@@ -38,6 +40,7 @@ export function isParseable(jql: IJQL): jql is IParseable {
  */
 export function parse<T extends CreateJQL>(json: ICreateJQL): T
 export function parse<T extends DropJQL>(json: IDropJQL): T
+export function parse(json: IInsertJQL): InsertJQL
 export function parse(json: IQuery): Query
 export function parse(json: IParseable): JQL
 export function parse(json: IParseable): JQL {
@@ -51,6 +54,8 @@ export function parse(json: IParseable): JQL {
       return new DropDatabaseJQL(json as IDropDatabaseJQL)
     case DropTableJQL.name:
       return new DropTableJQL(json as IDropTableJQL)
+    case InsertJQL.name:
+      return new InsertJQL(json as IInsertJQL)
     // TODO
     case Query.name:
       return new Query(json as IQuery)
