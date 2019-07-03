@@ -259,4 +259,11 @@ export class Query extends JQL implements IQuery {
     if (this.$limit) result.$limit = this.$limit.toJson()
     return result
   }
+
+  /**
+   * Clone the Query
+   */
+  public clone(): Query {
+    return new Query(this)
+  }
 }
