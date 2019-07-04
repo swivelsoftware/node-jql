@@ -37,7 +37,7 @@ export { IValue, Value } from './jql/expr/expressions/Value'
 // jql/query
 export { IQuery, Query } from './jql/query'
 export { IResultColumn, ResultColumn } from './jql/query/ResultColumn'
-export { IJoinClause, JoinClause, IFromTable, FromTable } from './jql/query/FromTable'
+export { JoinOperator, IJoinClause, JoinClause, IFromTable, FromTable } from './jql/query/FromTable'
 export { IGroupBy, GroupBy } from './jql/query/GroupBy'
 export { IOrderBy, OrderBy } from './jql/query/OrderBy'
 export { ILimitOffset, LimitOffset } from './jql/query/LimitOffset'
