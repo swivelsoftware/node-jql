@@ -262,7 +262,7 @@ export class FromTable extends JQL implements IFromTable {
   public validate(availableTables: string[]): void {
     if (typeof this.table !== 'string' && 'validate' in this.table) this.table.validate(availableTables)
     const table = this.$as ? this.$as : this.table as string
-    if (availableTables.indexOf(table) > -1) throw new SyntaxError(`Ambiguous table '${table}'`)
+    if (availableTables.indexOf(table) > -1) throw new SyntaxError(`Duplicate table name ${table}`)
     availableTables.push(table)
     for (const { table } of this.joinClauses) table.validate(availableTables)
   }

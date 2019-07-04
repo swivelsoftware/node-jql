@@ -169,14 +169,14 @@ export class Query extends JQL implements IQuery {
   /**
    * Whether the query returns all columns
    */
-  get isWildcard(): boolean {
+  get isSimpleWildcard(): boolean {
     return this.$select.length === 1 && this.$select[0].expression instanceof ColumnExpression && this.$select[0].expression.isWildcard
   }
 
   /**
    * Whether the query returns result length
    */
-  get isCountWildcard(): boolean {
+  get isSimpleCountWildcard(): boolean {
     return (
       this.$select.length === 1 && this.$select[0].expression instanceof FunctionExpression && this.$select[0].expression.name === 'COUNT' && // count function
       this.$select[0].expression.parameters.length === 1 &&                                                                                   // one parameter
@@ -189,7 +189,7 @@ export class Query extends JQL implements IQuery {
    */
   get isQuick(): boolean {
     return (
-      this.isWildcard &&                                                                              // wildcard
+      this.isSimpleWildcard &&                                                                              // wildcard
       !!this.$from && this.$from.length === 1 && !this.$from[0].isJoined &&                           // single table
       !this.$where && !this.$group &&                                                                 // no WHERE and GROUP BY
       (!this.$order || !this.$order.find(({ expression }) => expression instanceof ColumnExpression)) // simple ORDER BY
@@ -201,7 +201,7 @@ export class Query extends JQL implements IQuery {
    */
   get isQuickCount(): boolean {
     return (
-      this.isCountWildcard &&                                                                         // count wildcard
+      this.isSimpleCountWildcard &&                                                                         // count wildcard
       !!this.$from && this.$from.length === 1 && !this.$from[0].isJoined &&                           // single table
       !this.$where && !this.$group &&                                                                 // no WHERE and GROUP BY
       (!this.$order || !this.$order.find(({ expression }) => expression instanceof ColumnExpression)) // simple ORDER BY
@@ -234,7 +234,7 @@ export class Query extends JQL implements IQuery {
   public toSquel(): squel.Select {
     let builder = squel.select()
     if (this.$from) for (const table of this.$from) builder = table.apply(builder)
-    if (!this.isWildcard) for (const { expression, $as } of this.$select) builder = builder.field(expression.toSquel(), $as)
+    if (!this.isSimpleWildcard) for (const { expression, $as } of this.$select) builder = builder.field(expression.toSquel(), $as)
     if (this.$where) builder = builder.where(this.$where.toSquel(false))
     if (this.$group) builder = this.$group.apply(builder)
     if (this.$order) {

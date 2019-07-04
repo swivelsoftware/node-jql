@@ -12,7 +12,7 @@ export const defaults: { [key: string]: any } = {
   string: '',
   number: 0,
   boolean: false,
-  any: undefined,
+  any: null,
 }
 Object.defineProperty(defaults, 'object', {
   get: () => ({}),
