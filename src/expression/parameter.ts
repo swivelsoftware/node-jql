@@ -18,7 +18,9 @@ export class ParameterExpression extends Expression implements IParameterExpress
   constructor(json: IParameterExpression) {
     super()
     try {
+      this.prefix = json.prefix
       this.expression = parse(json.expression)
+      this.suffix = json.suffix
     }
     catch (e) {
       throw new InstantiateError('Fail to instantiate ParameterExpression', e)

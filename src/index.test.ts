@@ -6,6 +6,7 @@ import { FunctionExpression } from './expression/function'
 import { AndExpressions, OrExpressions } from './expression/grouped'
 import { InExpression } from './expression/in'
 import { MathExpression } from './expression/math'
+import { ParameterExpression } from './expression/parameter'
 import { Value } from './expression/value'
 import { JoinClause, JoinedTableOrSubquery, OrderingTerm, Query, ResultColumn, TableOrSubquery } from './query'
 
@@ -155,6 +156,26 @@ test('SELECT * FROM URL(GET 127.0.0.1) `Test`', () => {
   })
   query.validate()
   expect(query.toString()).toBe('SELECT * FROM URL(GET 127.0.0.1) `Test`')
+})
+
+test('SELECT DATE_ADD(NOW(), INTERVAL 7 DAY)', () => {
+  const query = new Query({
+    $select: new ResultColumn({
+      expression: new FunctionExpression({
+        name: 'DATE_ADD',
+        parameters: [
+          new FunctionExpression({ name: 'NOW' }),
+          new ParameterExpression({
+            prefix: 'INTERVAL',
+            expression: 7,
+            suffix: 'DAY',
+          }),
+        ],
+      }),
+    }),
+  })
+  query.validate()
+  expect(query.toString()).toBe('SELECT DATE_ADD(NOW(), INTERVAL 7 DAY)')
 })
 
 test('CREATE TEMP TABLE test SELECT * FROM Student', () => {
