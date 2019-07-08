@@ -29,7 +29,7 @@ export interface IJoinClause extends IJQL {
   /**
    * Joining condition
    */
-  $on: IConditionalExpression[]|IConditionalExpression
+  $on?: IConditionalExpression[]|IConditionalExpression
 }
 
 /**
@@ -38,7 +38,7 @@ export interface IJoinClause extends IJQL {
 export class JoinClause extends JQL implements IJoinClause {
   public operator: JoinOperator
   public table: FromTable
-  public $on: ConditionalExpression
+  public $on?: ConditionalExpression
 
   /**
    * @param json [IFromTable]
@@ -56,12 +56,12 @@ export class JoinClause extends JQL implements IJoinClause {
     super()
 
     // parse args
-    let operator: JoinOperator, table: IFromTable|string, $on: IConditionalExpression[]
+    let operator: JoinOperator, table: IFromTable|string, $on: IConditionalExpression[]|undefined
     if (args.length === 1) {
       const json = args[0] as IJoinClause
-      operator = json.operator || 'LEFT'
+      operator = json.operator || 'INNER'
       table = json.table
-      $on = Array.isArray(json.$on) ? json.$on : [json.$on]
+      if (json.$on) $on = Array.isArray(json.$on) ? json.$on : [json.$on]
     }
     else {
       operator = args[0]
@@ -69,10 +69,13 @@ export class JoinClause extends JQL implements IJoinClause {
       $on = args.slice(2)
     }
 
+    // check args
+    if (operator === 'CROSS' && $on && $on.length) throw new SyntaxError('CROSS JOIN should not be used with ON conditions')
+
     // set args
     this.operator = operator
     this.table = typeof table === 'string' ? new FromTable(table) : new FromTable(table)
-    if ($on) this.$on = $on.length > 1 ? new AndExpressions($on) : parse($on[0])
+    if ($on) this.$on = $on.length > 1 ? new AndExpressions($on) : parse<ConditionalExpression>($on[0])
   }
 
   private get joinMethod(): string {
@@ -115,7 +118,7 @@ export class JoinClause extends JQL implements IJoinClause {
   // @override
   public validate(availableTables: string[]): void {
     this.table.validate([])
-    this.$on.validate(availableTables)
+    if (this.$on) this.$on.validate(availableTables)
   }
 
   // @override
@@ -125,11 +128,12 @@ export class JoinClause extends JQL implements IJoinClause {
 
   // @override
   public toJson(): IJoinClause {
-    return {
+    const result = {
       operator: this.operator,
       table: this.table.toJson(),
-      $on: this.$on.toJson(),
-    }
+    } as IJoinClause
+    if (this.$on) result.$on = this.$on.toJson()
+    return result
   }
 }
 
