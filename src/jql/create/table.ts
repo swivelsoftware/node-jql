@@ -130,6 +130,7 @@ export class CreateTableJQL extends CreateJQL implements ICreateTableJQL {
     result.$temporary = this.$temporary
     if (this.database) result.database = this.database
     result.columns = this.columns.map(column => column.toJson())
+    if (this.constraints) result.constraints = this.constraints
     if (this.options) result.options = this.options
     return result
   }

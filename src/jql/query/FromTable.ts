@@ -71,6 +71,7 @@ export class JoinClause extends JQL implements IJoinClause {
 
     // check args
     if (operator === 'CROSS' && $on && $on.length) throw new SyntaxError('CROSS JOIN should not be used with ON conditions')
+    if (operator !== 'CROSS' && (!$on || !$on.length)) throw new SyntaxError(`ON condition(s) is required for ${operator} JOIN`)
 
     // set args
     this.operator = operator
