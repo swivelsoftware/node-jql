@@ -171,6 +171,27 @@ squel.flavours['node-jql'] = _squel => {
   }
 
   /**
+   * As-Query block
+   */
+  class AsQueryBlock extends squel.cls.Block {
+    private _builder: squel.Select
+
+    public as(builder: squel.Select): void {
+      this._builder = builder
+    }
+
+    // @override
+    public _toParamString(): squel.ParamString {
+      if (!this._builder) throw new Error('AS statement is missing')
+      const { text, values } = this._builder._toParamString()
+      return {
+        text: `AS (${text})`,
+        values,
+      }
+    }
+  }
+
+  /**
    * If-Exists block
    */
   class IfExistsBlock extends squel.cls.Block {
@@ -207,6 +228,17 @@ squel.flavours['node-jql'] = _squel => {
     new IfNotExistsBlock(options),
     new squel.cls.UpdateTableBlock(options),
     new ColumnsBlock(options),
+    new OptionsBlock(options),
+  ])
+
+  /**
+   * squel.createTableAs function
+   */
+  squel['createTableAs'] = (options: Partial<squel.CompleteQueryBuilderOptions> & { temporary?: boolean } = {}, blocks?: squel.Block[]) => new squel.cls.QueryBuilder(options, blocks || [
+    new squel.cls.StringBlock(options, `CREATE${options.temporary ? ' TEMPORARY' : ''} TABLE`),
+    new IfNotExistsBlock(options),
+    new squel.cls.UpdateTableBlock(options),
+    new AsQueryBlock(options),
     new OptionsBlock(options),
   ])
 

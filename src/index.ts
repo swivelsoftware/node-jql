@@ -47,6 +47,7 @@ export { ICreateJQL, CreateJQL } from './jql/create'
 export { IColumn, Column } from './jql/create/column'
 export { ICreateDatabaseJQL, CreateDatabaseJQL } from './jql/create/database'
 export { ICreateTableJQL, CreateTableJQL } from './jql/create/table'
+export { ICreateTableAsJQL, CreateTableAsJQL } from './jql/create/tableAs'
 
 // jql/drop
 export { IDropJQL, DropJQL } from './jql/drop'
