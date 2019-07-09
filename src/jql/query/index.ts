@@ -100,7 +100,12 @@ export class Query extends JQL implements IQuery {
     let $group: IGroupBy|string|undefined
     let $order: IOrderBy[]|IOrderBy|string|undefined
     let $limit: ILimitOffset|number|undefined
-    if (typeof args[0] === 'object' && args[0] !== null) {
+    if (Array.isArray(args[0])) {
+      $select = args[0]
+      $from = args[1]
+      $where = args.slice(2)
+    }
+    else if (typeof args[0] === 'object' && args[0] !== null) {
       const json = args[0] as Partial<IQuery>
       $distinct = json.$distinct
       $select = json.$select || '*'
@@ -109,11 +114,6 @@ export class Query extends JQL implements IQuery {
       $group = json.$group
       $order = json.$order
       $limit = json.$limit
-    }
-    else if (Array.isArray(args[0])) {
-      $select = args[0]
-      $from = args[1]
-      $where = args.slice(2)
     }
     else if (args.length === 2) {
       $from = { database: args[0] || undefined, table: args[1] }
@@ -189,7 +189,7 @@ export class Query extends JQL implements IQuery {
    */
   get isQuick(): boolean {
     return (
-      this.isSimpleWildcard &&                                                                              // wildcard
+      this.isSimpleWildcard &&                                                                        // wildcard
       !!this.$from && this.$from.length === 1 && !this.$from[0].isJoined &&                           // single table
       !this.$where && !this.$group &&                                                                 // no WHERE and GROUP BY
       (!this.$order || !this.$order.find(({ expression }) => expression instanceof ColumnExpression)) // simple ORDER BY
@@ -201,7 +201,7 @@ export class Query extends JQL implements IQuery {
    */
   get isQuickCount(): boolean {
     return (
-      this.isSimpleCountWildcard &&                                                                         // count wildcard
+      this.isSimpleCountWildcard &&                                                                   // count wildcard
       !!this.$from && this.$from.length === 1 && !this.$from[0].isJoined &&                           // single table
       !this.$where && !this.$group &&                                                                 // no WHERE and GROUP BY
       (!this.$order || !this.$order.find(({ expression }) => expression instanceof ColumnExpression)) // simple ORDER BY
