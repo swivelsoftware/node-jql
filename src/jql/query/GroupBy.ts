@@ -52,7 +52,7 @@ export class GroupBy extends JQL implements IGroupBy {
       const json = args[0] as IGroupBy
       expressions = Array.isArray(json.expressions) ? json.expressions : [json.expressions]
       json.$having = json.$having || []
-      $having = Array.isArray(json.$having) ? json.$having : [json.$having]
+      if (json.$having) $having = Array.isArray(json.$having) ? json.$having : [json.$having]
     }
     else if (typeof args[0] === 'string') {
       expressions = [new ColumnExpression(args[0])]
