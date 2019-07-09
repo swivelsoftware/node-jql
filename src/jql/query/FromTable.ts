@@ -188,10 +188,10 @@ export class FromTable extends JQL implements IFromTable {
   constructor(json: IFromTable)
 
   /**
-   * @param table [string|IQuery|IRemoteTable||Array<string>]
+   * @param table [string|Array<string>]
    * @param joinClauses [Array<IJoinClause>] optional
    */
-  constructor(table: string|IQuery|IRemoteTable|[string, string], ...joinClauses: IJoinClause[])
+  constructor(table: string|[string, string], ...joinClauses: IJoinClause[])
 
   /**
    * @param table [string|IQuery|IRemoteTable|Array<string>]
@@ -282,6 +282,7 @@ export class FromTable extends JQL implements IFromTable {
     const result: IFromTable = { table: this.table }
     if (this.database) result.database = this.database
     if (this.$as) result.$as = this.$as
+    if (this.joinClauses.length) result.joinClauses = this.joinClauses.map(jql => jql.toJson())
     return result
   }
 }

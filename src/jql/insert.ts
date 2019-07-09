@@ -1,9 +1,8 @@
-import moment = require('moment')
 import squel from 'squel'
 import { IJQL, JQL } from '.'
 import { IParseable } from './parse'
 
-export interface IInsertJQL extends IJQL, IParseable {
+export interface IInsertJQL<T = any> extends IJQL, IParseable {
   /**
    * Related database
    */
@@ -17,14 +16,14 @@ export interface IInsertJQL extends IJQL, IParseable {
   /**
    * Rows
    */
-  values: any[]
+  values: T[]
 }
 
-export class InsertJQL extends JQL implements IInsertJQL {
+export class InsertJQL<T = any> extends JQL implements IInsertJQL<T> {
   public readonly classname = InsertJQL.name
   public database?: string
   public name: string
-  public values: any[]
+  public values: T[]
 
   /**
    * @param json [Partial<IInsertJQL>]
@@ -35,13 +34,13 @@ export class InsertJQL extends JQL implements IInsertJQL {
    * @param name [Array<string>|string]
    * @param values [Array]
    */
-  constructor(name: [string, string]|string, ...values: any[])
+  constructor(name: [string, string]|string, ...values: T[])
 
   constructor(...args: any[]) {
     super()
 
     // parse args
-    let database: string|undefined, name: string, values: any[]
+    let database: string|undefined, name: string, values: T[]
     if (typeof args[0] === 'object' && !Array.isArray(args[0])) {
       const json = args[0] as IInsertJQL
       database = json.database
@@ -84,7 +83,7 @@ export class InsertJQL extends JQL implements IInsertJQL {
   }
 
   // @override
-  public toJson(): IInsertJQL {
+  public toJson(): IInsertJQL<T> {
     const result = { classname: this.classname, name: this.name, values: this.values } as IInsertJQL
     if (this.database) result.database = this.database
     return result
