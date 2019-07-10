@@ -170,7 +170,7 @@ export class Query extends JQL implements IQuery {
    * Whether the query returns all columns
    */
   get isSimpleWildcard(): boolean {
-    return this.$select.length === 1 && this.$select[0].expression instanceof ColumnExpression && this.$select[0].expression.isWildcard
+    return this.$select.length === 1 && this.$select[0].expression instanceof ColumnExpression && !this.$select[0].expression.table && this.$select[0].expression.isWildcard
   }
 
   /**

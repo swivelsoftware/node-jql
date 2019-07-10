@@ -68,7 +68,7 @@ export class ColumnExpression extends Expression implements IColumnExpression {
   }
 
   get isWildcard(): boolean {
-    return !this.table && this.name === '*'
+    return this.name === '*'
   }
 
   // @override

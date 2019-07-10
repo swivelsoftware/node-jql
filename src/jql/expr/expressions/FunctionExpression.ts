@@ -70,7 +70,7 @@ export class FunctionExpression extends Expression implements IFunctionExpressio
    * Whether it is a simple count function COUNT(*)
    */
   get isSimpleCount(): boolean {
-    return this.name === 'COUNT' && !this.parameters[0].prefix && this.parameters[0].expression instanceof ColumnExpression && this.parameters[0].expression.isWildcard
+    return this.name === 'COUNT' && !this.parameters[0].prefix && this.parameters[0].expression instanceof ColumnExpression && !this.parameters[0].expression.table && this.parameters[0].expression.isWildcard
   }
 
   // @override
