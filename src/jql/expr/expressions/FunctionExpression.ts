@@ -1,6 +1,7 @@
 import squel from 'squel'
 import { Expression, IExpression } from '..'
 import { parse } from '../parse'
+import { ColumnExpression } from './ColumnExpression'
 import { ParameterExpression } from './ParameterExpression'
 
 /**
@@ -63,6 +64,13 @@ export class FunctionExpression extends Expression implements IFunctionExpressio
       if (!(expression instanceof ParameterExpression)) expression = new ParameterExpression({ expression })
       return expression as ParameterExpression
     })
+  }
+
+  /**
+   * Whether it is a simple count function COUNT(*)
+   */
+  get isSimpleCount(): boolean {
+    return this.name === 'COUNT' && !this.parameters[0].prefix && this.parameters[0].expression instanceof ColumnExpression && this.parameters[0].expression.isWildcard
   }
 
   // @override

@@ -177,11 +177,7 @@ export class Query extends JQL implements IQuery {
    * Whether the query returns result length
    */
   get isSimpleCountWildcard(): boolean {
-    return (
-      this.$select.length === 1 && this.$select[0].expression instanceof FunctionExpression && this.$select[0].expression.name === 'COUNT' && // count function
-      this.$select[0].expression.parameters.length === 1 &&                                                                                   // one parameter
-      checkNull(this.$select[0].expression.parameters[0].prefix)                                                                              // no DISTINCT
-    )
+    return this.$select.length === 1 && this.$select[0].expression instanceof FunctionExpression && this.$select[0].expression.isSimpleCount
   }
 
   /**
