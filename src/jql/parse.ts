@@ -2,6 +2,7 @@ import { IJQL, JQL } from '.'
 import { CreateJQL, ICreateJQL } from './create'
 import { CreateDatabaseJQL, ICreateDatabaseJQL } from './create/database'
 import { CreateTableJQL, ICreateTableJQL } from './create/table'
+import { CreateTableAsJQL, ICreateTableAsJQL } from './create/tableAs'
 import { DropJQL, IDropJQL } from './drop'
 import { DropDatabaseJQL, IDropDatabaseJQL } from './drop/database'
 import { DropTableJQL, IDropTableJQL } from './drop/table'
@@ -26,6 +27,7 @@ export function isParseable(jql: IJQL): jql is IParseable {
   return 'classname' in jql && typeof jql['classname'] === 'string' && [
     'CreateDatabaseJQL',
     'CreateTableJQL',
+    'CreateTableAsJQL',
     'DropDatabaseJQL',
     'DropTableJQL',
     'InsertJQL',
@@ -50,6 +52,8 @@ export function parse(json: IParseable): JQL {
       return new CreateDatabaseJQL(json as ICreateDatabaseJQL)
     case CreateTableJQL.name:
       return new CreateTableJQL(json as ICreateTableJQL)
+    case CreateTableAsJQL.name:
+      return new CreateTableAsJQL(json as ICreateTableAsJQL)
     case DropDatabaseJQL.name:
       return new DropDatabaseJQL(json as IDropDatabaseJQL)
     case DropTableJQL.name:
