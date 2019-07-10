@@ -3,9 +3,9 @@ import { CreateJQL, ICreateJQL } from './create'
 import { CreateDatabaseJQL, ICreateDatabaseJQL } from './create/database'
 import { CreateFunctionJQL, ICreateFunctionJQL } from './create/function'
 import { CreateTableJQL, ICreateTableJQL } from './create/table'
-import { CreateTableAsJQL, ICreateTableAsJQL } from './create/tableAs'
 import { DropJQL, IDropJQL } from './drop'
 import { DropDatabaseJQL, IDropDatabaseJQL } from './drop/database'
+import { DropFunctionJQL, IDropFunctionJQL } from './drop/function'
 import { DropTableJQL, IDropTableJQL } from './drop/table'
 import { IInsertJQL, InsertJQL } from './insert'
 import { IQuery, Query } from './query'
@@ -26,15 +26,15 @@ export interface IParseable {
  */
 export function isParseable(jql: IJQL): jql is IParseable {
   return 'classname' in jql && typeof jql['classname'] === 'string' && [
-    'CreateDatabaseJQL',
-    'CreateTableJQL',
-    'CreateTableAsJQL',
-    'CreateFunctionJQL',
-    'DropDatabaseJQL',
-    'DropTableJQL',
-    'InsertJQL',
+    CreateDatabaseJQL.name,
+    CreateTableJQL.name,
+    CreateFunctionJQL.name,
+    DropDatabaseJQL.name,
+    DropTableJQL.name,
+    DropFunctionJQL.name,
+    InsertJQL.name,
     // TODO
-    'Query',
+    Query.name,
   ].indexOf(jql['classname']) > -1
 }
 
@@ -54,14 +54,14 @@ export function parse(json: IParseable): JQL {
       return new CreateDatabaseJQL(json as ICreateDatabaseJQL)
     case CreateTableJQL.name:
       return new CreateTableJQL(json as ICreateTableJQL)
-    case CreateTableAsJQL.name:
-      return new CreateTableAsJQL(json as ICreateTableAsJQL)
     case CreateFunctionJQL.name:
       return new CreateFunctionJQL(json as ICreateFunctionJQL)
     case DropDatabaseJQL.name:
       return new DropDatabaseJQL(json as IDropDatabaseJQL)
     case DropTableJQL.name:
       return new DropTableJQL(json as IDropTableJQL)
+    case DropFunctionJQL.name:
+      return new DropFunctionJQL(json as IDropFunctionJQL)
     case InsertJQL.name:
       return new InsertJQL(json as IInsertJQL)
     // TODO

@@ -1,5 +1,6 @@
 import squel from 'squel'
 import { CreateJQL, ICreateJQL } from '.'
+import { IQuery, Query } from '../query'
 import { Column, IColumn } from './column'
 
 /**
@@ -30,6 +31,11 @@ export interface ICreateTableJQL extends ICreateJQL {
    * Table options
    */
   options?: string[]|string
+
+  /**
+   * SELECT statement
+   */
+  $as?: IQuery
 }
 
 /**
@@ -42,6 +48,7 @@ export class CreateTableJQL extends CreateJQL implements ICreateTableJQL {
   public columns: Column[]
   public constraints?: string[]
   public options?: string[]
+  public $as?: Query
 
   /**
    * @param json [Partial<ICreateTableJQL>]
@@ -74,7 +81,7 @@ export class CreateTableJQL extends CreateJQL implements ICreateTableJQL {
     )
 
     // parse args
-    let $temporary: boolean|undefined, database: string|undefined, columns: IColumn[], constraints: string[]|string|undefined, options: string[]|string|undefined
+    let $temporary: boolean|undefined, database: string|undefined, columns: IColumn[], constraints: string[]|string|undefined, options: string[]|string|undefined, $as: IQuery|undefined
     if (typeof args[0] === 'object') {
       const json = args[0] as Partial<ICreateTableJQL>
       $temporary = json.$temporary
@@ -82,6 +89,7 @@ export class CreateTableJQL extends CreateJQL implements ICreateTableJQL {
       columns = json.columns || []
       constraints = json.constraints
       options = json.options
+      $as = json.$as
     }
     else if (typeof args[0] === 'boolean') {
       $temporary = args[0]
@@ -112,6 +120,7 @@ export class CreateTableJQL extends CreateJQL implements ICreateTableJQL {
       if (!Array.isArray(options)) options = [options]
       this.options = options
     }
+    if ($as) this.$as = new Query($as)
   }
 
   // @override
@@ -121,6 +130,7 @@ export class CreateTableJQL extends CreateJQL implements ICreateTableJQL {
     builder['table'](`${this.database ? `${this.database}.` : ''}${this.name}`)
     for (const column of this.columns) builder['column'](column.toSquel())
     if (this.options) for (const option of this.options) builder['option'](option)
+    if (this.$as) builder['as'](this.$as.toSquel())
     return builder
   }
 
@@ -132,6 +142,7 @@ export class CreateTableJQL extends CreateJQL implements ICreateTableJQL {
     result.columns = this.columns.map(column => column.toJson())
     if (this.constraints) result.constraints = this.constraints
     if (this.options) result.options = this.options
+    if (this.$as) result.$as = this.$as.toJson()
     return result
   }
 }

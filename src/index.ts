@@ -47,12 +47,13 @@ export { ICreateJQL, CreateJQL } from './jql/create'
 export { IColumn, Column } from './jql/create/column'
 export { ICreateDatabaseJQL, CreateDatabaseJQL } from './jql/create/database'
 export { ICreateTableJQL, CreateTableJQL } from './jql/create/table'
-export { ICreateTableAsJQL, CreateTableAsJQL } from './jql/create/tableAs'
+export { ICreateFunctionJQL, CreateFunctionJQL } from './jql/create/function'
 
 // jql/drop
 export { IDropJQL, DropJQL } from './jql/drop'
 export { IDropDatabaseJQL, DropDatabaseJQL } from './jql/drop/database'
 export { IDropTableJQL, DropTableJQL } from './jql/drop/table'
+export { IDropFunctionJQL, DropFunctionJQL } from './jql/drop/function'
 
 // jql/insert
 export { IInsertJQL, InsertJQL } from './jql/insert'
