@@ -124,6 +124,11 @@ export class CreateTableJQL extends CreateJQL implements ICreateTableJQL {
   }
 
   // @override
+  public validate(availableTables: string[] = []): void {
+    if (this.$as) this.$as.validate(availableTables)
+  }
+
+  // @override
   public toSquel(): squel.QueryBuilder {
     const builder = squel['createTable']({ temporary: this.$temporary }) as squel.QueryBuilder
     if (this.$ifNotExists) builder['ifNotExists']()
