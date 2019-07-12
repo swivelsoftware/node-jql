@@ -14,6 +14,122 @@ If you are looking for the database core, please visit [node-jql-core](https://g
 type Type = 'string'|'number'|'boolean'|'object'|'Date'|'Array'|'any'
 ```
 
+## ICreateDatabaseJQL
+
+```js
+new CreateDatabaseJQL(ICreateDatabaseJQL)
+new CreateDatabaseJQL(string, boolean?, string?)
+
+{
+  "name": string,
+  "$ifNotExists": boolean|undefined,
+  "engine": string|undefined
+}
+```
+
+## IDropDatabaseJQL
+
+```js
+new DropDatabaseJQL(IDropDatabaseJQL)
+new DropDatabaseJQL(string, boolean?)
+
+{
+  "name": string,
+  "$ifExists": boolean|undefined
+}
+```
+
+## ICreateTableJQL
+
+[IQuery](#IQuery)  
+[Type](#Type)
+
+```js
+new CreateTableJQL(ICreateTableJQL)  
+new CreateTableJQL([string, string]|string, IColumn[], boolean|undefined, string[]|string|undefined, ...string[])
+new CreateTableJQL(true, [string, string]|string, IColumn[], boolean|undefined, string[]|string|undefined, ...string[])
+
+{
+  "$temporary": boolean|undefined,
+  "database": boolean|undefined,
+  "name": string,
+  "$ifNotExists": boolean|undefined,
+  "columns": IColumn[],
+  "constraints": string[]|undefined,
+  "options": string[]|undefined,
+  "$as": IQuery|undefined
+}
+
+// IColumn
+new Column(IColumn)
+new Column(string, Type, boolean?, ...string[])
+
+{
+  "name": string,
+  "type": Type,
+  "nullable": boolean|undefined,
+  "defValue": any|undefined,
+  "options": string[]|string|undefined
+}
+```
+
+## IInsertJQL
+
+``` js
+new InsertJQL(IInsertJQL)
+new InsertJQL([string, string]|string, ...any[])
+
+{
+  "database": string|undefined,
+  "name": string,
+  "values": any[]
+}
+```
+
+## IDropTableJQL
+
+```js
+new DropTableJQL(IDropTableJQL)
+new DropTableJQL(string, boolean?)
+new DropTableJQL(true, string, boolean?)
+
+{
+  "$temporary": boolean|undefined,
+  "name": string,
+  "$ifExists": boolean|undefined
+}
+```
+
+## ICreateFunctionJQL
+
+[Type](#Type)
+
+``` js
+new CreateFunctionJQL(ICreateFunctionJQL)
+new CreateFunctionJQL(string, string|Function, Type?, ...Type)
+new CreateFunctionJQL(true, string, string|Function, Type?, ...Type)
+
+{
+  "aggregate": boolean|undefined,
+  "name": string,
+  "fn": string|Function,
+  "parameters": Type[]|undefined,
+  "type": Type|undefined
+}
+```
+
+## IDropFunctionJQL
+
+```js
+new DropFunctionJQL(IDropFunctionJQL)
+new DropFunctionJQL(string, boolean?)
+
+{
+  "name": string,
+  "$ifExists": boolean|undefined
+}
+```
+
 ## IQuery
 
 [IResultColumn](#IResultColumn)  
@@ -25,7 +141,7 @@ type Type = 'string'|'number'|'boolean'|'object'|'Date'|'Array'|'any'
 
 ``` js
 // full query
-new Query(json: IQuery)
+new Query(IQuery)
 
 // normal query - SELECT ... FROM ... WHERE
 new Query(IResultColumn[], IFromTable|string, ...IConditionalExpression[])
