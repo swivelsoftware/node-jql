@@ -213,6 +213,39 @@ squel.flavours['node-jql'] = _squel => {
   }
 
   /**
+   * SQL block
+   */
+  class SQLBlock extends squel.cls.Block {
+    private sqls: squel.BaseBuilder[] = []
+
+    public statement(sql: squel.BaseBuilder) {
+      this.sqls.push(sql)
+    }
+
+    // @override
+    public _toParamString(): squel.ParamString {
+      if (!this.sqls.length) throw new SyntaxError('No SQLs provided')
+      const result = this.sqls.reduce((result, sql, i) => {
+        const { text, values } = sql.toParam()
+        result.text += text
+        if (i < this.sqls.length - 1) result.text += '; '
+        result.values.push(...values)
+        return result
+      }, { text: '', values: [] as any[] })
+      result.text = '(' + result.text + ')'
+      return result
+    }
+  }
+
+  /**
+   * squel.predict function
+   */
+  squel['predict'] = (options: Partial<squel.CompleteQueryBuilderOptions> = {}, blocks?: squel.Block[]) => new squel.cls.QueryBuilder(options, blocks || [
+    new squel.cls.StringBlock(options, 'PREDICT'),
+    new SQLBlock(options),
+  ])
+
+  /**
    * squel.createDatabase function
    */
   squel['createDatabase'] = (options: Partial<squel.CompleteQueryBuilderOptions> = {}, blocks?: squel.Block[]) => new squel.cls.QueryBuilder(options, blocks || [

@@ -57,3 +57,6 @@ export { IDropFunctionJQL, DropFunctionJQL } from './jql/drop/function'
 
 // jql/insert
 export { IInsertJQL, InsertJQL } from './jql/insert'
+
+// jql/predict
+export { PredictJQL } from './jql/predict'
