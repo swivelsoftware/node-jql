@@ -57,22 +57,22 @@ export class CreateTableJQL extends CreateJQL implements ICreateTableJQL {
 
   /**
    * @param name [Array<string>|string]
-   * @param columns [Array<Column>]
+   * @param columns [Array<IColumn>]
    * @param $ifNotExists [boolean] optional
    * @param constraints [Array<string>|string] optional
    * @param options [Array<string] optional
    */
-  constructor(name: [string, string]|string, columns: Column[], $ifNotExists?: boolean, constraints?: string[]|string, ...options: string[])
+  constructor(name: [string, string]|string, columns: IColumn[], $ifNotExists?: boolean, constraints?: string[]|string, ...options: string[])
 
   /**
    * @param $temporary [boolean]
    * @param name [Array<string>|string]
-   * @param columns [Array<Column>]
+   * @param columns [Array<IColumn>]
    * @param $ifNotExists [boolean] optional
    * @param constraints [Array<string>|string] optional
    * @param options [Array<string] optional
    */
-  constructor($temporary: boolean, name: [string, string]|string, columns: Column[], $ifNotExists?: boolean, constraints?: string[]|string, ...options: string[])
+  constructor($temporary: true, name: [string, string]|string, columns: IColumn[], $ifNotExists?: boolean, constraints?: string[]|string, ...options: string[])
 
   constructor(...args: any) {
     super(

@@ -182,12 +182,14 @@ squel.flavours['node-jql'] = _squel => {
 
     // @override
     public _toParamString(): squel.ParamString {
-      if (!this._builder) throw new Error('AS statement is missing')
-      const { text, values } = this._builder._toParamString()
-      return {
-        text: `AS (${text})`,
-        values,
+      if (this._builder) {
+        const { text, values } = this._builder._toParamString()
+        return {
+          text: `AS (${text})`,
+          values,
+        }
       }
+      return { text: '', values: [] }
     }
   }
 

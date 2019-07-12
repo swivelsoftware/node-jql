@@ -1,7 +1,7 @@
 /* tslint:disable:no-console */
 
 import moment from 'moment'
-import { BinaryExpression, Column, ColumnExpression, CreateDatabaseJQL, CreateTableAsJQL, CreateTableJQL, DropDatabaseJQL, DropTableJQL, FromTable, FunctionExpression, InExpression, InsertJQL, JoinClause, MathExpression, OrderBy, OrExpressions, Query, ResultColumn, Type } from '.'
+import { BinaryExpression, Column, ColumnExpression, CreateDatabaseJQL, CreateTableJQL, DropDatabaseJQL, DropTableJQL, FromTable, FunctionExpression, InExpression, InsertJQL, JoinClause, MathExpression, OrderBy, OrExpressions, Query, ResultColumn, Type } from '.'
 
 test('CREATE DATABASE IF NOT EXISTS School', () => {
   const query = new CreateDatabaseJQL('School', true)
@@ -109,9 +109,16 @@ test('SELECT (1 + 1)', () => {
 })
 
 test('CREATE TABLE test AS SELECT * FROM URL(GET 127.0.0.1) `Test`', () => {
-  const query = new CreateTableAsJQL('test', new Query({
-    $from: new FromTable({ table: { url: '127.0.0.1', columns: [] }, $as: 'Test' }),
-  }))
+  const query = new CreateTableJQL({
+    name: 'test',
+    columns: [
+      new Column<Type>('id', 'number', false, 'PRIMARY KEY'),
+      new Column<Type>('value', 'string', false),
+    ],
+    $as: new Query({
+      $from: new FromTable({ table: { url: '127.0.0.1', columns: [] }, $as: 'Test' }),
+    }),
+  })
   query.validate()
   console.log(query.toString())
 })

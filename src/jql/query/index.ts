@@ -1,6 +1,5 @@
 import squel from 'squel'
 import { IJQL, JQL } from '..'
-import { checkNull } from '../../utils/check'
 import { ConditionalExpression, IConditionalExpression } from '../expr'
 import { AndExpressions } from '../expr/expressions/AndExpressions'
 import { ColumnExpression } from '../expr/expressions/ColumnExpression'

@@ -1,6 +1,5 @@
 import { IJQL, JQL } from '..'
 import { defaults } from '../../type'
-import { checkNull } from '../../utils/check'
 import { ColumnBlock } from '../squel'
 
 /**
