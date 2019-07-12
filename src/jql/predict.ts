@@ -1,5 +1,6 @@
 import squel = require('squel')
 import { IJQL, JQL } from '.'
+import { isParseable, parse } from './parse'
 import { Query } from './query'
 
 interface IPredictJQL extends IJQL {
@@ -13,11 +14,14 @@ export class PredictJQL extends JQL implements IPredictJQL {
   public jql: JQL[]
 
   /**
-   * @param jql [Array<JQL>]
+   * @param jql [Array<IJQL>]
    */
-  constructor(...jql: JQL[]) {
+  constructor(...jql: IJQL[]) {
     super()
-    this.jql = jql
+    this.jql = jql.map(jql => {
+      if (isParseable(jql)) return parse(jql)
+      throw new SyntaxError(`Invalid JQL: ${JSON.stringify(jql)}`)
+    })
     if (!(this.jql[this.jql.length - 1] instanceof Query)) throw new SyntaxError('The last statement must be a Query for prediction')
   }
 

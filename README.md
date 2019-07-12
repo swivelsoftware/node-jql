@@ -138,7 +138,7 @@ new DropFunctionJQL(string, boolean?)
 ## PredictJQL
 
 ``` js
-new PredictJQL(...JQL[])
+new PredictJQL(...IJQL[])
 ```
 
 ## IQuery
