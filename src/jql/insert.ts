@@ -117,7 +117,7 @@ export class InsertJQL<T = any> extends JQL implements IInsertJQL<T> {
   }
 
   // @override
-  public validate(availableTables: string[]): void {
+  public validate(availableTables: string[] = []): void {
     if (this.query) this.query.validate(availableTables)
   }
 
