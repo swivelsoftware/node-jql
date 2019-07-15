@@ -1,6 +1,5 @@
 import squel from 'squel'
-import { IJQL, JQL } from '.'
-import { IParseable } from './parse'
+import { IJQL, IParseable, JQL } from '.'
 import { IQuery, Query } from './query'
 
 /**

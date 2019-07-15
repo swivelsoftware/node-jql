@@ -1,5 +1,4 @@
-import { IJQL, JQL } from '..'
-import { IParseable } from '../parse'
+import { IJQL, IParseable, JQL } from '..'
 
 /**
  * Raw JQL defining CREATE statements

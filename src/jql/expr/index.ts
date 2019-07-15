@@ -1,6 +1,5 @@
 import squel from 'squel'
-import { IJQL, JQL } from '../../jql'
-import { IParseable } from '../parse'
+import { IJQL, IParseable, JQL } from '../../jql'
 
 /**
  * Raw JQL for expression

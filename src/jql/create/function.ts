@@ -1,8 +1,7 @@
 import squel = require('squel')
-import { IJQL, JQL } from '..'
+import { IJQL, IParseable, JQL } from '..'
 import { Type } from '../../Type'
 import { JQLError } from '../../utils/error'
-import { IParseable } from '../parse'
 
 function parseFunction(code: string): Function {
   code = code.trim()

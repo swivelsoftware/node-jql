@@ -2,7 +2,6 @@ import squel from 'squel'
 import { Type } from '../../../type'
 import { checkNull } from '../../../utils/check'
 import { Expression, IExpression } from '../../expr'
-import { IValue } from './Value'
 
 /**
  * Raw JQL for unknowns
@@ -69,7 +68,7 @@ export class Unknown extends Expression implements IUnknown {
   }
 
   // @override
-  public toJson(): IValue|IUnknown {
+  public toJson(): IUnknown|any {
     if (this.assigned) {
       return {
         classname: 'Value',
