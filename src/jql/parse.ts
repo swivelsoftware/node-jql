@@ -1,4 +1,4 @@
-import { IJQL, IParseable, JQL } from '.'
+import { IJQL, JQL } from '.'
 import { CreateJQL, ICreateJQL } from './create'
 import { CreateDatabaseJQL, ICreateDatabaseJQL } from './create/database'
 import { CreateFunctionJQL, ICreateFunctionJQL } from './create/function'
@@ -9,6 +9,16 @@ import { DropFunctionJQL, IDropFunctionJQL } from './drop/function'
 import { DropTableJQL, IDropTableJQL } from './drop/table'
 import { IInsertJQL, InsertJQL } from './insert'
 import { IQuery, Query } from './query'
+
+/**
+ * Parsealble JQL
+ */
+export interface IParseable {
+  /**
+   * The JQL class name
+   */
+  classname: string
+}
 
 /**
  * Check whether the JQL is parseable

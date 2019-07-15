@@ -5,11 +5,11 @@ import './jql/squel'
 squel.useFlavour('node-jql')
 
 // utils
-export { checkNull } from './utils/check'
+export { checkNull, equals } from './utils/check'
 export { JQLError } from './utils/error'
 
 // type
-export { Type, defaults, type, normalize, denormalize, equals } from './type'
+export { Type, defaults, type, normalize, denormalize } from './type'
 
 // jql
 export { IJQL, JQL } from './jql'
@@ -35,8 +35,9 @@ export { IUnknown, Unknown } from './jql/expr/expressions/Unknown'
 export { IValue, Value } from './jql/expr/expressions/Value'
 
 // jql/query
-export { IQuery, Query, JoinOperator, IJoinClause, JoinClause, IFromTable, FromTable } from './jql/query'
+export { IQuery, Query } from './jql/query'
 export { IResultColumn, ResultColumn } from './jql/query/ResultColumn'
+export { JoinOperator, IJoinClause, JoinClause, IFromTable, FromTable } from './jql/query/FromTable'
 export { IGroupBy, GroupBy } from './jql/query/GroupBy'
 export { IOrderBy, OrderBy } from './jql/query/OrderBy'
 export { ILimitOffset, LimitOffset } from './jql/query/LimitOffset'

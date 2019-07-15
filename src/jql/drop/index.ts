@@ -1,4 +1,5 @@
-import { IJQL, IParseable, JQL } from '..'
+import { IJQL, JQL } from '..'
+import { IParseable } from '../parse'
 
 /**
  * Raw JQL defining DROP statements

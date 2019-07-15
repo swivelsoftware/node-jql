@@ -1,16 +1,6 @@
 import squel from 'squel'
 
 /**
- * Parsealble JQL
- */
-export interface IParseable {
-  /**
-   * The JQL class name
-   */
-  classname: string
-}
-
-/**
  * Raw JQL
  */
 export interface IJQL {}
