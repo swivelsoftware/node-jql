@@ -20,7 +20,7 @@ export interface ICreateTableJQL extends ICreateJQL {
   /**
    * Table columns
    */
-  columns: IColumn[]
+  columns?: IColumn[]
 
   /**
    * Column constraints
