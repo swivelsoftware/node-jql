@@ -130,6 +130,15 @@ test('CREATE TABLE test AS SELECT * FROM URL(GET 127.0.0.1) `Test`', () => {
   console.log(query.toString())
 })
 
+test('SELECT ... UNION SELECT ...', () => {
+  const query = new Query({
+    $from: 'Table1',
+    $union: new Query('Table2'),
+  })
+  query.validate()
+  console.log(query.toString())
+})
+
 test('PREDICT (SELECT ...)', () => {
   const query = new PredictJQL(
     new CreateTableJQL({

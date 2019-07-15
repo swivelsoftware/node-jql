@@ -50,6 +50,11 @@ export interface IQuery extends IJQL, IParseable {
    * LIMIT ... OFFSET ...
    */
   $limit?: ILimitOffset|number
+
+  /**
+   * Link queries with UNION
+   */
+  $union?: IQuery
 }
 
 /**
@@ -64,6 +69,7 @@ export class Query extends JQL implements IQuery {
   public $group?: GroupBy
   public $order?: OrderBy[]
   public $limit?: LimitOffset
+  public $union?: Query
 
   /**
    * @param json [Partial<IQuery>]
@@ -99,6 +105,7 @@ export class Query extends JQL implements IQuery {
     let $group: IGroupBy|string|undefined
     let $order: IOrderBy[]|IOrderBy|string|undefined
     let $limit: ILimitOffset|number|undefined
+    let $union: IQuery|undefined
     if (Array.isArray(args[0])) {
       $select = args[0]
       $from = args[1]
@@ -113,6 +120,7 @@ export class Query extends JQL implements IQuery {
       $group = json.$group
       $order = json.$order
       $limit = json.$limit
+      $union = json.$union
     }
     else if (args.length === 2) {
       $from = { database: args[0] || undefined, table: args[1] }
@@ -163,6 +171,9 @@ export class Query extends JQL implements IQuery {
       if (typeof $limit === 'number') $limit = { $limit }
       this.$limit = new LimitOffset($limit)
     }
+
+    // $union
+    if ($union) this.$union = new Query($union)
   }
 
   /**
@@ -223,6 +234,7 @@ export class Query extends JQL implements IQuery {
     if (this.$group) this.$group.validate(availableTables)
     if (this.$order) for (const order of this.$order) order.validate(availableTables)
     if (this.$limit) this.$limit.validate(availableTables)
+    if (this.$union) this.$union.validate()
   }
 
   // @override
@@ -239,6 +251,7 @@ export class Query extends JQL implements IQuery {
       }
     }
     if (this.$limit) builder = squel.select({}, [...builder.blocks, new squel.cls.StringBlock({}, this.$limit.toString())]) as squel.Select
+    if (this.$union) builder = builder.union(this.$union.toSquel())
     return builder
   }
 
@@ -252,13 +265,7 @@ export class Query extends JQL implements IQuery {
     if (this.$group) result.$group = this.$group.toJson()
     if (this.$order) result.$order = this.$order.map(orderBy => orderBy.toJson())
     if (this.$limit) result.$limit = this.$limit.toJson()
+    if (this.$union) result.$union = this.$union.toJson()
     return result
-  }
-
-  /**
-   * Clone the Query
-   */
-  public clone(): Query {
-    return new Query(this)
   }
 }
