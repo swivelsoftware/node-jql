@@ -1,23 +1,9 @@
 import squel from 'squel'
-import { Expression, IExpression } from '..'
-import { parse } from '../parse'
+import { Expression } from '..'
+import { IFunctionExpression } from '../interface'
+import { parseExpr } from '../parse'
 import { ColumnExpression } from './ColumnExpression'
 import { ParameterExpression } from './ParameterExpression'
-
-/**
- * Raw JQL defining function expression
- */
-export interface IFunctionExpression extends IExpression {
-  /**
-   * Function name
-   */
-  name: string
-
-  /**
-   * Parameters
-   */
-  parameters?: any[]|any
-}
 
 /**
  * JQL class defining function expression
@@ -60,7 +46,7 @@ export class FunctionExpression extends Expression implements IFunctionExpressio
     // set args
     this.name = name.toLocaleUpperCase()
     this.parameters = parameters.map(parameter => {
-      let expression = parse(parameter)
+      let expression = parseExpr(parameter)
       if (!(expression instanceof ParameterExpression)) expression = new ParameterExpression({ expression })
       return expression as ParameterExpression
     })

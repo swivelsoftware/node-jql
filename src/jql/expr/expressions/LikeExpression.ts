@@ -1,15 +1,8 @@
-import { parse } from '../parse'
-import { BinaryExpression, IBinaryExpression } from './BinaryExpression'
-import { IUnknown, Unknown } from './Unknown'
+import { ILikeExpression, IUnknown } from '../interface'
+import { parseExpr } from '../parse'
+import { BinaryExpression } from './BinaryExpression'
+import { Unknown } from './Unknown'
 import { Value } from './Value'
-
-/**
- * Raw JQL for `{left} LIKE {right}`
- */
-export interface ILikeExpression extends IBinaryExpression {
-  operator: 'LIKE'|'REGEXP',
-  right?: IUnknown|string
-}
 
 /**
  * JQL class for `{left} LIKE {right}`
@@ -48,6 +41,6 @@ export class LikeExpression extends BinaryExpression implements ILikeExpression 
 
     // set args
     this.$not = $not
-    this.right = parse(right)
+    this.right = parseExpr(right)
   }
 }

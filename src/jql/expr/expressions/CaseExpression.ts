@@ -1,37 +1,7 @@
 import squel from 'squel'
-import { ConditionalExpression, Expression, IConditionalExpression, IExpression } from '..'
-import { IJQL } from '../..'
-import { parse } from '../parse'
-
-/**
- * Raw JQL for `WHEN {$when} THEN {$then}`
- */
-export interface ICase extends IJQL {
-  /**
-   * Condition check
-   */
-  $when: IConditionalExpression
-
-  /**
-   * If condition matched
-   */
-  $then: any
-}
-
-/**
- * Raw JQL for `CASE {cases} ELSE {$else}`
- */
-export interface ICaseExpression extends IExpression {
-  /**
-   * cases
-   */
-  cases: ICase[]|ICase
-
-  /**
-   * When no case matched
-   */
-  $else?: IExpression
-}
+import { ConditionalExpression, Expression } from '..'
+import { ICase, ICaseExpression, IExpression } from '../interface'
+import { parseExpr } from '../parse'
 
 /**
  * JQL class for `CASE {cases} ELSE {$else}`
@@ -71,8 +41,8 @@ export class CaseExpression extends Expression implements ICaseExpression {
     if (!cases.length) throw new SyntaxError('Missing cases. There must be at lease 1 case')
 
     // set args
-    this.cases = cases.map(({ $when, $then }) => ({ $when: parse($when), $then: parse($then) }))
-    if ($else) this.$else = parse($else)
+    this.cases = cases.map(({ $when, $then }) => ({ $when: parseExpr($when), $then: parseExpr($then) }))
+    if ($else) this.$else = parseExpr($else)
   }
 
   // @override

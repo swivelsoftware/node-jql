@@ -1,18 +1,8 @@
 import squel from 'squel'
 import { Type } from '../../../type'
 import { checkNull } from '../../../utils/check'
-import { Expression, IExpression } from '../../expr'
-import { IValue } from './Value'
-
-/**
- * Raw JQL for unknowns
- */
-export interface IUnknown extends IExpression {
-  /**
-   * Available type for the unknown
-   */
-  type?: Type[]|Type
-}
+import { Expression } from '../../expr'
+import { IUnknown, IValue } from '../interface'
 
 /**
  * JQL class for unknowns

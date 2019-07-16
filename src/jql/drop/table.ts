@@ -1,13 +1,6 @@
 import squel from 'squel'
-import { DropJQL, IDropJQL } from '.'
-
-/**
- * Raw JQL for `DROP TABLE ...`
- */
-export interface IDropTableJQL extends IDropJQL {
-  $temporary?: boolean
-  database?: string
-}
+import { DropJQL } from '.'
+import { IDropTableJQL } from './interface'
 
 /**
  * JQL class for `DROP TABLE ...`

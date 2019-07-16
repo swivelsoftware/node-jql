@@ -1,8 +1,8 @@
-import squel = require('squel')
-import { IJQL, JQL } from '..'
-import { Type } from '../../Type'
+import squel from 'squel'
+import { JQL } from '..'
+import { Type } from '../../type'
 import { JQLError } from '../../utils/error'
-import { IParseable } from '../parse'
+import { ICreateFunctionJQL } from './interface'
 
 function parseFunction(code: string): Function {
   code = code.trim()
@@ -21,36 +21,6 @@ function parseFunction(code: string): Function {
   args.push(code.substring(bodyIndex[0], bodyIndex[1]))
 
   return new Function(...args)
-}
-
-/**
- * Raw JQL for `CREATE FUNCTION ...`
- */
-export interface ICreateFunctionJQL extends IJQL, IParseable {
-  /**
-   * Whether it is an aggregate function
-   */
-  aggregate?: boolean
-
-  /**
-   * Function name
-   */
-  name: string
-
-  /**
-   * Main function
-   */
-  fn: string|Function
-
-  /**
-   * Parameters
-   */
-  parameters?: Type[]
-
-  /**
-   * Return type
-   */
-  type?: Type
 }
 
 /**

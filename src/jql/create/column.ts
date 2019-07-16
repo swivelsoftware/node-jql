@@ -1,36 +1,7 @@
-import { IJQL, JQL } from '..'
+import { JQL } from '..'
 import { defaults } from '../../type'
 import { ColumnBlock } from '../squel'
-
-/**
- * Raw JQL defining column
- */
-export interface IColumn<Type = any, Default = any> extends IJQL {
-  /**
-   * Column name
-   */
-  name: string
-
-  /**
-   * Column type
-   */
-  type: Type
-
-  /**
-   * Whether the column is nullable
-   */
-  nullable?: boolean
-
-  /**
-   * Default value
-   */
-  defValue?: Default
-
-  /**
-   * Extra options
-   */
-  options?: string[]|string
-}
+import { IColumn } from './interface'
 
 /**
  * JQL class defining column

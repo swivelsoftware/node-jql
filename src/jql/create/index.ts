@@ -1,20 +1,5 @@
-import { IJQL, JQL } from '..'
-import { IParseable } from '../parse'
-
-/**
- * Raw JQL defining CREATE statements
- */
-export interface ICreateJQL extends IJQL, IParseable {
-  /**
-   * Entity name
-   */
-  name: string
-
-  /**
-   * Whether to throw error if the target entity exists
-   */
-  $ifNotExists?: boolean
-}
+import { JQL } from '..'
+import { ICreateJQL } from './interface'
 
 /**
  * JQL class defining CREATE statements

@@ -1,61 +1,17 @@
 import squel from 'squel'
-import { IJQL, JQL } from '..'
-import { ConditionalExpression, IConditionalExpression } from '../expr'
+import { JQL } from '..'
+import { ConditionalExpression } from '../expr'
 import { AndExpressions } from '../expr/expressions/AndExpressions'
 import { ColumnExpression } from '../expr/expressions/ColumnExpression'
 import { FunctionExpression } from '../expr/expressions/FunctionExpression'
-import { parse } from '../expr/parse'
-import { IParseable } from '../parse'
-import { FromTable, IFromTable } from './FromTable'
-import { GroupBy, IGroupBy } from './GroupBy'
-import { ILimitOffset, LimitOffset } from './LimitOffset'
-import { IOrderBy, OrderBy } from './OrderBy'
-import { IResultColumn, ResultColumn } from './ResultColumn'
-
-/**
- * Raw JQL for SELECT query
- */
-export interface IQuery extends IJQL, IParseable {
-  /**
-   * Use SELECT DISTINCT instead
-   */
-  $distinct?: boolean
-
-  /**
-   * SELECT ...
-   */
-  $select?: IResultColumn[]|IResultColumn|string
-
-  /**
-   * FROM ...
-   */
-  $from?: IFromTable[]|IFromTable|string
-
-  /**
-   * WHERE ...
-   */
-  $where?: IConditionalExpression[]|IConditionalExpression
-
-  /**
-   * GROUP BY ... HAVING ...
-   */
-  $group?: IGroupBy|string
-
-  /**
-   * ORDER BY ...
-   */
-  $order?: IOrderBy[]|IOrderBy|string
-
-  /**
-   * LIMIT ... OFFSET ...
-   */
-  $limit?: ILimitOffset|number
-
-  /**
-   * Link queries with UNION
-   */
-  $union?: IQuery
-}
+import { IConditionalExpression } from '../expr/interface'
+import { parseExpr } from '../expr/parse'
+import { FromTable } from './FromTable'
+import { GroupBy } from './GroupBy'
+import { IFromTable, IGroupBy, ILimitOffset, IOrderBy, IQuery, IResultColumn } from './interface'
+import { LimitOffset } from './LimitOffset'
+import { OrderBy } from './OrderBy'
+import { ResultColumn } from './ResultColumn'
 
 /**
  * JQL class for SELECT query
@@ -149,7 +105,7 @@ export class Query extends JQL implements IQuery {
     }
 
     // $where
-    if ($where) this.$where = Array.isArray($where) ? new AndExpressions($where) : parse($where) as ConditionalExpression
+    if ($where) this.$where = Array.isArray($where) ? new AndExpressions($where) : parseExpr($where) as ConditionalExpression
 
     // $group
     if ($group) {

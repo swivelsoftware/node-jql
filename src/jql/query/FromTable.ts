@@ -1,36 +1,11 @@
-import { AxiosRequestConfig } from 'axios'
 import squel from 'squel'
-import { IQuery, Query } from '.'
-import { IJQL, JQL } from '..'
-import { Type } from '../../type'
-import { ConditionalExpression, IConditionalExpression } from '../expr'
+import { Query } from '.'
+import { JQL } from '..'
+import { ConditionalExpression } from '../expr'
 import { AndExpressions } from '../expr/expressions/AndExpressions'
-import { parse } from '../expr/parse'
-
-/**
- * Join operator for table
- */
-export type JoinOperator = 'INNER'|'CROSS'|'LEFT'|'RIGHT'|'FULL'
-
-/**
- * Raw JQL defining join clause
- */
-export interface IJoinClause extends IJQL {
-  /**
-   * Join operator
-   */
-  operator?: JoinOperator
-
-  /**
-   * Table for joining
-   */
-  table: IFromTable|string
-
-  /**
-   * Joining condition
-   */
-  $on?: IConditionalExpression[]|IConditionalExpression
-}
+import { IConditionalExpression } from '../expr/interface'
+import { parseExpr } from '../expr/parse'
+import { IFromTable, IJoinClause, IQuery, IRemoteTable, JoinOperator } from './interface'
 
 /**
  * JQL class defining join clause
@@ -76,7 +51,7 @@ export class JoinClause extends JQL implements IJoinClause {
     // set args
     this.operator = operator
     this.table = typeof table === 'string' ? new FromTable(table) : new FromTable(table)
-    if ($on) this.$on = $on.length > 1 ? new AndExpressions($on) : parse<ConditionalExpression>($on[0])
+    if ($on) this.$on = $on.length > 1 ? new AndExpressions($on) : parseExpr<ConditionalExpression>($on[0])
   }
 
   private get joinMethod(): string {
@@ -136,41 +111,6 @@ export class JoinClause extends JQL implements IJoinClause {
     if (this.$on) result.$on = this.$on.toJson()
     return result
   }
-}
-
-/**
- * Raw JQL defining tables for query
- */
-export interface IFromTable extends IJQL {
-  /**
-   * Database where the table is in
-   */
-  database?: string
-
-  /**
-   * Table definition
-   */
-  table: string|IQuery|IRemoteTable
-
-  /**
-   * Alias table name
-   */
-  $as?: string
-
-  /**
-   * Join clauses
-   */
-  joinClauses?: IJoinClause[]|IJoinClause
-}
-
-/**
- * Raw JQL defining remote table through API
- */
-export interface IRemoteTable extends AxiosRequestConfig {
-  /**
-   * Result structure
-   */
-  columns: Array<{ name: string, type?: Type }>
 }
 
 /**

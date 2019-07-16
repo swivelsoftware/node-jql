@@ -1,12 +1,7 @@
 import squel from 'squel'
-import { DropJQL, IDropJQL } from '.'
+import { DropJQL } from '.'
 import { JQLError } from '../../utils/error'
-
-/**
- * Raw JQL for `DROP FUNCTION ...`
- */
-export interface IDropFunctionJQL extends IDropJQL {
-}
+import { IDropFunctionJQL } from './interface'
 
 /**
  * JQL class for `DROP FUNCTION ...`

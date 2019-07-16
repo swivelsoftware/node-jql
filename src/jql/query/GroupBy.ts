@@ -1,24 +1,11 @@
 import squel from 'squel'
-import { IJQL, JQL } from '..'
-import { ConditionalExpression, Expression, IConditionalExpression, IExpression } from '../expr'
+import { JQL } from '..'
+import { ConditionalExpression, Expression } from '../expr'
 import { AndExpressions } from '../expr/expressions/AndExpressions'
 import { ColumnExpression } from '../expr/expressions/ColumnExpression'
-import { parse } from '../expr/parse'
-
-/**
- * Raw JQL for `GROUP BY ... HAVING ...`
- */
-export interface IGroupBy extends IJQL {
-  /**
-   * Grouping criteria
-   */
-  expressions: IExpression[]|IExpression
-
-  /**
-   * Grouping conditions
-   */
-  $having?: IConditionalExpression[]|IConditionalExpression
-}
+import { IConditionalExpression, IExpression } from '../expr/interface'
+import { parseExpr } from '../expr/parse'
+import { IGroupBy } from './interface'
 
 /**
  * JQL class for `GROUP BY ... HAVING ...`
@@ -65,8 +52,8 @@ export class GroupBy extends JQL implements IGroupBy {
     }
 
     // set args
-    this.expressions = expressions.map(expression => typeof expression === 'string' ? new ColumnExpression(expression) : parse(expression))
-    if ($having.length > 0) this.$having = $having.length > 1 ? new AndExpressions($having) : parse<ConditionalExpression>($having[0])
+    this.expressions = expressions.map(expression => typeof expression === 'string' ? new ColumnExpression(expression) : parseExpr(expression))
+    if ($having.length > 0) this.$having = $having.length > 1 ? new AndExpressions($having) : parseExpr<ConditionalExpression>($having[0])
   }
 
   // @override

@@ -1,9 +1,5 @@
 import squel from 'squel'
-
-/**
- * Raw JQL
- */
-export interface IJQL {}
+import { IJQL } from './interface'
 
 /**
  * Abstract JQL class

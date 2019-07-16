@@ -1,20 +1,6 @@
 import squel from 'squel'
-import { Expression, IExpression } from '..'
-
-/**
- * Raw JQL defining column expression
- */
-export interface IColumnExpression extends IExpression {
-  /**
-   * Table name related to the column
-   */
-  table?: string
-
-  /**
-   * Column name
-   */
-  name: string
-}
+import { Expression } from '..'
+import { IColumnExpression } from '../interface'
 
 /**
  * JQL class defining column expression

@@ -1,37 +1,8 @@
 import squel from 'squel'
-import { IJQL, JQL } from '.'
-import { IParseable } from './parse'
-import { IQuery, Query } from './query'
-
-/**
- * Raw JQL for INSERT INTO ...
- */
-export interface IInsertJQL<T = any> extends IJQL, IParseable {
-  /**
-   * Related database
-   */
-  database?: string
-
-  /**
-   * Table name
-   */
-  name: string
-
-  /**
-   * Rows
-   */
-  values?: T[]
-
-  /**
-   * Columns
-   */
-  columns?: string[]
-
-  /**
-   * Query
-   */
-  query?: IQuery
-}
+import { JQL } from '..'
+import { Query } from '../query'
+import { IQuery } from '../query/interface'
+import { IInsertJQL } from './interface'
 
 /**
  * JQL class for INSERT INTO ...
