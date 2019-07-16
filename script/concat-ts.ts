@@ -122,7 +122,7 @@ class Import {
 
   const imports: Import[] = []
   let exports_: string[] = []
-  const content: string[] = []
+  let content: string[] = []
   const check: { [key: string]: boolean } = {}
 
   async function processFile(file: string): Promise<void> {
@@ -197,5 +197,12 @@ class Import {
   const outDir = resolve(__dirname, '../intermediate')
   if (!await existsP(outDir)) await mkdirP(outDir)
   imports.sort(({ moduleName: l }, { moduleName: r }) => l.localeCompare(r))
-  await writeFileP(`${outDir}/index.ts`, imports.map(i => i.toString()).concat(content).join('\n') + '\n')
+  content = imports.map(i => i.toString()).concat(content)
+
+  if (args['post'] || args['p']) {
+    const fn = require(args['post'] || args['p']).default
+    content = fn(content)
+  }
+
+  await writeFileP(`${outDir}/index.ts`, content.join('\n') + '\n')
 })()
