@@ -54,7 +54,7 @@ export class CreateFunctionJQL extends JQL implements ICreateFunctionJQL {
    * @param type [Type] optional
    * @param parameters [Array<Type>] optional
    */
-  constructor(aggregate: true, fn: string|Function, type?: Type, ...parameters: Type[])
+  constructor(aggregate: true, name: string, fn: string|Function, type?: Type, ...parameters: Type[])
 
   constructor(...args: any[]) {
     super()
