@@ -15,7 +15,7 @@ function readFile(file: string): Promise<string[]> {
   })
 }
 
-function functionName(word: string): string {
+function getName(word: string): string {
   let result = ''
   for (let i = 0, length = word.length; i < length; i += 1) {
     const char = word.charAt(i)
@@ -183,11 +183,8 @@ class Import {
       let name: string|undefined
       const words = line.split(/(\s+)/).filter(w => w !== ' ')
       if (words[1] === 'abstract') words.splice(1, 1)
-      if (words[1] === 'class' || words[1] === 'interface' || words[1] === 'type') {
-        name = words[2]
-      }
-      else if (words[1] === 'function') {
-        name = functionName(words[2])
+      if (words[1] === 'class' || words[1] === 'interface' || words[1] === 'type' || words[1] === 'function') {
+        name = getName(words[2])
       }
       if (name) {
         const index = exports_.indexOf(name)
