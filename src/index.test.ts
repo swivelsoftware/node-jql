@@ -2,6 +2,7 @@
 
 import moment from 'moment'
 import { BinaryExpression, Column, ColumnExpression, CreateDatabaseJQL, CreateTableJQL, DropDatabaseJQL, DropTableJQL, FromTable, FunctionExpression, InExpression, InsertJQL, JoinClause, MathExpression, OrderBy, OrExpressions, PredictJQL, Query, ResultColumn, Type } from '.'
+import { GroupBy } from './jql/query/GroupBy'
 
 test('CREATE DATABASE IF NOT EXISTS School', () => {
   const query = new CreateDatabaseJQL('School', true)
@@ -155,6 +156,20 @@ test('PREDICT (SELECT ...)', () => {
     }),
     new Query('MaleStudents'),
   )
+  query.validate()
+  console.log(query.toString())
+})
+
+test('Empty function', () => {
+  const query = new Query({
+    $select: [
+      new ResultColumn(new ColumnExpression('c', 'className'), 'class'),
+      new ResultColumn(new FunctionExpression('ROWS'), 'students'),
+    ],
+    $from: new FromTable('Student', 's', new JoinClause('LEFT', new FromTable('Class', 'c'), new BinaryExpression(new ColumnExpression('s', 'id'), '=', new ColumnExpression('c', 'studentId')))),
+    $group: new GroupBy(new ColumnExpression('c', 'className')),
+    $order: new OrderBy(new ColumnExpression('c', 'className')),
+  })
   query.validate()
   console.log(query.toString())
 })
