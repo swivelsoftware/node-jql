@@ -73,7 +73,7 @@ export class CreateTableJQL extends CreateJQL implements ICreateTableJQL {
     }
 
     // check args
-    if (!columns.length) throw new SyntaxError('Table must have at least 1 column')
+    if (!$as && !columns.length) throw new SyntaxError('Table must have at least 1 column')
 
     // set args
     this.$temporary = $temporary || false
