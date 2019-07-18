@@ -96,7 +96,7 @@ export interface IColumn<Type = any, Default = any> extends IJQL {
 /**
  * Raw JQL for `CREATE FUNCTION ...`
  */
-export interface ICreateFunctionJQL extends IJQL, IParseable {
+export interface ICreateFunctionJQL extends IJQL, ICreateJQL {
   /**
    * Whether it is an aggregate function
    */

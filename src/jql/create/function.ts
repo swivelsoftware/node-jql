@@ -1,5 +1,5 @@
 import squel from 'squel'
-import { JQL } from '..'
+import { CreateJQL } from '.'
 import { Type } from '../../type'
 import { JQLError } from '../../utils/error'
 import { ICreateFunctionJQL } from './interface'
@@ -26,10 +26,9 @@ function parseFunction(code: string): Function {
 /**
  * JQL class for `CREATE FUNCTION ...`
  */
-export class CreateFunctionJQL extends JQL implements ICreateFunctionJQL {
+export class CreateFunctionJQL extends CreateJQL implements ICreateFunctionJQL {
   public readonly classname = CreateFunctionJQL.name
   public aggregate?: boolean
-  public name: string
   public fn: Function
   public parameters: Type[] = []
   public type: Type = 'any'
@@ -57,27 +56,25 @@ export class CreateFunctionJQL extends JQL implements ICreateFunctionJQL {
   constructor(aggregate: true, name: string, fn: string|Function, type?: Type, ...parameters: Type[])
 
   constructor(...args: any[]) {
-    super()
+    super(typeof args[0] === 'boolean' ? args[1] : args[0], typeof args[0] === 'object' ? undefined : true)
 
     // parse args
-    let aggregate: boolean|undefined, name: string, fn: Function, type: Type = 'any', parameters: Type[] = []
+    let aggregate: boolean|undefined, $ifNotExists = false, fn: Function, type: Type = 'any', parameters: Type[] = []
     if (typeof args[0] === 'object') {
       const json = args[0] as ICreateFunctionJQL
       aggregate = json.aggregate
-      name = json.name
+      $ifNotExists = json.$ifNotExists || false
       fn = typeof json.fn === 'string' ? parseFunction(json.fn) : json.fn
       if (json.type) type = json.type
       if (json.parameters) parameters = json.parameters
     }
     else if (typeof args[0] === 'boolean') {
       aggregate = args[0]
-      name = args[1]
       fn = typeof args[2] === 'string' ? parseFunction(args[2]) : args[2]
       type = args[3] || type
       parameters = args.slice(4)
     }
     else {
-      name = args[0]
       fn = typeof args[1] === 'string' ? parseFunction(args[1]) : args[1]
       type = args[2] || type
       parameters = args.slice(3)
@@ -88,7 +85,6 @@ export class CreateFunctionJQL extends JQL implements ICreateFunctionJQL {
 
     // set args
     this.aggregate = aggregate
-    this.name = name
     this.fn = fn
     this.type = type
     this.parameters = parameters
