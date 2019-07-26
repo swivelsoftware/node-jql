@@ -108,9 +108,9 @@ export interface ICreateFunctionJQL extends IJQL, ICreateJQL {
   name: string
 
   /**
-   * Main function
+   * Code of the function
    */
-  fn: string|Function
+  code: string
 
   /**
    * Parameters
