@@ -2,6 +2,7 @@
 
 import moment from 'moment'
 import { BinaryExpression, Column, ColumnExpression, CreateDatabaseJQL, CreateTableJQL, DropDatabaseJQL, DropTableJQL, FromTable, FunctionExpression, InExpression, InsertJQL, JoinClause, MathExpression, OrderBy, OrExpressions, PredictJQL, Query, ResultColumn, Type } from '.'
+import { LikeExpression } from './jql/expr/expressions/LikeExpression'
 import { RegexpExpression } from './jql/expr/expressions/RegexpExpression'
 import { GroupBy } from './jql/query/GroupBy'
 
@@ -170,6 +171,15 @@ test('Empty function', () => {
     $from: new FromTable('Student', 's', new JoinClause('LEFT', new FromTable('Class', 'c'), new BinaryExpression(new ColumnExpression('s', 'id'), '=', new ColumnExpression('c', 'studentId')))),
     $group: new GroupBy(new ColumnExpression('c', 'className')),
     $order: new OrderBy(new ColumnExpression('c', 'className')),
+  })
+  query.validate()
+  console.log(query.toString())
+})
+
+test('LikeExpression use case', () => {
+  const query = new Query({
+    $from: 'Student',
+    $where: new LikeExpression(new ColumnExpression('name'), false, 'Kennys', '{{ value }}%'),
   })
   query.validate()
   console.log(query.toString())

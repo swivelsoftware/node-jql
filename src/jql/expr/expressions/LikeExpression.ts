@@ -1,3 +1,5 @@
+import squel = require('squel')
+import * as swig from 'swig-templates'
 import { ILikeExpression, IUnknown } from '../interface'
 import { parseExpr } from '../parse'
 import { BinaryExpression } from './BinaryExpression'
@@ -46,6 +48,23 @@ export class LikeExpression extends BinaryExpression implements ILikeExpression 
     this.$not = $not
     this.right = parseExpr(right)
     this.format = format
+  }
+
+  // @override
+  public toSquel(): squel.BaseBuilder {
+    let right: string|squel.BaseBuilder
+    if (this.right instanceof Value && this.format) {
+      right = swig.render(this.format, { locals: { value: this.right.value } } )
+    }
+    else {
+      right = this.right.toSquel()
+    }
+    return squel.expr()
+      .and(
+        `? LIKE ?`,
+        this.left.toSquel(),
+        right,
+      )
   }
 
   // @override
