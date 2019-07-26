@@ -65,10 +65,8 @@ export class ColumnExpression extends Expression implements IColumnExpression {
   }
 
   // @override
-  public toSquel(): squel.GetFieldBlock {
-    const builder = new squel.cls.GetFieldBlock()
-    builder.field(`${this.table ? `${this.table}.` : ''}${this.name}`)
-    return builder
+  public toSquel(): squel.FunctionBlock {
+    return squel.rstr(`${this.table ? `${this.table}.` : ''}${this.name}`)
   }
 
   // @override
