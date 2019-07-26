@@ -174,7 +174,7 @@ export interface IIsNullExpression extends IBinaryExpression {
  */
 export interface ILikeExpression extends IBinaryExpression {
   operator: 'LIKE'|'REGEXP',
-  right?: IUnknown|string
+  right?: IUnknown|RegExp|string
 }
 
 /**

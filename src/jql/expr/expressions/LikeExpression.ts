@@ -22,13 +22,13 @@ export class LikeExpression extends BinaryExpression implements ILikeExpression 
    * @param $not [boolean]
    * @param right [IUnknown|string] optional
    */
-  constructor(left: any, $not: boolean, right?: IUnknown|string)
+  constructor(left: any, $not: boolean, right?: IUnknown|RegExp|string)
 
   constructor(...args: any[]) {
     super(args.length > 1 ? { left: args[0], operator: args[1], right: args[2] } : args[0], true)
 
     // parse args
-    let $not = false, right: IUnknown|string|undefined
+    let $not = false, right: IUnknown|RegExp|string|undefined
     if (args.length === 1) {
       const json = args[0] as ILikeExpression
       $not = json.$not || false
