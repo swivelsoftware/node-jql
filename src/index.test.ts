@@ -2,6 +2,7 @@
 
 import moment from 'moment'
 import { BinaryExpression, Column, ColumnExpression, CreateDatabaseJQL, CreateTableJQL, DropDatabaseJQL, DropTableJQL, FromTable, FunctionExpression, InExpression, InsertJQL, JoinClause, MathExpression, OrderBy, OrExpressions, PredictJQL, Query, ResultColumn, Type } from '.'
+import { RegexpExpression } from './jql/expr/expressions/RegexpExpression'
 import { GroupBy } from './jql/query/GroupBy'
 
 test('CREATE DATABASE IF NOT EXISTS School', () => {
@@ -169,6 +170,24 @@ test('Empty function', () => {
     $from: new FromTable('Student', 's', new JoinClause('LEFT', new FromTable('Class', 'c'), new BinaryExpression(new ColumnExpression('s', 'id'), '=', new ColumnExpression('c', 'studentId')))),
     $group: new GroupBy(new ColumnExpression('c', 'className')),
     $order: new OrderBy(new ColumnExpression('c', 'className')),
+  })
+  query.validate()
+  console.log(query.toString())
+})
+
+test('RegexpExpression use case 1', () => {
+  const query = new Query({
+    $from: 'Student',
+    $where: new RegexpExpression(new ColumnExpression('name'), false, /Kennys/gi),
+  })
+  query.validate()
+  console.log(query.toString())
+})
+
+test('RegexpExpression use case 2', () => {
+  const query = new Query({
+    $from: 'Student',
+    $where: new RegexpExpression(new ColumnExpression('name'), false, 'Kennys'),
   })
   query.validate()
   console.log(query.toString())

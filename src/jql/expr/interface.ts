@@ -173,7 +173,16 @@ export interface IIsNullExpression extends IBinaryExpression {
  * Raw JQL for `{left} LIKE {right}`
  */
 export interface ILikeExpression extends IBinaryExpression {
-  operator: 'LIKE'|'REGEXP',
+  operator: 'LIKE',
+  right?: IUnknown|string
+  format?: string
+}
+
+/**
+ * Raw JQL for `{left} REGEXP {right}`
+ */
+export interface IRegexpExpression extends IBinaryExpression {
+  operator: 'REGEXP',
   right?: IUnknown|RegExp|string
 }
 

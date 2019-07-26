@@ -22,8 +22,5 @@ export abstract class Expression extends JQL implements IExpression {
  */
 export abstract class ConditionalExpression extends Expression implements IConditionalExpression {
   // @override
-  public abstract toSquel(options?: any): squel.Expression
-
-  // @override
   public abstract toJson(): IConditionalExpression
 }

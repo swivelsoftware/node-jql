@@ -67,7 +67,7 @@ export class GroupBy extends JQL implements IGroupBy {
    */
   public apply(builder: squel.Select): squel.Select {
     for (const expression of this.expressions) builder = builder.group(expression.toString())
-    if (this.$having) builder = builder.having(this.$having.toSquel())
+    if (this.$having) builder = builder.having(this.$having.toSquel() as squel.Expression)
     return builder
   }
 

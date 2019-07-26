@@ -29,5 +29,5 @@ export abstract class JQL implements IJQL {
   /**
    * Convert to squel builder
    */
-  public abstract toSquel(): squel.BaseBuilder
+  public abstract toSquel(...args: any[]): squel.BaseBuilder
 }

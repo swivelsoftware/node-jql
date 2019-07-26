@@ -68,7 +68,7 @@ export class BinaryExpression extends ConditionalExpression implements IBinaryEx
   }
 
   // @override
-  public toSquel(): squel.Expression {
+  public toSquel(): squel.BaseBuilder {
     return squel.expr()
       .and(
         `? ${this.operator} ?`,
