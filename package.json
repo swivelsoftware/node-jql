@@ -1,6 +1,6 @@
 {
   "name": "node-jql",
-  "version": "2.0.0-rc.42",
+  "version": "2.0.0-rc.47",
   "description": "The JSON structure of SQL statements for node-jql-core",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -33,7 +33,7 @@
     "@types/node": "^12.6.8",
     "chalk": "^2.4.2",
     "jest": "^24.8.0",
-    "lodash": "^4.17.14",
+    "lodash": "^4.17.15",
     "minimist": "^1.2.0",
     "ts-jest": "^24.0.2",
     "ts-node": "^8.3.0",
