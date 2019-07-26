@@ -1,3 +1,5 @@
+// tslint:disable:no-eval
+
 import { ILikeExpression, IUnknown } from '../interface'
 import { parseExpr } from '../parse'
 import { BinaryExpression } from './BinaryExpression'
@@ -39,8 +41,20 @@ export class LikeExpression extends BinaryExpression implements ILikeExpression 
       right = args[2]
     }
 
+    // check args
+    if (typeof right === 'string' && right.startsWith('/') && right.indexOf('/', 1)) {
+      right = eval(right) as RegExp
+    }
+
     // set args
     this.$not = $not
     this.right = parseExpr(right)
+  }
+
+  // @override
+  public toJson(): ILikeExpression {
+    const result = super.toJson() as ILikeExpression
+    if (result.right && result.right instanceof RegExp) result.right = result.right.toString()
+    return result
   }
 }
