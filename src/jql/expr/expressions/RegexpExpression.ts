@@ -43,7 +43,7 @@ export class RegexpExpression extends BinaryExpression implements IRegexpExpress
     }
 
     // convert string to regexp
-    if (typeof right === 'string' && right.length > 2 && right.startsWith('/') && right.indexOf('/', 1) > -1) {
+    if (typeof right === 'string' && right.length > 2 && right.startsWith('/') && right.indexOf('/', 2) > -1) {
       right = eval(right) as RegExp
     }
 
