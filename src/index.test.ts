@@ -176,15 +176,6 @@ test('Empty function', () => {
   console.log(query.toString())
 })
 
-test('LikeExpression use case', () => {
-  const query = new Query({
-    $from: 'Student',
-    $where: new LikeExpression(new ColumnExpression('name'), false, 'Kennys', '{{ value }}%'),
-  })
-  query.validate()
-  console.log(query.toString())
-})
-
 test('RegexpExpression use case 1', () => {
   const query = new Query({
     $from: 'Student',

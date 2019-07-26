@@ -1,5 +1,3 @@
-import squel = require('squel')
-import * as swig from 'swig-templates'
 import { ILikeExpression, IUnknown } from '../interface'
 import { parseExpr } from '../parse'
 import { BinaryExpression } from './BinaryExpression'
@@ -13,7 +11,6 @@ export class LikeExpression extends BinaryExpression implements ILikeExpression 
   public readonly classname = LikeExpression.name
   public operator: 'LIKE'
   public right: Unknown|Value
-  public format?: string
 
   /**
    * @param json [Partial<ILikeExpression>]
@@ -25,52 +22,25 @@ export class LikeExpression extends BinaryExpression implements ILikeExpression 
    * @param $not [boolean]
    * @param right [IUnknown|string] optional
    */
-  constructor(left: any, $not: boolean, right?: IUnknown|string, format?: string)
+  constructor(left: any, $not: boolean, right?: IUnknown|string)
 
   constructor(...args: any[]) {
     super(args.length > 1 ? { left: args[0], operator: 'LIKE', right: args[2] } : args[0], true)
 
     // parse args
-    let $not = false, right: IUnknown|string|undefined, format: string|undefined
+    let $not = false, right: IUnknown|string|undefined
     if (args.length === 1) {
       const json = args[0] as ILikeExpression
       $not = json.$not || false
       right = json.right
-      format = json.format
     }
     else {
       $not = args[1]
       right = args[2]
-      format = args[3]
     }
 
     // set args
     this.$not = $not
     this.right = parseExpr(right)
-    this.format = format
-  }
-
-  // @override
-  public toSquel(): squel.BaseBuilder {
-    let right: string|squel.BaseBuilder
-    if (this.right instanceof Value && this.format) {
-      right = swig.render(this.format, { locals: { value: this.right.value } } )
-    }
-    else {
-      right = this.right.toSquel()
-    }
-    return squel.expr()
-      .and(
-        `? LIKE ?`,
-        this.left.toSquel(),
-        right,
-      )
-  }
-
-  // @override
-  public toJson(): ILikeExpression {
-    const json = super.toJson() as ILikeExpression
-    if (this.format) json.format = this.format
-    return json
   }
 }
