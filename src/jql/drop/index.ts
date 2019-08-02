@@ -1,20 +1,5 @@
-import { IJQL, JQL } from '..'
-import { IParseable } from '../parse'
-
-/**
- * Raw JQL defining DROP statements
- */
-export interface IDropJQL extends IJQL, IParseable {
-  /**
-   * Entity name
-   */
-  name: string
-
-  /**
-   * Whether to throw error if the target entity does not exists
-   */
-  $ifExists?: boolean
-}
+import { JQL } from '..'
+import { IDropJQL } from './interface'
 
 /**
  * JQL class defining DROP statements

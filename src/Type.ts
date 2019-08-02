@@ -3,7 +3,7 @@ import { checkNull } from './utils/check'
 /**
  * Available types in node-jql
  */
-export type Type = 'string'|'number'|'boolean'|'object'|'Date'|'Array'|'any'
+export type Type = 'string'|'number'|'boolean'|'object'|'Date'|'Array'|'RegExp'|'any'
 
 /**
  * Default value for each type
@@ -38,6 +38,7 @@ export function type(value: any): Type {
       return 'boolean'
     case 'object':
       if (value instanceof Date && Object.prototype.toString.call(value) === '[object Date]') return 'Date'
+      if (value instanceof RegExp) return 'RegExp'
       if (Array.isArray(value)) return 'Array'
       return 'object'
     default:

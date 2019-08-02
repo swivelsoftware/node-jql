@@ -1,26 +1,7 @@
 import squel from 'squel'
-import { Expression, IExpression } from '..'
-import { parse } from '../parse'
-
-/**
- * Raw JQL defining parameters for function expression
- */
-export interface IParameterExpression extends IExpression {
-  /**
-   * Parameter prefix
-   */
-  prefix?: string
-
-  /**
-   * Parameter context
-   */
-  expression: any
-
-  /**
-   * Parameter suffix
-   */
-  suffix?: string
-}
+import { Expression } from '..'
+import { IExpression, IParameterExpression } from '../interface'
+import { parseExpr } from '../parse'
 
 /**
  * JQL class defining parameters for function expression
@@ -62,7 +43,7 @@ export class ParameterExpression extends Expression implements IParameterExpress
 
     // set args
     this.prefix = prefix
-    this.expression = parse(expression)
+    this.expression = parseExpr(expression)
     this.suffix = suffix
   }
 

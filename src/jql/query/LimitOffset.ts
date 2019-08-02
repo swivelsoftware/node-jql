@@ -1,22 +1,9 @@
 import squel from 'squel'
-import { IJQL, JQL } from '..'
-import { Expression, IExpression } from '../expr'
-import { parse } from '../expr/parse'
-
-/**
- * Raw JQL for `LIMIT {$limit} OFFSET {$offset}`
- */
-export interface ILimitOffset extends IJQL {
-  /**
-   * Limit result count
-   */
-  $limit: number|IExpression
-
-  /**
-   * Result start from ...
-   */
-  $offset?: number|IExpression
-}
+import { JQL } from '..'
+import { Expression } from '../expr'
+import { IExpression } from '../expr/interface'
+import { parseExpr } from '../expr/parse'
+import { ILimitOffset } from './interface'
 
 /**
  * JQL class defining selected columns in query
@@ -52,8 +39,8 @@ export class LimitOffset extends JQL implements ILimitOffset {
     }
 
     // set args
-    this.$limit = parse($limit)
-    if ($offset) this.$offset = parse($offset)
+    this.$limit = parseExpr($limit)
+    if ($offset) this.$offset = parseExpr($offset)
   }
 
   // @override

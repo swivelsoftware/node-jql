@@ -1,23 +1,10 @@
 import squel from 'squel'
-import { IJQL, JQL } from '..'
-import { Expression, IExpression } from '../expr'
+import { JQL } from '..'
+import { Expression } from '../expr'
 import { ColumnExpression } from '../expr/expressions/ColumnExpression'
-import { parse } from '../expr/parse'
-
-/**
- * Raw JQL defining selected columns in query
- */
-export interface IResultColumn extends IJQL {
-  /**
-   * Result column context
-   */
-  expression: IExpression
-
-  /**
-   * alias column name
-   */
-  $as?: string
-}
+import { IExpression } from '../expr/interface'
+import { parseExpr } from '../expr/parse'
+import { IResultColumn } from './interface'
 
 /**
  * JQL class defining selected columns in query
@@ -53,7 +40,7 @@ export class ResultColumn extends JQL implements IResultColumn {
     }
 
     // set args
-    this.expression = parse(expression)
+    this.expression = parseExpr(expression)
     this.$as = $as
   }
 

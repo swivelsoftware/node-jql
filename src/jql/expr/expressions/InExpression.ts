@@ -1,17 +1,11 @@
 import squel from 'squel'
-import { IQuery, Query } from '../../query'
-import { parse } from '../parse'
-import { BinaryExpression, IBinaryExpression } from './BinaryExpression'
-import { IUnknown, Unknown } from './Unknown'
-import { IValue, Value } from './Value'
-
-/**
- * Raw JQL for `{left} IN {right}`
- */
-export interface IInExpression extends IBinaryExpression {
-  operator: 'IN',
-  right?: IUnknown|IValue|any[]|IQuery
-}
+import { Query } from '../../query'
+import { IQuery } from '../../query/interface'
+import { IInExpression, IUnknown, IValue } from '../interface'
+import { parseExpr } from '../parse'
+import { BinaryExpression } from './BinaryExpression'
+import { Unknown } from './Unknown'
+import { Value } from './Value'
 
 /**
  * JQL class for `{left} IN {right}`
@@ -51,7 +45,7 @@ export class InExpression extends BinaryExpression implements IInExpression {
     // set args
     this.$not = $not
     if (right && !Array.isArray(right) && right.classname === 'Query') this.right = new Query(right as IQuery)
-    if (!this.right) this.right = parse<Unknown|Value>(right)
+    if (!this.right) this.right = parseExpr<Unknown|Value>(right)
   }
 
   // @override

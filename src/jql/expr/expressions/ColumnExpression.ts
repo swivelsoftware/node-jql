@@ -1,20 +1,6 @@
 import squel from 'squel'
-import { Expression, IExpression } from '..'
-
-/**
- * Raw JQL defining column expression
- */
-export interface IColumnExpression extends IExpression {
-  /**
-   * Table name related to the column
-   */
-  table?: string
-
-  /**
-   * Column name
-   */
-  name: string
-}
+import { Expression } from '..'
+import { IColumnExpression } from '../interface'
 
 /**
  * JQL class defining column expression
@@ -79,10 +65,8 @@ export class ColumnExpression extends Expression implements IColumnExpression {
   }
 
   // @override
-  public toSquel(): squel.GetFieldBlock {
-    const builder = new squel.cls.GetFieldBlock()
-    builder.field(`${this.table ? `${this.table}.` : ''}${this.name}`)
-    return builder
+  public toSquel(): squel.FunctionBlock {
+    return squel.rstr(`${this.table ? `${this.table}.` : ''}${this.name}`)
   }
 
   // @override

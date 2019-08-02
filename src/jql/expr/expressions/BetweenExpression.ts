@@ -1,34 +1,10 @@
 import squel from 'squel'
 import { checkNull } from '../../../utils/check'
-import { ConditionalExpression, Expression, IConditionalExpression, IExpression } from '../../expr'
-import { parse } from '../parse'
+import { ConditionalExpression, Expression } from '../../expr'
+import { IBetweenExpression, IExpression } from '../interface'
+import { parseExpr } from '../parse'
 import { Unknown } from './Unknown'
 import { Value } from './Value'
-
-/**
- * Raw JQL for `{left} BETWEEN {start} AND {end}`
- */
-export interface IBetweenExpression extends IConditionalExpression {
-  /**
-   * Left expression
-   */
-  left: any
-
-  /**
-   * Whether `NOT BETWEEN` or `BETWEEN`
-   */
-  $not?: boolean
-
-  /**
-   * Start expression
-   */
-  start?: any
-
-  /**
-   * End expression
-   */
-  end?: any
-}
 
 /**
  * JQL class for `{left} BETWEEN {start} AND {end}`
@@ -76,10 +52,10 @@ export class BetweenExpression extends ConditionalExpression implements IBetween
     if (checkNull(left)) throw new SyntaxError('Missing left expression')
 
     // set args
-    this.left = parse(left)
+    this.left = parseExpr(left)
     this.$not = $not
-    this.start = parse(start)
-    this.end = parse(end)
+    this.start = parseExpr(start)
+    this.end = parseExpr(end)
   }
 
   // @override

@@ -1,23 +1,10 @@
 import squel from 'squel'
-import { IJQL, JQL } from '..'
-import { Expression, IExpression } from '../expr'
+import { JQL } from '..'
+import { Expression } from '../expr'
 import { ColumnExpression } from '../expr/expressions/ColumnExpression'
-import { parse } from '../expr/parse'
-
-/**
- * Raw JQL for ordering terms in query
- */
-export interface IOrderBy extends IJQL {
-  /**
-   * Sorting context
-   */
-  expression: IExpression
-
-  /**
-   * Sorting order
-   */
-  order?: 'ASC'|'DESC'
-}
+import { IExpression } from '../expr/interface'
+import { parseExpr } from '../expr/parse'
+import { IOrderBy } from './interface'
 
 /**
  * JQL class for ordering terms in query
@@ -53,7 +40,7 @@ export class OrderBy extends JQL implements IOrderBy {
     }
 
     // set args
-    this.expression = parse(expression)
+    this.expression = parseExpr(expression)
     this.order = order
   }
 

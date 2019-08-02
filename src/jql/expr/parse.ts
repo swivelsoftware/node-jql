@@ -1,24 +1,24 @@
-import { Expression, IExpression } from '.'
-import { Unknown } from './expressions/Unknown'
-import { Value } from './expressions/Value'
+import { Expression } from '.'
+import { expressions } from './expressions'
+import { IExpression } from './interface'
 
 /**
  * Parse JQL raw json to class instance
  * @param json [IExpression]
  */
-export function parse<T extends Expression>(json: IExpression|any): T
-export function parse(json: IExpression|any): Expression
-export function parse(json: IExpression|any): Expression {
+export function parseExpr<T extends Expression>(json: IExpression|any): T
+export function parseExpr(json: IExpression|any): Expression
+export function parseExpr(json: IExpression|any): Expression {
   if (json === undefined) {
-    return new Unknown()
+    return new expressions.Unknown()
   }
-  else if (typeof json === 'object' && !(json instanceof Date) && !Array.isArray(json)) {
+  else if (typeof json === 'object' && !(json instanceof Date) && !(json instanceof RegExp) && !Array.isArray(json)) {
     if (!json.classname) throw new SyntaxError('Unknown expression: classname not defined')
-    const CONSTRUCTOR = require(`./expressions/${json.classname}`)[json.classname]
+    const CONSTRUCTOR = expressions[json.classname]
     if (!CONSTRUCTOR) throw new SyntaxError(`Unknown expression: classname ${json.classname} not found`)
     return new CONSTRUCTOR(json)
   }
   else {
-    return new Value(json)
+    return new expressions.Value(json)
   }
 }

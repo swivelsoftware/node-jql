@@ -1,56 +1,17 @@
 import squel from 'squel'
-import { IJQL, JQL } from '..'
-import { ConditionalExpression, IConditionalExpression } from '../expr'
+import { JQL } from '..'
+import { ConditionalExpression } from '../expr'
 import { AndExpressions } from '../expr/expressions/AndExpressions'
 import { ColumnExpression } from '../expr/expressions/ColumnExpression'
 import { FunctionExpression } from '../expr/expressions/FunctionExpression'
-import { parse } from '../expr/parse'
-import { IParseable } from '../parse'
-import { FromTable, IFromTable } from './FromTable'
-import { GroupBy, IGroupBy } from './GroupBy'
-import { ILimitOffset, LimitOffset } from './LimitOffset'
-import { IOrderBy, OrderBy } from './OrderBy'
-import { IResultColumn, ResultColumn } from './ResultColumn'
-
-/**
- * Raw JQL for SELECT query
- */
-export interface IQuery extends IJQL, IParseable {
-  /**
-   * Use SELECT DISTINCT instead
-   */
-  $distinct?: boolean
-
-  /**
-   * SELECT ...
-   */
-  $select?: IResultColumn[]|IResultColumn|string
-
-  /**
-   * FROM ...
-   */
-  $from?: IFromTable[]|IFromTable|string
-
-  /**
-   * WHERE ...
-   */
-  $where?: IConditionalExpression[]|IConditionalExpression
-
-  /**
-   * GROUP BY ... HAVING ...
-   */
-  $group?: IGroupBy|string
-
-  /**
-   * ORDER BY ...
-   */
-  $order?: IOrderBy[]|IOrderBy|string
-
-  /**
-   * LIMIT ... OFFSET ...
-   */
-  $limit?: ILimitOffset|number
-}
+import { IConditionalExpression } from '../expr/interface'
+import { parseExpr } from '../expr/parse'
+import { FromTable } from './FromTable'
+import { GroupBy } from './GroupBy'
+import { IFromTable, IGroupBy, ILimitOffset, IOrderBy, IQuery, IResultColumn } from './interface'
+import { LimitOffset } from './LimitOffset'
+import { OrderBy } from './OrderBy'
+import { ResultColumn } from './ResultColumn'
 
 /**
  * JQL class for SELECT query
@@ -64,6 +25,7 @@ export class Query extends JQL implements IQuery {
   public $group?: GroupBy
   public $order?: OrderBy[]
   public $limit?: LimitOffset
+  public $union?: Query
 
   /**
    * @param json [Partial<IQuery>]
@@ -99,6 +61,7 @@ export class Query extends JQL implements IQuery {
     let $group: IGroupBy|string|undefined
     let $order: IOrderBy[]|IOrderBy|string|undefined
     let $limit: ILimitOffset|number|undefined
+    let $union: IQuery|undefined
     if (Array.isArray(args[0])) {
       $select = args[0]
       $from = args[1]
@@ -113,6 +76,7 @@ export class Query extends JQL implements IQuery {
       $group = json.$group
       $order = json.$order
       $limit = json.$limit
+      $union = json.$union
     }
     else if (args.length === 2) {
       $from = { database: args[0] || undefined, table: args[1] }
@@ -141,7 +105,7 @@ export class Query extends JQL implements IQuery {
     }
 
     // $where
-    if ($where) this.$where = Array.isArray($where) ? new AndExpressions($where) : parse($where) as ConditionalExpression
+    if ($where) this.$where = Array.isArray($where) ? new AndExpressions($where) : parseExpr($where) as ConditionalExpression
 
     // $group
     if ($group) {
@@ -163,6 +127,9 @@ export class Query extends JQL implements IQuery {
       if (typeof $limit === 'number') $limit = { $limit }
       this.$limit = new LimitOffset($limit)
     }
+
+    // $union
+    if ($union) this.$union = new Query($union)
   }
 
   /**
@@ -223,6 +190,7 @@ export class Query extends JQL implements IQuery {
     if (this.$group) this.$group.validate(availableTables)
     if (this.$order) for (const order of this.$order) order.validate(availableTables)
     if (this.$limit) this.$limit.validate(availableTables)
+    if (this.$union) this.$union.validate()
   }
 
   // @override
@@ -230,7 +198,7 @@ export class Query extends JQL implements IQuery {
     let builder = squel.select()
     if (this.$from) for (const table of this.$from) builder = table.apply(builder)
     if (!this.isSimpleWildcard) for (const { expression, $as } of this.$select) builder = builder.field(expression.toSquel(), $as)
-    if (this.$where) builder = builder.where(this.$where.toSquel(false))
+    if (this.$where) builder = builder.where(this.$where.toSquel(false) as squel.Expression)
     if (this.$group) builder = this.$group.apply(builder)
     if (this.$order) {
       for (const { expression, order } of this.$order) {
@@ -239,6 +207,7 @@ export class Query extends JQL implements IQuery {
       }
     }
     if (this.$limit) builder = squel.select({}, [...builder.blocks, new squel.cls.StringBlock({}, this.$limit.toString())]) as squel.Select
+    if (this.$union) builder = builder.union(this.$union.toSquel())
     return builder
   }
 
@@ -252,13 +221,7 @@ export class Query extends JQL implements IQuery {
     if (this.$group) result.$group = this.$group.toJson()
     if (this.$order) result.$order = this.$order.map(orderBy => orderBy.toJson())
     if (this.$limit) result.$limit = this.$limit.toJson()
+    if (this.$union) result.$union = this.$union.toJson()
     return result
-  }
-
-  /**
-   * Clone the Query
-   */
-  public clone(): Query {
-    return new Query(this)
   }
 }

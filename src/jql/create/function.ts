@@ -1,66 +1,16 @@
-import squel = require('squel')
-import { IJQL, JQL } from '..'
-import { Type } from '../../Type'
+import squel from 'squel'
+import { CreateJQL } from '.'
+import { Type } from '../../type'
 import { JQLError } from '../../utils/error'
-import { IParseable } from '../parse'
-
-function parseFunction(code: string): Function {
-  code = code.trim()
-
-  if (!code.startsWith('function')) throw new SyntaxError(`Position 0: Keyword 'function' is missing`)
-
-  const argsIndex = [code.indexOf('(') + 1, code.indexOf(')')]
-  const bodyIndex = [code.indexOf('{') + 1, code.lastIndexOf('}')]
-  if (argsIndex[1] > bodyIndex[0]) throw new SyntaxError(`Position ${bodyIndex[0]}: Curved bracket '{}' is not allowed in argument section 'function()'`)
-  if (bodyIndex[1] - bodyIndex[0] === 1) throw new SyntaxError(`Position ${bodyIndex[0]}: Empty function`)
-
-  let args: string[] = []
-  if (argsIndex[1] - argsIndex[0] > 1) {
-    args = code.substring(argsIndex[0], argsIndex[1]).split(',').map(pc => pc.trim())
-  }
-  args.push(code.substring(bodyIndex[0], bodyIndex[1]))
-
-  return new Function(...args)
-}
-
-/**
- * Raw JQL for `CREATE FUNCTION ...`
- */
-export interface ICreateFunctionJQL extends IJQL, IParseable {
-  /**
-   * Whether it is an aggregate function
-   */
-  aggregate?: boolean
-
-  /**
-   * Function name
-   */
-  name: string
-
-  /**
-   * Main function
-   */
-  fn: string|Function
-
-  /**
-   * Parameters
-   */
-  parameters?: Type[]
-
-  /**
-   * Return type
-   */
-  type?: Type
-}
+import { ICreateFunctionJQL } from './interface'
 
 /**
  * JQL class for `CREATE FUNCTION ...`
  */
-export class CreateFunctionJQL extends JQL implements ICreateFunctionJQL {
+export class CreateFunctionJQL extends CreateJQL implements ICreateFunctionJQL {
   public readonly classname = CreateFunctionJQL.name
   public aggregate?: boolean
-  public name: string
-  public fn: Function
+  public code: string
   public parameters: Type[] = []
   public type: Type = 'any'
 
@@ -84,31 +34,29 @@ export class CreateFunctionJQL extends JQL implements ICreateFunctionJQL {
    * @param type [Type] optional
    * @param parameters [Array<Type>] optional
    */
-  constructor(aggregate: true, fn: string|Function, type?: Type, ...parameters: Type[])
+  constructor(aggregate: true, name: string, fn: string|Function, type?: Type, ...parameters: Type[])
 
   constructor(...args: any[]) {
-    super()
+    super(typeof args[0] === 'boolean' ? args[1] : args[0], typeof args[0] === 'object' ? undefined : true)
 
     // parse args
-    let aggregate: boolean|undefined, name: string, fn: Function, type: Type = 'any', parameters: Type[] = []
+    let aggregate: boolean|undefined, $ifNotExists = false, code: string, type: Type = 'any', parameters: Type[] = []
     if (typeof args[0] === 'object') {
       const json = args[0] as ICreateFunctionJQL
       aggregate = json.aggregate
-      name = json.name
-      fn = typeof json.fn === 'string' ? parseFunction(json.fn) : json.fn
+      $ifNotExists = json.$ifNotExists || false
+      code = json.code
       if (json.type) type = json.type
       if (json.parameters) parameters = json.parameters
     }
     else if (typeof args[0] === 'boolean') {
       aggregate = args[0]
-      name = args[1]
-      fn = typeof args[2] === 'string' ? parseFunction(args[2]) : args[2]
+      code = typeof args[2] === 'function' ? args[2].toString() : args[2]
       type = args[3] || type
       parameters = args.slice(4)
     }
     else {
-      name = args[0]
-      fn = typeof args[1] === 'string' ? parseFunction(args[1]) : args[1]
+      code = typeof args[1] === 'function' ? args[1].toString() : args[1]
       type = args[2] || type
       parameters = args.slice(3)
     }
@@ -118,8 +66,7 @@ export class CreateFunctionJQL extends JQL implements ICreateFunctionJQL {
 
     // set args
     this.aggregate = aggregate
-    this.name = name
-    this.fn = fn
+    this.code = code
     this.type = type
     this.parameters = parameters
   }
@@ -134,7 +81,7 @@ export class CreateFunctionJQL extends JQL implements ICreateFunctionJQL {
 
   // @override
   public toJson(): ICreateFunctionJQL {
-    const result = { name: this.name, fn: this.fn.toString() } as ICreateFunctionJQL
+    const result = { name: this.name, code: this.code } as ICreateFunctionJQL
     if (this.aggregate) result.aggregate = this.aggregate
     if (this.type !== 'any') result.type = this.type
     if (this.parameters.length) result.parameters = this.parameters

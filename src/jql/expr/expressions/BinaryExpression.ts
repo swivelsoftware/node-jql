@@ -1,40 +1,11 @@
 import squel from 'squel'
-import { ConditionalExpression, Expression, IConditionalExpression, IExpression } from '..'
+import { ConditionalExpression, Expression } from '..'
 import { checkNull } from '../../../utils/check'
 import { JQLError } from '../../../utils/error'
-import { parse } from '../parse'
+import { BinaryOperator, IBinaryExpression, IExpression } from '../interface'
+import { parseExpr } from '../parse'
 import { Unknown } from './Unknown'
 import { Value } from './Value'
-
-/**
- * Binary operator
- */
-export type BinaryOperator = '='|'<>'|'<'|'<='|'>'|'>='|'IN'|'IS'|'LIKE'|'REGEXP'
-
-/**
- * Raw JQL for `{left} {operator} {right}`
- */
-export interface IBinaryExpression extends IConditionalExpression {
-  /**
-   * Left expression
-   */
-  left: any
-
-  /**
-   * Whether `NOT` is added before operator
-   */
-  $not?: boolean
-
-  /**
-   * The operator used
-   */
-  operator: BinaryOperator
-
-  /**
-   * Right expression
-   */
-  right?: any
-}
 
 /**
  * JQL class for `{left} {operator} {right}`
@@ -85,9 +56,9 @@ export class BinaryExpression extends ConditionalExpression implements IBinaryEx
     if (!operator) throw new SyntaxError('Missing operator')
 
     // set args
-    this.left = parse(left)
+    this.left = parseExpr(left)
     this.operator = operator
-    if (!(typeof args[1] === 'boolean' && args[1])) this.right = parse(right)
+    if (!(typeof args[1] === 'boolean' && args[1])) this.right = parseExpr(right)
   }
 
   // @override
@@ -97,7 +68,7 @@ export class BinaryExpression extends ConditionalExpression implements IBinaryEx
   }
 
   // @override
-  public toSquel(): squel.Expression {
+  public toSquel(): squel.BaseBuilder {
     return squel.expr()
       .and(
         `? ${this.operator} ?`,

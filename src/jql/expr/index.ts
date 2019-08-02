@@ -1,12 +1,6 @@
 import squel from 'squel'
-import { IJQL, JQL } from '../../jql'
-import { IParseable } from '../parse'
-
-/**
- * Raw JQL for expression
- */
-export interface IExpression extends IJQL, IParseable {
-}
+import { JQL } from '../../jql'
+import { IConditionalExpression, IExpression } from './interface'
 
 /**
  * Abstract expression class in JQL
@@ -24,17 +18,9 @@ export abstract class Expression extends JQL implements IExpression {
 }
 
 /**
- * Raw JQL for expression that returns boolean
- */
-export interface IConditionalExpression extends IExpression {}
-
-/**
  * Abstract JQL class for expression that returns boolean
  */
 export abstract class ConditionalExpression extends Expression implements IConditionalExpression {
-  // @override
-  public abstract toSquel(options?: any): squel.Expression
-
   // @override
   public abstract toJson(): IConditionalExpression
 }

@@ -1,13 +1,6 @@
 import squel from 'squel'
-import { BinaryExpression, IBinaryExpression } from './BinaryExpression'
-
-/**
- * Raw JQL for `{left} IS NULL`
- */
-export interface IIsNullExpression extends IBinaryExpression {
-  operator: 'IS',
-  right?: null|undefined
-}
+import { IIsNullExpression } from '../interface'
+import { BinaryExpression } from './BinaryExpression'
 
 /**
  * JQL class for `{left} IS NULL`

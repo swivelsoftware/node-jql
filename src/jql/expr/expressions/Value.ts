@@ -1,15 +1,6 @@
 import { type } from '../../../type'
-import { IUnknown, Unknown } from './Unknown'
-
-/**
- * Raw JQL for constants
- */
-export interface IValue extends IUnknown {
-  /**
-   * Value assigned
-   */
-  value: any
-}
+import { IValue } from '../interface'
+import { Unknown } from './Unknown'
 
 /**
  * JQL class for constants

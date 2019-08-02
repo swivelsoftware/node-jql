@@ -1,21 +1,8 @@
 import squel from 'squel'
-import { ConditionalExpression, IConditionalExpression } from '..'
-import { IQuery, Query } from '../../query'
-
-/**
- * Raw JQL for `EXISTS {query}`
- */
-export interface IExistsExpression extends IConditionalExpression {
-  /**
-   * Whether `NOT EXISTS` or `EXISTS`
-   */
-  $not?: boolean
-
-  /**
-   * Sub-query for checking
-   */
-  query: IQuery
-}
+import { ConditionalExpression } from '..'
+import { Query } from '../../query'
+import { IQuery } from '../../query/interface'
+import { IExistsExpression } from '../interface'
 
 /**
  * JQL class for `EXISTS {query}`

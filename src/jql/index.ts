@@ -1,9 +1,5 @@
 import squel from 'squel'
-
-/**
- * Raw JQL
- */
-export interface IJQL {}
+import { IJQL } from './interface'
 
 /**
  * Abstract JQL class
@@ -33,5 +29,5 @@ export abstract class JQL implements IJQL {
   /**
    * Convert to squel builder
    */
-  public abstract toSquel(): squel.BaseBuilder
+  public abstract toSquel(...args: any[]): squel.BaseBuilder
 }

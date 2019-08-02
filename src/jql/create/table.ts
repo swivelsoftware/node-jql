@@ -1,42 +1,9 @@
 import squel from 'squel'
-import { CreateJQL, ICreateJQL } from '.'
-import { IQuery, Query } from '../query'
-import { Column, IColumn } from './column'
-
-/**
- * Raw JQL for `CREATE TABLE ...`
- */
-export interface ICreateTableJQL extends ICreateJQL {
-  /**
-   * Whether it is a temporary table
-   */
-  $temporary?: boolean
-
-  /**
-   * Related database
-   */
-  database?: string
-
-  /**
-   * Table columns
-   */
-  columns: IColumn[]
-
-  /**
-   * Column constraints
-   */
-  constraints?: string[]|string
-
-  /**
-   * Table options
-   */
-  options?: string[]|string
-
-  /**
-   * SELECT statement
-   */
-  $as?: IQuery
-}
+import { CreateJQL } from '.'
+import { Query } from '../query'
+import { IQuery } from '../query/interface'
+import { Column } from './column'
+import { IColumn, ICreateTableJQL } from './interface'
 
 /**
  * JQL class for `CREATE TABLE ...`
@@ -106,7 +73,7 @@ export class CreateTableJQL extends CreateJQL implements ICreateTableJQL {
     }
 
     // check args
-    if (!columns.length) throw new SyntaxError('Table must have at least 1 column')
+    if (!$as && !columns.length) throw new SyntaxError('Table must have at least 1 column')
 
     // set args
     this.$temporary = $temporary || false
@@ -121,6 +88,11 @@ export class CreateTableJQL extends CreateJQL implements ICreateTableJQL {
       this.options = options
     }
     if ($as) this.$as = new Query($as)
+  }
+
+  // @override
+  public validate(availableTables: string[] = []): void {
+    if (this.$as) this.$as.validate(availableTables)
   }
 
   // @override

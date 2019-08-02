@@ -75,14 +75,19 @@ new Column(string, Type, boolean?, ...string[])
 
 ## IInsertJQL
 
+[IQuery](#IQuery)
+
 ``` js
 new InsertJQL(IInsertJQL)
+new InsertJQL([string, string]|string, IQuery, string[])
 new InsertJQL([string, string]|string, ...any[])
 
 {
   "database": string|undefined,
   "name": string,
-  "values": any[]
+  "values": any[]|undefined,
+  "columns": string[]|undefined,
+  "query": IQuery|undefined
 }
 ```
 
@@ -128,6 +133,12 @@ new DropFunctionJQL(string, boolean?)
   "name": string,
   "$ifExists": boolean|undefined
 }
+```
+
+## PredictJQL
+
+``` js
+new PredictJQL(...IJQL[])
 ```
 
 ## IQuery

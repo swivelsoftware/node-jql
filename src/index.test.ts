@@ -1,7 +1,10 @@
 /* tslint:disable:no-console */
 
 import moment from 'moment'
-import { BinaryExpression, Column, ColumnExpression, CreateDatabaseJQL, CreateTableJQL, DropDatabaseJQL, DropTableJQL, FromTable, FunctionExpression, InExpression, InsertJQL, JoinClause, MathExpression, OrderBy, OrExpressions, Query, ResultColumn, Type } from '.'
+import { BinaryExpression, Column, ColumnExpression, CreateDatabaseJQL, CreateTableJQL, DropDatabaseJQL, DropTableJQL, FromTable, FunctionExpression, InExpression, InsertJQL, JoinClause, MathExpression, OrderBy, OrExpressions, PredictJQL, Query, ResultColumn, Type } from '.'
+import { LikeExpression } from './jql/expr/expressions/LikeExpression'
+import { RegexpExpression } from './jql/expr/expressions/RegexpExpression'
+import { GroupBy } from './jql/query/GroupBy'
 
 test('CREATE DATABASE IF NOT EXISTS School', () => {
   const query = new CreateDatabaseJQL('School', true)
@@ -39,6 +42,12 @@ test('INSERT INTO Student VALUES (...)', () => {
     { id: 1, name: 'Kennys Ng', gender: 'M', birthday: moment('1992-04-21').toDate(), admittedAt: new Date() },
     { id: 2, name: 'Kirino Chiba', gender: 'F', birthday: moment('1992-06-08').toDate(), admittedAt: new Date() },
   )
+  query.validate()
+  console.log(query.toString())
+})
+
+test('INSERT INTO Student (...) SELECT ...', () => {
+  const query = new InsertJQL(['School', 'Student'], new Query('School2', 'Student'), ['id', 'name', 'gender', 'birthday', 'admittedAt', 'graduatedAt'])
   query.validate()
   console.log(query.toString())
 })
@@ -118,6 +127,68 @@ test('CREATE TABLE test AS SELECT * FROM URL(GET 127.0.0.1) `Test`', () => {
     $as: new Query({
       $from: new FromTable({ table: { url: '127.0.0.1', columns: [] }, $as: 'Test' }),
     }),
+  })
+  query.validate()
+  console.log(query.toString())
+})
+
+test('SELECT ... UNION SELECT ...', () => {
+  const query = new Query({
+    $from: 'Table1',
+    $union: new Query('Table2'),
+  })
+  query.validate()
+  console.log(query.toString())
+})
+
+test('PREDICT (SELECT ...)', () => {
+  const query = new PredictJQL(
+    new CreateTableJQL({
+      $temporary: true,
+      name: 'MaleStudents',
+      columns: [
+        new Column<Type>('id', 'number', false, 'PRIMARY KEY'),
+        new Column<Type>('name', 'string', false),
+        new Column<Type>('gender', 'string', false),
+        new Column<Type>('birthday', 'Date', false),
+        new Column<Type>('admittedAt', 'Date', false),
+        new Column<Type>('graduatedAt', 'Date', true),
+      ],
+      $as: new Query([new ResultColumn('*')], 'Student', new BinaryExpression(new ColumnExpression('gender'), '=', 'M')),
+    }),
+    new Query('MaleStudents'),
+  )
+  query.validate()
+  console.log(query.toString())
+})
+
+test('Empty function', () => {
+  const query = new Query({
+    $select: [
+      new ResultColumn(new ColumnExpression('c', 'className'), 'class'),
+      new ResultColumn(new FunctionExpression('ROWS'), 'students'),
+    ],
+    $from: new FromTable('Student', 's', new JoinClause('LEFT', new FromTable('Class', 'c'), new BinaryExpression(new ColumnExpression('s', 'id'), '=', new ColumnExpression('c', 'studentId')))),
+    $group: new GroupBy(new ColumnExpression('c', 'className')),
+    $order: new OrderBy(new ColumnExpression('c', 'className')),
+  })
+  query.validate()
+  console.log(query.toString())
+})
+
+test('RegexpExpression use case 1', () => {
+  const query = new Query({
+    $from: 'Student',
+    $where: new RegexpExpression(new ColumnExpression('name'), false, /Kennys/gi),
+  })
+  query.validate()
+  console.log(query.toString())
+})
+
+test('RegexpExpression use case 2', () => {
+  const query = new Query({
+    $from: 'Student',
+    $where: new RegexpExpression(new ColumnExpression('name'), false, 'Kennys'),
   })
   query.validate()
   console.log(query.toString())

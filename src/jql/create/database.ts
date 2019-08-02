@@ -1,15 +1,6 @@
 import squel from 'squel'
-import { CreateJQL, ICreateJQL } from '.'
-
-/**
- * Raw JQL for `CREATE DATABASE ...`
- */
-export interface ICreateDatabaseJQL extends ICreateJQL {
-  /**
-   * Database engine
-   */
-  engine?: string
-}
+import { CreateJQL } from '.'
+import { ICreateDatabaseJQL } from './interface'
 
 /**
  * JQL class for `CREATE DATABASE ...`

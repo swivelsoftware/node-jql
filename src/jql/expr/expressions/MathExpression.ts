@@ -1,34 +1,10 @@
 import squel from 'squel'
-import { Expression, IExpression } from '..'
+import { Expression } from '..'
 import { checkNull } from '../../../utils/check'
-import { parse } from '../parse'
+import { IExpression, IMathExpression, MathOperator } from '../interface'
+import { parseExpr } from '../parse'
 import { Unknown } from './Unknown'
 import { Value } from './Value'
-
-/**
- * Mathematical operator
- */
-export type MathOperator = '+'|'-'|'*'|'/'|'%'|'MOD'|'DIV'
-
-/**
- * Raw JQL defining mathematical expression
- */
-export interface IMathExpression extends IExpression {
-  /**
-   * Left expression
-   */
-  left: any
-
-  /**
-   * The operator used
-   */
-  operator: MathOperator
-
-  /**
-   * Right expression
-   */
-  right?: any
-}
 
 /**
  * JQL class defining mathematical expression
@@ -73,9 +49,9 @@ export class MathExpression extends Expression implements IMathExpression {
     if (!operator) throw new SyntaxError('Missing operator')
 
     // set args
-    this.left = parse(left)
+    this.left = parseExpr(left)
     this.operator = operator || '+'
-    this.right = parse(right)
+    this.right = parseExpr(right)
   }
 
   // @override
