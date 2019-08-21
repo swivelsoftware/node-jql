@@ -84,9 +84,9 @@ export class BetweenExpression extends ConditionalExpression implements IBetween
     }
     if (this.$not) result.$not = true
     const start = this.exprToJson(this.start)
-    if (start) result.start = start
+    if (!checkNull(start)) result.start = start
     const end = this.exprToJson(this.end)
-    if (end) result.end = end
+    if (!checkNull(end)) result.end = end
     return result
   }
 

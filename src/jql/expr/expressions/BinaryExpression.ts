@@ -87,7 +87,7 @@ export class BinaryExpression extends ConditionalExpression implements IBinaryEx
     if (this.$not) result.$not = this.$not
     if (!checkNull(this.right)) {
       const right = this.exprToJson(this.right)
-      if (right) result.right = right
+      if (!checkNull(right)) result.right = right
     }
     return result
   }
