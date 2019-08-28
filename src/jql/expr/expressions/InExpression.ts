@@ -28,7 +28,7 @@ export class InExpression extends BinaryExpression implements IInExpression {
   constructor(left: any, $not: boolean, right?: IUnknown|IValue|any[]|IQuery)
 
   constructor(...args: any[]) {
-    super(args.length > 1 ? { left: args[0], operator: 'IN', right: args[2] } : args[0], true)
+    super(args.length > 1 ? { left: args[0], operator: 'IN', right: args[2] } : { ...args[0], operator: 'IN' }, true)
 
     // parse args
     let $not = false, right: IUnknown|IValue|any[]|IQuery|undefined

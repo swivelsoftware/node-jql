@@ -25,7 +25,7 @@ export class LikeExpression extends BinaryExpression implements ILikeExpression 
   constructor(left: any, $not: boolean, right?: IUnknown|string)
 
   constructor(...args: any[]) {
-    super(args.length > 1 ? { left: args[0], operator: 'LIKE', right: args[2] } : args[0], true)
+    super(args.length > 1 ? { left: args[0], operator: 'LIKE', right: args[2] } : { ...args[0], operator: 'LIKE' }, true)
 
     // parse args
     let $not = false, right: IUnknown|string|undefined
