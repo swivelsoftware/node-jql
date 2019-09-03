@@ -9,8 +9,8 @@
     "lint": "tslint -p tsconfig.json",
     "bundle": "ts-node ./script/concat-ts.ts -p ./post-process src/index.ts && tslint -p tsconfig.bundle.json --fix",
     "build": "npm run bundle && tsc -p tsconfig.bundle.json &&  rm -rf intermediate",
-    "prepublishOnly": "npm i && npm run build",
-    "postpublish": "rm package-lock.json && rm -rf dist"
+    "prepublishOnly": "npm run build",
+    "postpublish": "rm -rf dist"
   },
   "repository": {
     "type": "git",
