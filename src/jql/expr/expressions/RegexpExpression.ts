@@ -1,7 +1,8 @@
 // tslint:disable:no-eval
 
 import squel = require('squel')
-import { IRegexpExpression, IUnknown } from '../interface'
+import { checkNull } from '../../../utils/check'
+import { BinaryOperator, IRegexpExpression, IUnknown } from '../interface'
 import { parseExpr } from '../parse'
 import { BinaryExpression } from './BinaryExpression'
 import { Unknown } from './Unknown'
@@ -12,7 +13,7 @@ import { Value } from './Value'
  */
 export class RegexpExpression extends BinaryExpression implements IRegexpExpression {
   public readonly classname = RegexpExpression.name
-  public operator: 'REGEXP'
+  public readonly operator: BinaryOperator = 'REGEXP'
   public right: Unknown|Value
 
   /**
@@ -54,19 +55,25 @@ export class RegexpExpression extends BinaryExpression implements IRegexpExpress
 
   // @override
   public toSquel(): squel.BaseBuilder {
-    if (this.right instanceof Value && this.right.value instanceof RegExp && this.right.value.flags) {
-      const regexp = this.right.value
-      let flags = ''
-      if (regexp.flags.indexOf('i') > -1) flags += 'i'
-      if (regexp.flags.indexOf('m') > -1) flags += 'm'
-      if (regexp.flags.indexOf('u') > -1) flags += 'u'
-      if (flags.length && flags.indexOf('i') === -1) flags += 'c'
-      return squel.rstr(
-        flags ? `REGEXP_LIKE(?, ?, ?)` : `REGEXP_LIKE(?, ?)`,
-        this.left.toSquel(),
-        regexp.source,
-        flags,
-      )
+    if (this.right instanceof Value) {
+      if (this.right.value instanceof RegExp && this.right.value.flags) {
+        const regexp = this.right.value
+        let flags = ''
+        if (regexp.flags.indexOf('i') > -1) flags += 'i'
+        if (regexp.flags.indexOf('m') > -1) flags += 'm'
+        if (regexp.flags.indexOf('u') > -1) flags += 'u'
+        if (flags.length && flags.indexOf('i') === -1) flags += 'c'
+        return squel.rstr(
+          flags ? `REGEXP_LIKE(?, ?, ?)` : `REGEXP_LIKE(?, ?)`,
+          this.left.toSquel(),
+          regexp.source,
+          flags,
+        )
+      }
+      // empty string -> illegal argument to a regular expression
+      else if (typeof this.right.value === 'string' && !this.right.value.length) {
+        return squel.expr().and('1 = 1')
+      }
     }
     return super.toSquel()
   }
@@ -74,7 +81,7 @@ export class RegexpExpression extends BinaryExpression implements IRegexpExpress
   // @override
   public toJson(): IRegexpExpression {
     const json = super.toJson() as IRegexpExpression
-    if (json.right && json.right instanceof RegExp) json.right = json.right.toString()
+    if (!checkNull(json.right) && json.right instanceof RegExp) json.right = json.right.toString()
     return json
   }
 }

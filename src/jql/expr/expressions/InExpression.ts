@@ -1,7 +1,7 @@
 import squel from 'squel'
 import { Query } from '../../query'
 import { IQuery } from '../../query/interface'
-import { IInExpression, IUnknown, IValue } from '../interface'
+import { BinaryOperator, IInExpression, IUnknown, IValue } from '../interface'
 import { parseExpr } from '../parse'
 import { BinaryExpression } from './BinaryExpression'
 import { Unknown } from './Unknown'
@@ -12,7 +12,7 @@ import { Value } from './Value'
  */
 export class InExpression extends BinaryExpression implements IInExpression {
   public readonly classname = InExpression.name
-  public operator: 'IN'
+  public readonly operator: BinaryOperator = 'IN'
   public right: Unknown|Value|Query
 
   /**
@@ -28,7 +28,7 @@ export class InExpression extends BinaryExpression implements IInExpression {
   constructor(left: any, $not: boolean, right?: IUnknown|IValue|any[]|IQuery)
 
   constructor(...args: any[]) {
-    super(args.length > 1 ? { left: args[0], operator: 'IN', right: args[2] } : args[0], true)
+    super(args.length > 1 ? { left: args[0], operator: 'IN', right: args[2] } : { ...args[0], operator: 'IN' }, true)
 
     // parse args
     let $not = false, right: IUnknown|IValue|any[]|IQuery|undefined

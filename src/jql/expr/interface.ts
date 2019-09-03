@@ -1,6 +1,7 @@
 import { Type } from '../../Type'
 import { IJQL, IParseable } from '../interface'
 import { IQuery } from '../query/interface'
+import { BinaryExpression } from './expressions/BinaryExpression'
 
 /**
  * Raw JQL for expression
@@ -157,7 +158,6 @@ export interface IFunctionExpression extends IExpression {
  * Raw JQL for `{left} IN {right}`
  */
 export interface IInExpression extends IBinaryExpression {
-  operator: 'IN',
   right?: IUnknown|IValue|any[]|IQuery
 }
 
@@ -165,7 +165,6 @@ export interface IInExpression extends IBinaryExpression {
  * Raw JQL for `{left} IS NULL`
  */
 export interface IIsNullExpression extends IBinaryExpression {
-  operator: 'IS',
   right?: null|undefined
 }
 
@@ -173,7 +172,6 @@ export interface IIsNullExpression extends IBinaryExpression {
  * Raw JQL for `{left} LIKE {right}`
  */
 export interface ILikeExpression extends IBinaryExpression {
-  operator: 'LIKE',
   right?: IUnknown|string
 }
 
@@ -181,7 +179,6 @@ export interface ILikeExpression extends IBinaryExpression {
  * Raw JQL for `{left} REGEXP {right}`
  */
 export interface IRegexpExpression extends IBinaryExpression {
-  operator: 'REGEXP',
   right?: IUnknown|RegExp|string
 }
 

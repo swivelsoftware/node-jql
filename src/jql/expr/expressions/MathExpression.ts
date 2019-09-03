@@ -78,7 +78,7 @@ export class MathExpression extends Expression implements IMathExpression {
     }
     if (!checkNull(this.right)) {
       const right = this.exprToJson(this.right)
-      if (right) result.right = right
+      if (!checkNull(right)) result.right = right
     }
     return result
   }

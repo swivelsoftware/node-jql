@@ -42,7 +42,7 @@ export class BinaryExpression extends ConditionalExpression implements IBinaryEx
     }
     else {
       left = args[0]
-      operator = args[1]
+      operator = args[1] as BinaryOperator
       right = args[2]
     }
 
@@ -87,7 +87,7 @@ export class BinaryExpression extends ConditionalExpression implements IBinaryEx
     if (this.$not) result.$not = this.$not
     if (!checkNull(this.right)) {
       const right = this.exprToJson(this.right)
-      if (right) result.right = right
+      if (!checkNull(right)) result.right = right
     }
     return result
   }

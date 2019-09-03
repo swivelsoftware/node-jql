@@ -1,5 +1,5 @@
 import squel from 'squel'
-import { IIsNullExpression } from '../interface'
+import { BinaryOperator, IIsNullExpression } from '../interface'
 import { BinaryExpression } from './BinaryExpression'
 
 /**
@@ -7,7 +7,7 @@ import { BinaryExpression } from './BinaryExpression'
  */
 export class IsNullExpression extends BinaryExpression implements IIsNullExpression {
   public readonly classname = IsNullExpression.name
-  public operator: 'IS'
+  public readonly operator: BinaryOperator = 'IS'
   public right: null
 
   /**
@@ -22,7 +22,7 @@ export class IsNullExpression extends BinaryExpression implements IIsNullExpress
   constructor(left: any, $not: boolean)
 
   constructor(...args: any[]) {
-    super(args.length > 1 ? { left: args[0], operator: 'IS' } : args[0], true)
+    super(args.length > 1 ? { left: args[0], operator: 'IS' } : { ...args[0], operator: 'IS' }, true)
 
     // parse args
     let $not = false

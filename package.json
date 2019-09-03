@@ -1,16 +1,16 @@
 {
   "name": "node-jql",
-  "version": "2.0.0-rc.53",
+  "version": "2.0.0-rc.57",
   "description": "The JSON structure of SQL statements for node-jql-core",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "test": "jest",
     "lint": "tslint -p tsconfig.json",
-    "bundle": "ts-node ./script/concat-ts.ts src/index.ts && tslint -p tsconfig.bundle.json --fix",
+    "bundle": "ts-node ./script/concat-ts.ts -p ./post-process src/index.ts && tslint -p tsconfig.bundle.json --fix",
     "build": "npm run bundle && tsc -p tsconfig.bundle.json &&  rm -rf intermediate",
-    "prepublishOnly": "npm i && npm run build",
-    "postpublish": "rm package-lock.json && rm -rf dist"
+    "prepublishOnly": "npm run build",
+    "postpublish": "rm -rf dist"
   },
   "repository": {
     "type": "git",
@@ -27,18 +27,18 @@
   "homepage": "https://github.com/kennysng/node-jql#readme",
   "devDependencies": {
     "@types/deep-diff": "^1.0.0",
-    "@types/jest": "^24.0.15",
-    "@types/lodash": "^4.14.136",
+    "@types/jest": "^24.0.18",
+    "@types/lodash": "^4.14.138",
     "@types/minimist": "^1.2.0",
-    "@types/node": "^12.6.8",
+    "@types/node": "^12.7.3",
     "chalk": "^2.4.2",
-    "jest": "^24.8.0",
+    "jest": "^24.9.0",
     "lodash": "^4.17.15",
     "minimist": "^1.2.0",
     "ts-jest": "^24.0.2",
     "ts-node": "^8.3.0",
-    "tslint": "^5.18.0",
-    "typescript": "^3.5.3"
+    "tslint": "^5.19.0",
+    "typescript": "^3.6.2"
   },
   "dependencies": {
     "axios": "^0.19.0",
