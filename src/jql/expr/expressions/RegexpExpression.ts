@@ -2,7 +2,7 @@
 
 import squel = require('squel')
 import { checkNull } from '../../../utils/check'
-import { IRegexpExpression, IUnknown } from '../interface'
+import { BinaryOperator, IRegexpExpression, IUnknown } from '../interface'
 import { parseExpr } from '../parse'
 import { BinaryExpression } from './BinaryExpression'
 import { Unknown } from './Unknown'
@@ -13,7 +13,7 @@ import { Value } from './Value'
  */
 export class RegexpExpression extends BinaryExpression implements IRegexpExpression {
   public readonly classname = RegexpExpression.name
-  public operator: 'REGEXP'
+  public readonly operator: BinaryOperator = 'REGEXP'
   public right: Unknown|Value
 
   /**

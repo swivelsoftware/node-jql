@@ -42,7 +42,7 @@ export class BinaryExpression extends ConditionalExpression implements IBinaryEx
     }
     else {
       left = args[0]
-      operator = args[1]
+      operator = args[1] as BinaryOperator
       right = args[2]
     }
 

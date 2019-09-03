@@ -1,5 +1,5 @@
 import squel from 'squel'
-import { IIsNullExpression } from '../interface'
+import { BinaryOperator, IIsNullExpression } from '../interface'
 import { BinaryExpression } from './BinaryExpression'
 
 /**
@@ -7,7 +7,7 @@ import { BinaryExpression } from './BinaryExpression'
  */
 export class IsNullExpression extends BinaryExpression implements IIsNullExpression {
   public readonly classname = IsNullExpression.name
-  public operator: 'IS'
+  public readonly operator: BinaryOperator = 'IS'
   public right: null
 
   /**

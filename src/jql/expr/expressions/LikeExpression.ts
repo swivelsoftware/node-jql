@@ -1,4 +1,4 @@
-import { ILikeExpression, IUnknown } from '../interface'
+import { BinaryOperator, ILikeExpression, IUnknown } from '../interface'
 import { parseExpr } from '../parse'
 import { BinaryExpression } from './BinaryExpression'
 import { Unknown } from './Unknown'
@@ -9,7 +9,7 @@ import { Value } from './Value'
  */
 export class LikeExpression extends BinaryExpression implements ILikeExpression {
   public readonly classname = LikeExpression.name
-  public operator: 'LIKE'
+  public readonly operator: BinaryOperator = 'LIKE'
   public right: Unknown|Value
 
   /**
