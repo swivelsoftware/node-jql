@@ -1,0 +1,21 @@
+{
+  "name": "@node-jql/core",
+  "version": "0.0.1",
+  "description": "MySQL-like RDBMS written in TypeScript",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://kennysng@github.com/kennysng/node-jql.git"
+  },
+  "author": "Kennys Ng <kennysng@hotmail.com.hk>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/kennysng/node-jql/issues"
+  },
+  "files": [
+    "dist"
+  ]
+}
