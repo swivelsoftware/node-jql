@@ -19,5 +19,6 @@ tsconfig.json
 
 # configuration
 package-lock.json
+yarn.lock
 tslint.json
 tsconfig.json
