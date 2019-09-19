@@ -1,7 +1,7 @@
 {
-  "name": "@node-jql/core",
+  "name": "@node-jql/server",
   "version": "0.0.1",
-  "description": "The core of a MySQL-like RDBMS written in TypeScript",
+  "description": "The server component of node-jql based on WebSocket",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {

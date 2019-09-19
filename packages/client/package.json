@@ -1,7 +1,7 @@
 {
-  "name": "@node-jql/core",
+  "name": "@node-jql/memory",
   "version": "0.0.1",
-  "description": "The core of a MySQL-like RDBMS written in TypeScript",
+  "description": "The API for connecting node-jql server",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
