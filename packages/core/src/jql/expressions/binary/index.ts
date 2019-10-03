@@ -5,45 +5,79 @@ import { parse, register } from '../parse'
 import { Unknown } from '../unknown'
 import { BinaryOperator, IBinaryExpression } from './index.if'
 
+const SIMPLE_OPERATOR: BinaryOperator[] = ['=', '<>', '<', '<=', '>', '>=']
+
 /**
- * {left} {operator} {right}
+ * {left} {$not} {operator} {right}
  */
 export class BinaryExpression extends ConditionalExpression implements IBinaryExpression {
   // @override
-  public readonly classname: string = BinaryExpression.name
+  public readonly classname = BinaryExpression.name
 
   // @override
-  public left: Expression
+  public left: Expression = new Unknown()
 
   // @override
-  public operator: BinaryOperator
+  public operator: BinaryOperator = '='
 
   // @override
-  public right: Expression
+  public $not = false
 
-  constructor(json: IBinaryExpression)
-  constructor(left: Expression, operator: BinaryOperator, right: Expression)
-  constructor(...args: any[]) {
+  // @override
+  public right: Expression = new Unknown()
+
+  constructor(json?: IBinaryExpression) {
     super()
 
     // parse
-    let left: IExpression, operator: BinaryOperator, right: IExpression
-    if (args.length === 1) {
-      const json = args[0] as IBinaryExpression
-      left = json.left
-      operator = json.operator
-      right = json.right || new Unknown(['any'])
+    if (json) {
+      this
+        .setLeft(json.left)
+        .setOperator(json.operator)
+        .setNot(json.$not)
+        .setRight(json.right)
     }
-    else {
-      left = args[0] as Expression
-      operator = args[1] as BinaryOperator
-      right = args[2] as Expression
-    }
+  }
 
-    // set
-    this.left = parse(left)
-    this.operator = operator
-    this.right = parse(right)
+  /**
+   * set LEFT expression
+   * @param expr [IExpression]
+   */
+  public setLeft(expr?: IExpression): BinaryExpression {
+    this.left = expr ? parse(expr) : new Unknown()
+    return this
+  }
+
+  /**
+   * set binary operator
+   * @param operator [BinaryOperator]
+   */
+  public setOperator(operator: BinaryOperator): BinaryExpression {
+    if (SIMPLE_OPERATOR.indexOf(this.operator = operator) > -1) {
+      this.$not = false
+    }
+    return this
+  }
+
+  /**
+   * set NOT flag
+   * @param expr [IExpression]
+   */
+  public setNot(flag = false): BinaryExpression {
+    if (this.$not = flag && SIMPLE_OPERATOR.indexOf(this.operator) > -1) {
+      this.$not = false
+      throw new SyntaxError(`NOT flag cannot be applied to operator ${this.operator}`)
+    }
+    return this
+  }
+
+  /**
+   * set RIGHT expression
+   * @param expr [IExpression]
+   */
+  public setRight(expr?: IExpression): BinaryExpression {
+    this.right = expr ? parse(expr) : new Unknown()
+    return this
   }
 
   // @override
@@ -51,6 +85,7 @@ export class BinaryExpression extends ConditionalExpression implements IBinaryEx
     return {
       classname: this.classname,
       left: this.left.toJson(),
+      $not: this.$not,
       operator: this.operator,
       right: this.right.toJson(),
     }
@@ -58,11 +93,20 @@ export class BinaryExpression extends ConditionalExpression implements IBinaryEx
 
   // @override
   public toString(): string {
-    return format('{0} {1} {2}',
-      this.left.toString(),
-      this.operator,
-      this.right.toString(),
-    )
+    if (SIMPLE_OPERATOR.indexOf(this.operator) > -1) {
+      return format('{0} {1} {2}',
+        this.left.toString(),
+        this.operator,
+        this.right.toString(),
+      )
+    }
+    else {
+      return format(this.$not ? '{0} NOT {1} {2}' : '{0} {1} {2}',
+        this.left.toString(),
+        this.operator,
+        this.right.toString(),
+      )
+    }
   }
 }
 

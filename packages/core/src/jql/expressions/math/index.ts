@@ -1,7 +1,9 @@
+import format from 'string-format'
 import { Expression } from '..'
 import { Type } from '../../index.if'
 import { IExpression } from '../index.if'
 import { parse, register } from '../parse'
+import { Unknown } from '../unknown'
 import { IMathExpression, MathOperator } from './index.if'
 
 /**
@@ -9,43 +11,56 @@ import { IMathExpression, MathOperator } from './index.if'
  */
 export class MathExpression extends Expression implements IMathExpression {
   // @override
-  public readonly classname: string = MathExpression.name
+  public readonly classname = MathExpression.name
 
   // @override
   public readonly returnType: Type = 'number'
 
   // @override
-  public left: Expression
+  public left: Expression = new Unknown()
 
   // @override
-  public operator: MathOperator
+  public operator: MathOperator = '+'
 
   // @override
-  public right: Expression
+  public right: Expression = new Unknown()
 
-  constructor(json: IMathExpression)
-  constructor(left: Expression, operator: MathOperator, right: Expression)
-  constructor(...args: any[]) {
+  constructor(json?: IMathExpression) {
     super()
 
-    // parse
-    let left: IExpression, operator: MathOperator, right: IExpression
-    if (args.length === 1) {
-      const json = args[0] as IMathExpression
-      left = json.left
-      operator = json.operator
-      right = json.right
+    if (json) {
+      this
+        .setLeft(json.left)
+        .setOperator(json.operator)
+        .setRight(json.right)
     }
-    else {
-      left = args[0] as Expression
-      operator = args[1] as MathOperator
-      right = args[2] as Expression
-    }
+  }
 
-    // set
-    this.left = parse(left)
+  /**
+   * set LEFT expression
+   * @param expr [IExpression]
+   */
+  public setLeft(expr?: IExpression): MathExpression {
+    this.left = expr ? parse(expr) : new Unknown()
+    return this
+  }
+
+  /**
+   * set binary operator
+   * @param operator [MathOperator]
+   */
+  public setOperator(operator: MathOperator): MathExpression {
     this.operator = operator
-    this.right = parse(right)
+    return this
+  }
+
+  /**
+   * set RIGHT expression
+   * @param expr [IExpression]
+   */
+  public setRight(expr?: IExpression): MathExpression {
+    this.right = expr ? parse(expr) : new Unknown()
+    return this
   }
 
   // @override
@@ -56,6 +71,15 @@ export class MathExpression extends Expression implements IMathExpression {
       operator: this.operator,
       right: this.right.toJson(),
     }
+  }
+
+  // @override
+  public toString(): string {
+    return format('{0} {1} {2}',
+      this.left.toString(),
+      this.operator,
+      this.right.toString(),
+    )
   }
 }
 

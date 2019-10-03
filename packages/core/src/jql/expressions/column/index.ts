@@ -7,7 +7,7 @@ import { IColumnExpression } from './index.if'
  */
 export class ColumnExpression extends Expression implements IColumnExpression {
   // @override
-  public readonly classname: string = ColumnExpression.name
+  public readonly classname = ColumnExpression.name
 
   // @override
   public table?: string
@@ -15,34 +15,45 @@ export class ColumnExpression extends Expression implements IColumnExpression {
   // @override
   public name: string
 
-  constructor(json: IColumnExpression)
-  constructor(name: string)
-  constructor(table: string, name: string)
-  constructor(...args: any[]) {
+  constructor(json?: IColumnExpression) {
     super()
 
-    // parse
-    let table: string|undefined, name: string
-    if (args.length === 1 && typeof args[0] === 'object') {
-      const json = args[0] as IColumnExpression
-      table = json.table
-      name = json.name
+    if (json) {
+      if (json.table) {
+        this.setColumn(json.table, json.name)
+      }
+      else {
+        this.setColumn(json.name)
+      }
     }
-    else if (args.length === 2) {
-      table = args[0] as string
-      name = args[1] as string
+  }
+
+  /**
+   * set column
+   * @param name [string]
+   */
+  public setColumn(name: string): ColumnExpression
+  /**
+   * set column
+   * @param table [string]
+   * @param name [string]
+   */
+  public setColumn(table: string, name: string): ColumnExpression
+  public setColumn(...args: any[]): ColumnExpression {
+    if (args.length === 1) {
+      this.table = undefined
+      this.name = args[0] as string
     }
     else {
-      name = args[0] as string
+      this.table = args[0] as string
+      this.name = args[1] as string
     }
-
-    // set
-    this.table = table
-    this.name = name
+    return this
   }
 
   // @override
   public toJson(): IColumnExpression {
+    this.check()
     return {
       classname: this.classname,
       table: this.table,
@@ -52,10 +63,16 @@ export class ColumnExpression extends Expression implements IColumnExpression {
 
   // @override
   public toString(): string {
+    this.check()
     let result = ''
     if (this.table) result += `\`${this.table}\`.`
     result += `\`${this.name}\``
     return result
+  }
+
+  // @override
+  protected check(): void {
+    if (!this.name) throw new Error('Column name is not defined')
   }
 }
 

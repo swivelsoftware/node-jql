@@ -38,16 +38,23 @@ export function check(type: Type, value: any) {
  * Base JQL class
  */
 export abstract class JQL implements IJQL {
-  // @override
-  public abstract classname: string
 
   // @override
   get [Symbol.toStringTag](): string {
     return this.classname
   }
+  // @override
+  public abstract classname: string
 
   /**
    * Convert to raw JQL, i.e. JSON
    */
   public abstract toJson(): IJQL
+
+  /**
+   * check if valid
+   */
+  protected check(): void {
+    // do nothing
+  }
 }

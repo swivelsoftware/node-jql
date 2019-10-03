@@ -9,38 +9,50 @@ import { ICaseExpression } from './index.if'
  */
 export class CaseExpression extends Expression implements ICaseExpression {
   // @override
-  public readonly classname: string = CaseExpression.name
+  public readonly classname = CaseExpression.name
 
   // @override
-  public readonly cases: Array<{ $when: ConditionalExpression, $then: Expression }>
+  public cases: Array<{ $when: ConditionalExpression, $then: Expression }> = []
 
   // @override
-  public readonly $else?: Expression
+  public $else?: Expression
 
-  constructor(json: ICaseExpression)
-  constructor(cases: Array<{ $when: ConditionalExpression, $then: Expression }>, $else?: Expression)
-  constructor(...args: any[]) {
+  constructor(json?: ICaseExpression) {
     super()
 
-    // parse
-    let cases: Array<{ $when: IConditionalExpression, $then: IExpression }>, $else: IExpression|undefined
-    if (args.length === 1 && !Array.isArray(args[0])) {
-      const json = args[0] as ICaseExpression
-      cases = json.cases
-      $else = json.$else
+    if (json) {
+      for (const { $when, $then } of json.cases) {
+        this.addCase($when, $then)
+      }
+      if (json.$else) this.setElse(json.$else)
     }
-    else {
-      cases = args[0] as Array<{ $when: IConditionalExpression, $then: IExpression }>
-      $else = args[1] as IExpression|undefined
-    }
+  }
 
-    // set
-    this.cases = cases.map(({ $when, $then }) => ({ $when: parse($when), $then: parse($then) }))
-    if ($else) this.$else = parse($else)
+  /**
+   * add case statement
+   * @param when [IConditionalExpression]
+   * @param then [IExpression]
+   */
+  public addCase(when: IConditionalExpression, then: IExpression): CaseExpression {
+    this.cases.push({
+      $when: parse(when),
+      $then: parse(then),
+    })
+    return this
+  }
+
+  /**
+   * set ELSE expression
+   * @param $else [IExpression]
+   */
+  public setElse($else: IExpression): CaseExpression {
+    this.$else = parse($else)
+    return this
   }
 
   // @override
   public toJson(): ICaseExpression {
+    this.check()
     return {
       classname: this.classname,
       cases: this.cases.map(({ $when, $then }) => ({ $when: $when.toJson(), $then: $then.toJson() })),
@@ -50,10 +62,15 @@ export class CaseExpression extends Expression implements ICaseExpression {
 
   // @override
   public toString(): string {
+    this.check()
     return format('CASE {0} ELSE {1}',
       this.cases.map(({ $when, $then }) => format('WHEN {0} THEN {1}', $when.toString(), $then.toString())).join(' '),
       this.$else ? this.$else.toString() : 'NULL',
     )
+  }
+
+  protected check(): void {
+    if (!this.cases.length) throw new Error('No cases is defined')
   }
 }
 

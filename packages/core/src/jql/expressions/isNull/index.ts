@@ -1,6 +1,7 @@
 import { Expression } from '..'
 import { BinaryExpression } from '../binary'
 import { BinaryOperator, IBinaryExpression } from '../binary/index.if'
+import { IExpression } from '../index.if'
 import { register } from '../parse'
 import { Value } from '../value'
 
@@ -9,15 +10,23 @@ import { Value } from '../value'
  */
 export class IsNullExpression extends BinaryExpression implements IBinaryExpression {
   // @override
-  public readonly classname: string = IsNullExpression.name
+  public readonly classname = IsNullExpression.name
 
   // @override
   public readonly operator: BinaryOperator = 'IS'
 
-  constructor(json: IBinaryExpression)
-  constructor(left: Expression, right: Expression)
-  constructor(...args: any[]) {
-    super(args.length === 1 ? args[0] : { left: args[0] as Expression, operator: 'IS', right: new Value(null) })
+  constructor(json?: IBinaryExpression) {
+    super(json ? { ...json, operator: 'IS', right: new Value(null) } : undefined)
+  }
+
+  // @override
+  public setOperator(operator: BinaryOperator): IsNullExpression {
+    throw new Error('Operator of IsNullExpression cannot be changed')
+  }
+
+  // @override
+  public setRight(expr: IExpression): IsNullExpression {
+    throw new Error('Right expression of IsNullExpression cannot be changed')
   }
 }
 

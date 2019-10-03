@@ -8,15 +8,18 @@ import { register } from '../parse'
  */
 export class LikeExpression extends BinaryExpression implements IBinaryExpression {
   // @override
-  public readonly classname: string = LikeExpression.name
+  public readonly classname = LikeExpression.name
 
   // @override
   public readonly operator: BinaryOperator = 'LIKE'
 
-  constructor(json: IBinaryExpression)
-  constructor(left: Expression, right: Expression)
-  constructor(...args: any[]) {
-    super(args.length === 1 ? args[0] : { left: args[0] as Expression, operator: 'LIKE', right: args[1] as Expression })
+  constructor(json?: IBinaryExpression) {
+    super(json ? { ...json, operator: 'LIKE' } : undefined)
+  }
+
+  // @override
+  public setOperator(operator: BinaryOperator): LikeExpression {
+    throw new Error('Operator of LikeExpression cannot be changed')
   }
 }
 

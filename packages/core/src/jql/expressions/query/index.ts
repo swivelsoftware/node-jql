@@ -9,24 +9,21 @@ import { IQueryExpression } from './index.if'
  */
 export class QueryExpression extends Expression implements IQueryExpression {
   // @override
-  public readonly classname: string = QueryExpression.name
+  public readonly classname = QueryExpression.name
 
   // @override
   public query: Query
 
-  constructor(json: IQueryExpression)
-  constructor(query: Query)
-  constructor(...args: any[]) {
+  constructor(json: IQueryExpression|Query) {
     super()
 
     // parse
     let query: IQuery
-    if ('classname' in args[0] && args[0].classname === 'QueryExpression') {
-      const json = args[0] as IQueryExpression
-      query = json.query
+    if ('classname' in json && json.classname === 'QueryExpression') {
+      query = (json as IQueryExpression).query
     }
     else {
-      query = args[0] as Query
+      query = json as Query
     }
 
     // set
@@ -39,6 +36,11 @@ export class QueryExpression extends Expression implements IQueryExpression {
       classname: this.classname,
       query: this.query.toJson(),
     }
+  }
+
+  // @override
+  public toString(): string {
+    return `(${this.query.toString()})`
   }
 }
 

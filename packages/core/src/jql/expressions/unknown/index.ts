@@ -12,35 +12,33 @@ import { IUnknown } from './index.if'
  */
 export class Unknown extends Expression implements IUnknown {
   // @override
-  public readonly classname: string = Unknown.name
+  public readonly classname = Unknown.name
 
   // @override
-  public type: Type[]
+  public type: Type = 'any'
 
   // assigned value
   private value_: any
 
-  constructor(json: IUnknown)
-  constructor(type: Type[])
-  constructor(...args: any[]) {
+  constructor(json?: IUnknown)  {
     super()
 
-    // parse
-    let type: Type[]
-    if (!Array.isArray(args[0])) {
-      const json = args[0] as IUnknown
-      type = json.type
+    if (json) {
+      this.setType(json.type)
     }
-    else {
-      type = args[0] as Type[]
-    }
+  }
 
-    // set
+  /**
+   * set unknown type
+   * @param type [Type]
+   */
+  public setType(type: Type = 'any'): Unknown {
     this.type = type
+    return this
   }
 
   set value(value: any) {
-    if (!this.check(value)) throw new SyntaxError(`Unmatched type '${typeOf(value)}'. Expect ${this.type.map(t => `'${t}'`).join(', ')}`)
+    if (!check(this.type, value)) throw new SyntaxError(`Unmatched type '${typeOf(value)}'. Expect '${this.type}'`)
     this.value_ = value
   }
 
@@ -48,22 +46,25 @@ export class Unknown extends Expression implements IUnknown {
     return this.value_
   }
 
+  /**
+   * convert to Value expression
+   */
+  public toValue(): Value {
+    return new Value(this.value_)
+  }
+
   // @override
   public toJson(): IUnknown|IValue {
     return checkNull(this.value_)
       ? { classname: this.classname, type: this.type } as IUnknown
-      : new Value(this.value_).toJson()
+      : this.toValue().toJson()
   }
 
   // @override
   public toString(): string {
     return checkNull(this.value_)
       ? '?'
-      : new Value(this.value_).toString()
-  }
-
-  private check(value: any): boolean {
-    return this.type.reduce((result, t) => result || check(t, value), false)
+      : this.toValue().toString()
   }
 }
 

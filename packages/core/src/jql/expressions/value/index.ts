@@ -28,24 +28,21 @@ export function typeOf(value: any): Type {
  */
 export class Value extends Expression implements IValue {
   // @override
-  public readonly classname: string = Value.name
+  public readonly classname = Value.name
 
   // @override
   public value: any
 
-  constructor(json: IValue)
-  constructor(value: any)
-  constructor(...args: any[]) {
+  constructor(json: IValue | any) {
     super()
 
     // parse
     let value: any
-    if ('classname' in args[0]) {
-      const json = args[0] as IValue
-      value = json.value
+    if ('classname' in json) {
+      value = (json as IValue).value
     }
     else {
-      value = args[0] as any
+      value = json as any
     }
 
     // set

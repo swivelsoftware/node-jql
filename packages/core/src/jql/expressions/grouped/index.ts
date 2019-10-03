@@ -1,5 +1,5 @@
 import { ConditionalExpression } from '..'
-import { IConditionalExpression } from '../index.if'
+import { IConditionalExpression, IExpression } from '../index.if'
 import { parse, register } from '../parse'
 import { IGroupedExpressions } from './index.if'
 
@@ -10,31 +10,38 @@ abstract class GroupedExpressions extends ConditionalExpression implements IGrou
   // @override
   public expressions: ConditionalExpression[] = []
 
-  constructor(json: IGroupedExpressions)
-  constructor(expressions: ConditionalExpression[])
-  constructor(...args: any[]) {
+  constructor(json?: IGroupedExpressions) {
     super()
 
     // parse
-    let expressions: IConditionalExpression[]
-    if (!Array.isArray(args[0])) {
-      const json = args[0] as IGroupedExpressions
-      expressions = json.expressions
+    if (json) {
+      for (const expr of json.expressions) {
+        this.addExpression(expr)
+      }
     }
-    else {
-      expressions = args[0] as ConditionalExpression[]
-    }
+  }
 
-    // set
-    this.expressions = expressions.map(e => parse(e))
+  /**
+   * add expression
+   * @param expr [IConditionalExpression]
+   */
+  public addExpression(expr: IConditionalExpression): GroupedExpressions {
+    this.expressions.push(parse(expr))
+    return this
   }
 
   // @override
   public toJson(): IGroupedExpressions {
+    this.check()
     return {
       classname: this.classname,
       expressions: this.expressions.map(e => e.toJson()),
     }
+  }
+
+  // @override
+  protected check(): void {
+    if (!this.expressions.length) throw new Error('No expressions is defined')
   }
 }
 
@@ -43,10 +50,11 @@ abstract class GroupedExpressions extends ConditionalExpression implements IGrou
  */
 export class AndExpressions extends GroupedExpressions implements IGroupedExpressions {
   // @override
-  public readonly classname: string = AndExpressions.name
+  public readonly classname = AndExpressions.name
 
   // @override
   public toString(): string {
+    this.check()
     let result = this.expressions.map(e => e.toString()).join(' AND ')
     if (this.expressions.length > 1) result = `(${result})`
     return result
@@ -58,10 +66,11 @@ export class AndExpressions extends GroupedExpressions implements IGroupedExpres
  */
 export class OrExpressions extends GroupedExpressions implements IGroupedExpressions {
   // @override
-  public readonly classname: string = OrExpressions.name
+  public readonly classname = OrExpressions.name
 
   // @override
   public toString(): string {
+    this.check()
     let result = this.expressions.map(e => e.toString()).join(' OR ')
     if (this.expressions.length > 1) result = `(${result})`
     return result

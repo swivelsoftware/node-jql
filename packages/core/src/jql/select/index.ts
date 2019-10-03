@@ -1,22 +1,43 @@
 import { JQL } from '..'
+import { ColumnExpression } from '../expressions/column'
+import { QueryExpression } from '../expressions/query'
 import { IQuery } from './index.if'
+import { ResultColumn } from './resultColumn'
 
 /**
  * SELECT ... FROM ...
  */
 export class Query extends JQL implements IQuery {
   // @override
-  public readonly classname: string = Query.name
+  public readonly classname = Query.name
 
-  constructor(json: IQuery)
-  constructor(...args: any[]) {
+  // @override
+  public $select: ResultColumn[] = [
+    new ResultColumn().setExpression(new ColumnExpression().setColumn('*')),
+  ]
+
+  constructor(json?: IQuery) {
     super()
 
-    // TODO
+    if (json) {
+      // TODO
+    }
   }
 
   // @override
   public toJson(): IQuery {
     // TODO
+  }
+
+  // @override
+  public toString(): string {
+    // TODO
+  }
+
+  /**
+   * convert to Expression
+   */
+  public toExpression(): QueryExpression {
+    return new QueryExpression(this)
   }
 }

@@ -8,15 +8,18 @@ import { register } from '../parse'
  */
 export class InExpression extends BinaryExpression implements IBinaryExpression {
   // @override
-  public readonly classname: string = InExpression.name
+  public readonly classname = InExpression.name
 
   // @override
   public readonly operator: BinaryOperator = 'IN'
 
-  constructor(json: IBinaryExpression)
-  constructor(left: Expression, right: Expression)
-  constructor(...args: any[]) {
-    super(args.length === 1 ? args[0] : { left: args[0] as Expression, operator: 'IN', right: args[1] as Expression })
+  constructor(json?: IBinaryExpression) {
+    super(json ? { ...json, operator: 'IN' } : undefined)
+  }
+
+  // @override
+  public setOperator(operator: BinaryOperator): BinaryExpression {
+    throw new Error('Operator of InExpression cannot be changed')
   }
 }
 

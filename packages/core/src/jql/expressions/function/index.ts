@@ -1,6 +1,9 @@
+import format from 'string-format'
 import { Expression } from '..'
+import { checkNull } from '../../../utils'
 import { IExpression } from '../index.if'
-import { register } from '../parse'
+import { parse, register } from '../parse'
+import { formats } from './formats'
 import { IFunctionExpression } from './index.if'
 
 /**
@@ -8,43 +11,77 @@ import { IFunctionExpression } from './index.if'
  */
 export class FunctionExpression extends Expression implements IFunctionExpression {
   // @override
-  public readonly classname: string = FunctionExpression.name
+  public readonly classname = FunctionExpression.name
 
   // @override
   public name: string
 
   // @override
-  public parameters: Expression[]
+  public parameters: Expression[] = []
 
-  constructor(json: IFunctionExpression)
-  constructor(name: string, ...parameters: Expression[])
-  constructor(...args: any[]) {
+  constructor(json?: IFunctionExpression) {
     super()
 
-    // parse
-    let name: string, parameters: IExpression[]
-    if (args.length === 1 && typeof args[0] === 'object') {
-      const json = args[0] as IFunctionExpression
-      name = json.name
-      parameters = json.parameters || []
+    if (json) {
+      this.setFunction(json.name)
+      if (json.parameters) {
+        for (const param of json.parameters) this.addParameter(param)
+      }
     }
-    else {
-      name = args[0] as string
-      parameters = args.slice(1) as Expression[]
-    }
+  }
 
-    // set
+  /**
+   * set function
+   * @param name [string]
+   */
+  public setFunction(name: string): FunctionExpression {
     this.name = name
-    this.parameters = this.parameters
+    return this
+  }
+
+  /**
+   * add parameter
+   * @param expr [IExpression]
+   */
+  public addParameter(expr: IExpression): FunctionExpression {
+    this.parameters.push(parse(expr))
+    return this
   }
 
   // @override
   public toJson(): IFunctionExpression {
+    this.check()
     return {
       classname: this.classname,
       name: this.name,
       parameters: this.parameters.map(e => e.toJson()),
     }
+  }
+
+  // @override
+  public toString(): string {
+    this.check()
+    const format_ = this.find()
+    const parameters_ = this.parameters.map(e => e.toString())
+    if (checkNull(format_)) {
+      return `${this.name.toLocaleUpperCase()}(${parameters_.join(', ')})`
+    }
+    else {
+      return format(format_, ...parameters_)
+    }
+  }
+
+  // @override
+  protected check(): void {
+    if (!this.name) throw new Error('Function name is not defined')
+  }
+
+  private find(): string|null {
+    const name = this.name.toLocaleLowerCase()
+    for (const key of Object.keys(formats)) {
+      if (key.toLocaleLowerCase() === name) return formats[key]
+    }
+    return null
   }
 }
 
