@@ -1,12 +1,14 @@
-import { type } from '../../../type'
+import squel = require('squel')
+import { Expression } from '..'
+import { type, Type } from '../../../type'
 import { IValue } from '../interface'
-import { Unknown } from './Unknown'
 
 /**
  * JQL class for constants
  */
-export class Value extends Unknown implements IValue {
+export class Value extends Expression implements IValue {
   public readonly classname = Value.name
+  public type: Type[] = ['any']
   public value: any
 
   /**
@@ -20,7 +22,7 @@ export class Value extends Unknown implements IValue {
   constructor(value: any)
 
   constructor(...args: any[]) {
-    super(...args)
+    super()
 
     // parse args
     let value: any
@@ -36,6 +38,14 @@ export class Value extends Unknown implements IValue {
     const type_ = typeof value
     if (type_ === 'bigint' || type_ === 'function') throw new TypeError(`Invalid type ${type_} for node-jql`)
     this.type = [type(this.value = value)]
+  }
+
+  // @override
+  public validate(): void { /* do nothing */ }
+
+  // @override
+  public toSquel(): squel.FunctionBlock {
+    return squel.rstr('?', this.value)
   }
 
   // @override

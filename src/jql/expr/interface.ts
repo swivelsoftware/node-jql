@@ -242,6 +242,11 @@ export interface IUnknown extends IExpression {
  */
 export interface IValue extends IUnknown {
   /**
+   * Available type for the unknown
+   */
+  type?: Type[]|Type
+
+  /**
    * Value assigned
    */
   value: any
