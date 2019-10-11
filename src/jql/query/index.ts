@@ -196,6 +196,7 @@ export class Query extends JQL implements IQuery {
   // @override
   public toSquel(): squel.Select {
     let builder = squel.select()
+    if (this.$distinct) builder.distinct()
     if (this.$from) for (const table of this.$from) builder = table.apply(builder)
     if (!this.isSimpleWildcard) for (const { expression, $as } of this.$select) builder = builder.field(expression.toSquel(), $as)
     if (this.$where) builder = builder.where(this.$where.toSquel(false) as squel.Expression)
