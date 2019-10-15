@@ -49,7 +49,7 @@ export class BetweenExpression extends ConditionalExpression implements IBetween
    * set NOT flag
    * @param expr [IExpression]
    */
-  public setNot(flag = false): BetweenExpression {
+  public setNot(flag = true): BetweenExpression {
     this.$not = flag
     return this
   }

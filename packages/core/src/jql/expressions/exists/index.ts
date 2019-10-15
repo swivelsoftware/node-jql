@@ -64,7 +64,7 @@ export class ExistsExpression extends ConditionalExpression implements IExistsEx
 
   // @override
   protected check(): void {
-    if (!this.query) throw new Error('Query is not defined')
+    if (!this.query) throw new SyntaxError('Query is not defined')
   }
 }
 

@@ -63,8 +63,8 @@ export class BinaryExpression extends ConditionalExpression implements IBinaryEx
    * set NOT flag
    * @param expr [IExpression]
    */
-  public setNot(flag = false): BinaryExpression {
-    if (this.$not = flag && SIMPLE_OPERATOR.indexOf(this.operator) > -1) {
+  public setNot(flag = true): BinaryExpression {
+    if ((this.$not = flag) && SIMPLE_OPERATOR.indexOf(this.operator) > -1) {
       this.$not = false
       throw new SyntaxError(`NOT flag cannot be applied to operator ${this.operator}`)
     }
@@ -101,7 +101,7 @@ export class BinaryExpression extends ConditionalExpression implements IBinaryEx
       )
     }
     else {
-      return format(this.$not ? '{0} NOT {1} {2}' : '{0} {1} {2}',
+      return format(this.$not ? this.operator === 'IS' ? '{0} {1} NOT {2}' : '{0} NOT {1} {2}' : '{0} {1} {2}',
         this.left.toString(),
         this.operator,
         this.right.toString(),

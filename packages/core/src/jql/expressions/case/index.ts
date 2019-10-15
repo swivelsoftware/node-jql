@@ -70,7 +70,7 @@ export class CaseExpression extends Expression implements ICaseExpression {
   }
 
   protected check(): void {
-    if (!this.cases.length) throw new Error('No cases is defined')
+    if (!this.cases.length) throw new SyntaxError('No cases is defined')
   }
 }
 

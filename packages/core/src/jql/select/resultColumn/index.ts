@@ -47,7 +47,7 @@ export class ResultColumn extends JQL implements IResultColumn {
 
   // @override
   public toJson(): IResultColumn {
-    if (!this.expression) throw new Error('Column expression is undefined')
+    if (!this.expression) throw new SyntaxError('Column expression is undefined')
     return {
       classname: this.classname,
       expression: this.expression.toJson(),

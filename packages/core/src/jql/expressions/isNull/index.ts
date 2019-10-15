@@ -17,16 +17,17 @@ export class IsNullExpression extends BinaryExpression implements IBinaryExpress
 
   constructor(json?: IBinaryExpression) {
     super(json ? { ...json, operator: 'IS', right: new Value(null) } : undefined)
+    if (!json) super.setRight(new Value(null))
   }
 
   // @override
   public setOperator(operator: BinaryOperator): IsNullExpression {
-    throw new Error('Operator of IsNullExpression cannot be changed')
+    throw new SyntaxError('Operator of IsNullExpression cannot be changed')
   }
 
   // @override
   public setRight(expr: IExpression): IsNullExpression {
-    throw new Error('Right expression of IsNullExpression cannot be changed')
+    throw new SyntaxError('Right expression of IsNullExpression cannot be changed')
   }
 }
 

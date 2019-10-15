@@ -19,7 +19,7 @@ export class LikeExpression extends BinaryExpression implements IBinaryExpressio
 
   // @override
   public setOperator(operator: BinaryOperator): LikeExpression {
-    throw new Error('Operator of LikeExpression cannot be changed')
+    throw new SyntaxError('Operator of LikeExpression cannot be changed')
   }
 }
 

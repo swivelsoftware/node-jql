@@ -5,4 +5,5 @@ import { IExpression } from '../index.if'
  */
 export interface IValue extends IExpression {
   value: any
+  raw?: boolean
 }

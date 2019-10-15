@@ -72,7 +72,7 @@ export class ColumnExpression extends Expression implements IColumnExpression {
 
   // @override
   protected check(): void {
-    if (!this.name) throw new Error('Column name is not defined')
+    if (!this.name) throw new SyntaxError('Column name is not defined')
   }
 }
 

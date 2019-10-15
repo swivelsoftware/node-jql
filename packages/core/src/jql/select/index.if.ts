@@ -1,4 +1,5 @@
 import { IJQL } from '../index.if'
+import { IFromTable } from './fromTable/index.if'
 import { IResultColumn } from './resultColumn/index.if'
 
 /**
@@ -6,5 +7,6 @@ import { IResultColumn } from './resultColumn/index.if'
  */
 export interface IQuery extends IJQL {
   $select?: IResultColumn[]
+  $from?: IFromTable[]
   // TODO
 }

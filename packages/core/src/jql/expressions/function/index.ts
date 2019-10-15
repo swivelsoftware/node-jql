@@ -67,13 +67,13 @@ export class FunctionExpression extends Expression implements IFunctionExpressio
       return `${this.name.toLocaleUpperCase()}(${parameters_.join(', ')})`
     }
     else {
-      return format(format_, ...parameters_)
+      return `${this.name.toLocaleUpperCase()}(${format(format_ as string, ...parameters_)})`
     }
   }
 
   // @override
   protected check(): void {
-    if (!this.name) throw new Error('Function name is not defined')
+    if (!this.name) throw new SyntaxError('Function name is not defined')
   }
 
   private find(): string|null {

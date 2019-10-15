@@ -1,4 +1,5 @@
 import { Expression } from '..'
+import { checkNull } from '../../../utils'
 import { Type } from '../../index.if'
 import { register } from '../parse'
 import { IValue } from './index.if'
@@ -14,12 +15,13 @@ export function typeOf(value: any): Type {
     case 'number':
     case 'string':
       return type
-    case 'undefined':
-      return 'any'
     case 'object':
       if (value === null) return 'any'
       if (value instanceof Date) return 'datetime'
       return 'object'
+    case 'undefined':
+    default:
+      return 'any'
   }
 }
 
@@ -33,13 +35,17 @@ export class Value extends Expression implements IValue {
   // @override
   public value: any
 
+  // @override
+  public raw = false
+
   constructor(json: IValue | any) {
     super()
 
     // parse
-    let value: any
-    if ('classname' in json) {
+    let value: any, raw = false
+    if (typeof json === 'object' && !checkNull(json) && 'classname' in json) {
       value = (json as IValue).value
+      raw = (json as IValue).raw || false
     }
     else {
       value = json as any
@@ -47,10 +53,21 @@ export class Value extends Expression implements IValue {
 
     // set
     this.value = value
+
+    if (raw) this.setRaw(raw)
   }
 
   get type(): Type {
     return typeOf(this.value)
+  }
+
+  /**
+   * Set if the value is JQL raw string
+   * @param flag [boolean]
+   */
+  public setRaw(flag = true): Value {
+    this.raw = flag
+    return this
   }
 
   // @override
@@ -58,13 +75,15 @@ export class Value extends Expression implements IValue {
     return {
       classname: this.classname,
       value: this.value,
+      raw: this.raw,
     }
   }
 
   // @override
   public toString(): string {
+    if (checkNull(this.value)) return 'NULL'
     if (Array.isArray(this.value)) return this.value.length === 0 ? 'NULL' : `(${this.value.map(v => JSON.stringify(v)).join(', ')})`
-    return JSON.stringify(this.value)
+    return this.raw ? String(this.value) : JSON.stringify(this.value)
   }
 }
 

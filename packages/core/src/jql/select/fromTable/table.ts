@@ -4,6 +4,7 @@ import { ColumnDef } from '../../create/column'
 import { IColumnDef } from '../../create/index.if'
 import { IQuery } from '../index.if'
 import { IDatabaseTable, IRemoteTable, ISelectTable, ITable } from './index.if'
+import { register } from './parse'
 
 /**
  * Table interface
@@ -35,7 +36,7 @@ export class DatabaseTable extends Table implements IDatabaseTable {
 
     if (json) {
       if (json.function) {
-        if (!json.$as) throw new Error('Missing alias name for table')
+        if (!json.$as) throw new SyntaxError('Missing alias name for table')
         this.setFunction(json.function, json.$as)
       }
       if (json.database) {
@@ -114,7 +115,7 @@ export class DatabaseTable extends Table implements IDatabaseTable {
 
   // @override
   protected check(): void {
-    if (this.function && !this.$as) throw new Error('Missing alias name for table')
+    if (this.function && !this.$as) throw new SyntaxError('Missing alias name for table')
   }
 }
 
@@ -135,7 +136,7 @@ export class SelectTable extends Table implements ISelectTable {
     super()
 
     if (json) {
-      if (!json.$as) throw new Error('Alias name is required')
+      if (!json.$as) throw new SyntaxError('Alias name is required')
       this.setQuery(json.query, json.$as)
     }
   }
@@ -169,15 +170,15 @@ export class SelectTable extends Table implements ISelectTable {
 
   // @override
   protected check(): void {
-    if (!this.query) throw new Error('Query is not defined')
-    if (!this.$as) throw new Error('Missing alias name for table')
+    if (!this.query) throw new SyntaxError('Query is not defined')
+    if (!this.$as) throw new SyntaxError('Missing alias name for table')
   }
 }
 
 /**
  * Table from API
  */
-export class RemoteTable<Request = RequestInit> extends Table implements IRemoteTable<Request> {
+export class RemoteTable<RequestConfig> extends Table implements IRemoteTable<RequestConfig> {
   // @override
   public readonly classname = RemoteTable.name
 
@@ -185,16 +186,16 @@ export class RemoteTable<Request = RequestInit> extends Table implements IRemote
   public columns: ColumnDef[]
 
   // @override
-  public requestConfig: Request
+  public requestConfig: RequestConfig
 
   // @override
   public $as: string
 
-  constructor(json?: IRemoteTable<Request>) {
+  constructor(json?: IRemoteTable<RequestConfig>) {
     super()
 
     if (json) {
-      if (!json.$as) throw new Error('Alias name is required')
+      if (!json.$as) throw new SyntaxError('Alias name is required')
       this.setAPI(json.requestConfig, json.columns, json.$as)
     }
   }
@@ -205,7 +206,7 @@ export class RemoteTable<Request = RequestInit> extends Table implements IRemote
    * @param columns [Array<IColumnDef>]
    * @param $as [string]
    */
-  public setAPI(config: Request, columns: IColumnDef[], $as: string): RemoteTable {
+  public setAPI(config: RequestConfig, columns: IColumnDef[], $as: string): RemoteTable<RequestConfig> {
     this.requestConfig = config
     this.columns = columns.map(c => new ColumnDef(c))
     this.$as = $as
@@ -229,7 +230,11 @@ export class RemoteTable<Request = RequestInit> extends Table implements IRemote
 
   // @override
   protected check(): void {
-    if (!this.requestConfig) throw new Error('API configuration is not defined')
-    if (!this.$as) throw new Error('Missing alias name for table')
+    if (!this.requestConfig) throw new SyntaxError('API configuration is not defined')
+    if (!this.$as) throw new SyntaxError('Missing alias name for table')
   }
 }
+
+register(DatabaseTable)
+register(SelectTable)
+register(RemoteTable)

@@ -41,7 +41,7 @@ abstract class GroupedExpressions extends ConditionalExpression implements IGrou
 
   // @override
   protected check(): void {
-    if (!this.expressions.length) throw new Error('No expressions is defined')
+    if (!this.expressions.length) throw new SyntaxError('No expressions is defined')
   }
 }
 

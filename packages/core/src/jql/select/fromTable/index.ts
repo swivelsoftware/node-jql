@@ -1,9 +1,10 @@
 import { JQL } from '../..'
 import { ConditionalExpression } from '../../expressions'
 import { IConditionalExpression } from '../../expressions/index.if'
-import { parse } from '../../expressions/parse'
-import { IDatabaseTable, IFromTable, IJoinClause, IRemoteTable, ISelectTable, ITable, JoinOperator } from './index.if'
-import { DatabaseTable, RemoteTable, SelectTable, Table } from './table'
+import { parse as parseExpr } from '../../expressions/parse'
+import { IFromTable, IJoinClause, ITable, JoinOperator } from './index.if'
+import { parse } from './parse'
+import { Table } from './table'
 
 /**
  * Join clauses for table
@@ -45,20 +46,8 @@ export class JoinClause extends JQL implements IJoinClause {
    * @param $on [IConditionalExpression]
    */
   public setTable(table: ITable, $on: IConditionalExpression): JoinClause {
-    switch (table.classname) {
-      case 'DatabaseTable':
-        this.table = new DatabaseTable(table as IDatabaseTable)
-        break
-      case 'SelectTable':
-        this.table = new SelectTable(table as ISelectTable)
-        break
-      case 'RemoteTable':
-        this.table = new RemoteTable(table as IRemoteTable)
-        break
-      default:
-        throw new SyntaxError(`Unknown table type '${table.classname}'`)
-    }
-    this.$on = parse($on)
+    this.table = parse(table)
+    this.$on = parseExpr($on)
     return this
   }
 
@@ -80,11 +69,14 @@ export class JoinClause extends JQL implements IJoinClause {
   }
 
   protected check(): void {
-    if (!this.table) throw new Error('Table is not defined')
+    if (!this.table) throw new SyntaxError('Table is not defined')
   }
 }
 
-export class FromTable<Table extends ITable = DatabaseTable> extends JQL implements IFromTable {
+/**
+ * Retrieve data from table
+ */
+export class FromTable extends JQL implements IFromTable {
   // @override
   public readonly classname = FromTable.name
 
@@ -93,4 +85,57 @@ export class FromTable<Table extends ITable = DatabaseTable> extends JQL impleme
 
   // @override
   public joinClauses: JoinClause[] = []
+
+  constructor(json?: IFromTable) {
+    super()
+
+    if (json) {
+      this.setTable(json.table)
+      if (json.joinClauses) {
+        for (const joinClause of json.joinClauses) this.addJoinClause(joinClause)
+      }
+    }
+  }
+
+  /**
+   * set table
+   * @param table [ITable]
+   */
+  public setTable(table: ITable): FromTable {
+    this.table = parse(table)
+    return this
+  }
+
+  /**
+   * Add join clause
+   * @param joinClause [IJoinClause]
+   */
+  public addJoinClause(joinClause: IJoinClause): FromTable {
+    this.joinClauses.push(new JoinClause(joinClause))
+    return this
+  }
+
+  // @override
+  public toJson(): IFromTable {
+    this.check()
+    return {
+      classname: this.classname,
+      table: this.table.toJson(),
+      joinClauses: this.joinClauses.map(j => j.toJson()),
+    }
+  }
+
+  // @override
+  public toString(): string {
+    this.check()
+    let result = this.table.toString()
+    if (this.joinClauses.length) {
+      for (const j of this.joinClauses) result += ' ' + j.toString()
+    }
+    return result
+  }
+
+  protected check(): void {
+    if (!this.table) throw new SyntaxError('Table is not defined')
+  }
 }

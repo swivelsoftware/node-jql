@@ -4,7 +4,9 @@
   "description": "The core of a MySQL-like RDBMS written in TypeScript",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "scripts": {},
+  "scripts": {
+    "test": "jest"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://kennysng@github.com/kennysng/node-jql.git"

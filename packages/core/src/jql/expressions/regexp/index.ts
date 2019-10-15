@@ -19,7 +19,7 @@ export class RegexpExpression extends BinaryExpression implements IBinaryExpress
 
   // @override
   public setOperator(operator: BinaryOperator): RegexpExpression {
-    throw new Error('Operator of RegexpExpression cannot be changed')
+    throw new SyntaxError('Operator of RegexpExpression cannot be changed')
   }
 }
 

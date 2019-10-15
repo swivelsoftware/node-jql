@@ -15,11 +15,12 @@ export class InExpression extends BinaryExpression implements IBinaryExpression 
 
   constructor(json?: IBinaryExpression) {
     super(json ? { ...json, operator: 'IN' } : undefined)
+    if (!json) super.setOperator('IN')
   }
 
   // @override
   public setOperator(operator: BinaryOperator): BinaryExpression {
-    throw new Error('Operator of InExpression cannot be changed')
+    throw new SyntaxError('Operator of InExpression cannot be changed')
   }
 }
 
