@@ -10,6 +10,8 @@ import { register } from './parse'
  * Table interface
  */
 export abstract class Table extends JQL implements ITable {
+  // @override
+  public $as?: string
 }
 
 /**
@@ -27,9 +29,6 @@ export class DatabaseTable extends Table implements IDatabaseTable {
 
   // @override
   public table: string
-
-  // @override
-  public $as?: string
 
   constructor(json?: IDatabaseTable) {
     super()
@@ -129,9 +128,6 @@ export class SelectTable extends Table implements ISelectTable {
   // @override
   public query: Query
 
-  // @override
-  public $as: string
-
   constructor(json?: ISelectTable) {
     super()
 
@@ -187,9 +183,6 @@ export class RemoteTable<RequestConfig> extends Table implements IRemoteTable<Re
 
   // @override
   public requestConfig: RequestConfig
-
-  // @override
-  public $as: string
 
   constructor(json?: IRemoteTable<RequestConfig>) {
     super()

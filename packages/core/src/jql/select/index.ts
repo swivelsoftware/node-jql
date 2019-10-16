@@ -1,12 +1,20 @@
 import format from 'string-format'
 import { JQL } from '..'
 import { ConditionalExpression, Expression } from '../expressions'
+import { BetweenExpression } from '../expressions/between'
+import { BinaryExpression } from '../expressions/binary'
+import { CaseExpression } from '../expressions/case'
 import { ColumnExpression } from '../expressions/column'
+import { ExistsExpression } from '../expressions/exists'
+import { FunctionExpression } from '../expressions/function'
+import { AndExpressions, OrExpressions } from '../expressions/grouped'
 import { IConditionalExpression, IExpression } from '../expressions/index.if'
+import { MathExpression } from '../expressions/math'
 import { parse as parseExpr } from '../expressions/parse'
 import { QueryExpression } from '../expressions/query'
 import { FromTable } from './fromTable'
 import { IFromTable } from './fromTable/index.if'
+import { DatabaseTable, RemoteTable, SelectTable, Table } from './fromTable/table'
 import { IQuery } from './index.if'
 import { LimitBy } from './limitBy'
 import { ILimitBy } from './limitBy/index.if'
@@ -202,8 +210,92 @@ export class Query extends JQL implements IQuery {
     return new QueryExpression(this)
   }
 
-  protected check(): void {
+  /**
+   * validate the query
+   */
+  public check(tables: string[] = []): void {
     if (!this.$select.length && !this.$from.length) throw new SyntaxError('Missing data source. Please specify either SELECT or FROM')
     if (this.$having && !this.$group.length) throw new SyntaxError('Invalid use of HAVING without GROUP BY')
+
+    for (const { table, joinClauses } of this.$from) {
+      this.registerTable(tables, table)
+
+      for (const { table, $on } of joinClauses) {
+        this.registerTable(tables, table)
+        this.checkExpr(tables, $on)
+      }
+    }
+
+    for (const { expression } of this.$select) {
+      this.checkExpr(tables, expression)
+    }
+
+    for (const expr of this.$group) {
+      this.checkExpr(tables, expr)
+    }
+
+    if (this.$having) {
+      this.checkExpr(tables, this.$having)
+    }
+
+    if (this.$where) {
+      this.checkExpr(tables, this.$where)
+    }
+
+    for (const { expression } of this.$order) {
+      this.checkExpr(tables, expression)
+    }
+  }
+
+  private registerTable(tables: string[], table: Table): void {
+    if (table instanceof SelectTable || table instanceof RemoteTable) {
+      tables.push(table.$as as string)
+    }
+    else if (table instanceof DatabaseTable) {
+      tables.push(table.$as || table.table)
+    }
+  }
+
+  private checkExpr(tables: string[], expression: Expression): void {
+    if (expression instanceof BetweenExpression) {
+      this.checkExpr(tables, expression.left)
+      this.checkExpr(tables, expression.start)
+      this.checkExpr(tables, expression.end)
+    }
+    else if (expression instanceof BinaryExpression || expression instanceof MathExpression) {
+      this.checkExpr(tables, expression.left)
+      this.checkExpr(tables, expression.right)
+    }
+    else if (expression instanceof CaseExpression) {
+      for (const { $when, $then } of expression.cases) {
+        this.checkExpr(tables, $when)
+        this.checkExpr(tables, $then)
+      }
+      if (expression.$else) this.checkExpr(tables, expression.$else)
+    }
+    else if (expression instanceof ColumnExpression) {
+      if (expression.table && tables.indexOf(expression.table) === -1) {
+        throw new SyntaxError(`Unknown table \`${expression.table}\``)
+      }
+      else if (expression.isWildcard && !tables.length) {
+        throw new SyntaxError(`Invalid use of wildcard columns without tables`)
+      }
+    }
+    else if (expression instanceof ExistsExpression) {
+      this.checkExpr(tables, expression.query)
+    }
+    else if (expression instanceof FunctionExpression) {
+      for (const expr of expression.parameters) {
+        this.checkExpr(tables, expr)
+      }
+    }
+    else if (expression instanceof AndExpressions || expression instanceof OrExpressions) {
+      for (const expr of expression.expressions) {
+        this.checkExpr(tables, expr)
+      }
+    }
+    else if (expression instanceof QueryExpression) {
+      expression.query.check(tables)
+    }
   }
 }
