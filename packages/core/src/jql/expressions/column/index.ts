@@ -10,6 +10,9 @@ export class ColumnExpression extends Expression implements IColumnExpression {
   public readonly classname = ColumnExpression.name
 
   // @override
+  public $distinct = false
+
+  // @override
   public table?: string
 
   // @override
@@ -19,6 +22,7 @@ export class ColumnExpression extends Expression implements IColumnExpression {
     super()
 
     if (json) {
+      if (json.$distinct) this.setDistinct()
       if (json.table) {
         this.setColumn(json.table, json.name)
       }
@@ -26,6 +30,22 @@ export class ColumnExpression extends Expression implements IColumnExpression {
         this.setColumn(json.name)
       }
     }
+  }
+
+  /**
+   * check if wildcard column
+   */
+  get isWildcard(): boolean {
+    return this.name === '*'
+  }
+
+  /**
+   * set distinct flag
+   * @param flag [boolean]
+   */
+  public setDistinct(flag = true): ColumnExpression {
+    this.$distinct = flag
+    return this
   }
 
   /**
@@ -56,17 +76,19 @@ export class ColumnExpression extends Expression implements IColumnExpression {
     this.check()
     return {
       classname: this.classname,
+      $distinct: this.$distinct,
       table: this.table,
       name: this.name,
     }
   }
 
   // @override
-  public toString(): string {
+  public toString(noDistinct = false): string {
     this.check()
     let result = ''
     if (this.table) result += `\`${this.table}\`.`
     result += `\`${this.name}\``
+    if (!noDistinct && this.$distinct) result = 'DISTINCT ' + result
     return result
   }
 

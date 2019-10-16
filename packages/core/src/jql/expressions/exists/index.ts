@@ -32,7 +32,7 @@ export class ExistsExpression extends ConditionalExpression implements IExistsEx
    * set NOT flag
    * @param expr [IExpression]
    */
-  public setNot(flag = false): ExistsExpression {
+  public setNot(flag = true): ExistsExpression {
     this.$not = flag
     return this
   }

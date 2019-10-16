@@ -1,5 +1,7 @@
 /* tslint:disable:no-console */
-import { AndExpressions, BetweenExpression, BinaryExpression, CaseExpression, ColumnExpression, FunctionExpression, InExpression, IsNullExpression, LikeExpression, MathExpression, RegexpExpression, Unknown, Value } from '.'
+import { AndExpressions, BetweenExpression, BinaryExpression, CaseExpression, ColumnExpression, DatabaseTable, FromTable, FunctionExpression, InExpression, IsNullExpression, LikeExpression, MathExpression, OrderBy, Query, QueryExpression, RegexpExpression, ResultColumn, Unknown, Value } from '.'
+import { ExistsExpression } from './jql/expressions/exists'
+import { LimitBy } from './jql/select/limitBy'
 
 test('BetweenExpression', () => {
   const expr = new BetweenExpression()
@@ -36,7 +38,17 @@ test('CaseExpression', () => {
   console.log(`CaseExpression: ${expr.toString()}`)
 })
 
-// TODO ExistsExpression
+test('ExistsExpression', () => {
+  const expr = new ExistsExpression()
+    .setNot()
+    .setQuery(new QueryExpression(
+      new Query()
+        .select(new ResultColumn().setExpression(new Value('x')))
+        .from(new FromTable().setTable(new DatabaseTable().setTable('billSummary')))
+        .where(new BinaryExpression().setLeft(new ColumnExpression().setColumn('id')).setOperator('=').setRight(new Value(1))),
+    ))
+  console.log(`ExistsExpression: ${expr.toString()}`)
+})
 
 test('FunctionExpression', () => {
   let expr = new FunctionExpression()
@@ -60,13 +72,21 @@ test('GroupedExpressions', () => {
 })
 
 test('InExpression', () => {
-  const expr = new InExpression()
+  let expr = new InExpression()
     .setLeft(new ColumnExpression().setColumn('division'))
     .setNot()
     .setRight(new Value(['AE', 'AI']))
   console.log(`InExpression: ${expr.toString()}`)
 
-  // TODO setRight(QueryExpression)
+  expr = new InExpression()
+    .setLeft(new ColumnExpression().setColumn('division'))
+    .setRight(new QueryExpression(
+      new Query()
+        .select(new ResultColumn().setExpression(new ColumnExpression().setColumn('code')))
+        .from(new FromTable().setTable(new DatabaseTable().setTable('codeMaster')))
+        .where(new BinaryExpression().setLeft(new ColumnExpression().setColumn('codeType')).setOperator('=').setRight(new Value('division'))),
+    ))
+  console.log(`InExpression: ${expr.toString()}`)
 })
 
 test('IsNullExpression', () => {
@@ -92,12 +112,27 @@ test('MathExpression', () => {
   console.log(`MathExpression: ${expr.toString()}`)
 })
 
-// TODO QueryExpression
-
 test('RegexpExpression', () => {
   const expr = new RegexpExpression()
     .setLeft(new ColumnExpression().setColumn('userName'))
     .setNot()
     .setRight(new Value('kennys.ng'))
   console.log(`RegexpExpression: ${expr.toString()}`)
+})
+
+test('Query', () => {
+  let query = new Query()
+    .setDistinct()
+    .from(new FromTable().setTable(new DatabaseTable().setTable('billSummary').setAlias('b')))
+    .where(new BinaryExpression().setLeft(new ColumnExpression().setColumn('customerId')).setOperator('=').setRight(new Value(49)))
+    .orderBy(new OrderBy().setExpression(new ColumnExpression().setColumn('id'), 'DESC'))
+    .limitBy(new LimitBy().setLimit(20).setOffset(20))
+  console.log(`Query: ${query.toString()}`)
+
+  query = new Query()
+    .select(new ResultColumn().setExpression(new FunctionExpression().setFunction('count').addParameter(new ColumnExpression().setColumn('*').setDistinct())).setAs('count'))
+    .from(new FromTable().setTable(new DatabaseTable().setTable('billSummary')))
+    .groupBy(new ColumnExpression().setColumn('moduleType'))
+    .having(new BinaryExpression().setLeft(new ColumnExpression().setColumn('count')).setOperator('>').setRight(new Unknown()))
+  console.log(`Query: ${query.toString()}`)
 })

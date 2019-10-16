@@ -56,8 +56,8 @@ export class ResultColumn extends JQL implements IResultColumn {
   }
 
   // @override
-  public toString(): string {
-    let result = this.expression.toString()
+  public toString(...args): string {
+    let result = (this.expression.toString as Function)(...args)
     if (this.$as) result = `${result} AS \`${this.$as}\``
     return result
   }

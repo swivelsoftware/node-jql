@@ -1,7 +1,9 @@
 import format from 'string-format'
 import { ConditionalExpression, Expression } from '..'
+import { ColumnExpression } from '../column'
 import { IExpression } from '../index.if'
 import { parse, register } from '../parse'
+import { QueryExpression } from '../query'
 import { Unknown } from '../unknown'
 import { BinaryOperator, IBinaryExpression } from './index.if'
 
@@ -76,7 +78,13 @@ export class BinaryExpression extends ConditionalExpression implements IBinaryEx
    * @param expr [IExpression]
    */
   public setRight(expr?: IExpression): BinaryExpression {
-    this.right = expr ? parse(expr) : new Unknown()
+    const expr_ = expr ? parse(expr) : new Unknown()
+    if (expr_ instanceof QueryExpression) {
+      if (expr_.query.$select.length !== 1 || (expr_.query.$select[0].expression instanceof ColumnExpression && expr_.query.$select[0].expression.isWildcard)) {
+        throw new SyntaxError('Operand in Query format should return 1 column only')
+      }
+    }
+    this.right = expr_
     return this
   }
 
