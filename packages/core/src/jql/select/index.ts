@@ -14,7 +14,7 @@ import { parse as parseExpr } from '../expressions/parse'
 import { QueryExpression } from '../expressions/query'
 import { FromTable } from './fromTable'
 import { IFromTable } from './fromTable/index.if'
-import { DatabaseTable, RemoteTable, SelectTable, Table } from './fromTable/table'
+import { RemoteTable, SchemaTable, SelectTable, Table } from './fromTable/table'
 import { IQuery } from './index.if'
 import { LimitBy } from './limitBy'
 import { ILimitBy } from './limitBy/index.if'
@@ -251,7 +251,7 @@ export class Query extends JQL implements IQuery {
     if (table instanceof SelectTable || table instanceof RemoteTable) {
       tables.push(table.$as as string)
     }
-    else if (table instanceof DatabaseTable) {
+    else if (table instanceof SchemaTable) {
       tables.push(table.$as || table.table)
     }
   }

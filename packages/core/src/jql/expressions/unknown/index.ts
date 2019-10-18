@@ -20,10 +20,13 @@ export class Unknown extends Expression implements IUnknown {
   // assigned value
   private value_: any
 
-  constructor(json?: IUnknown)  {
+  constructor(json?: Type|IUnknown)  {
     super()
 
-    if (json) {
+    if (typeof json === 'string') {
+      this.setType(json)
+    }
+    else if (json) {
       this.setType(json.type)
     }
   }

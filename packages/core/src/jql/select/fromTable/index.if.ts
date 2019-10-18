@@ -11,11 +11,11 @@ export interface ITable extends IJQL {
 }
 
 /**
- * {function}({database}.{table})
+ * {function}({schema}.{table})
  */
-export interface IDatabaseTable extends ITable {
+export interface ISchemaTable extends ITable {
   function?: string
-  database?: string
+  schema?: string
   table: string
 }
 
@@ -29,9 +29,9 @@ export interface ISelectTable extends ITable {
 /**
  * Table from API
  */
-export interface IRemoteTable<Request = RequestInit> extends ITable {
+export interface IRemoteTable<R> extends ITable {
   columns: IColumnDef[]
-  requestConfig: Request
+  requestConfig: R
 }
 
 /**

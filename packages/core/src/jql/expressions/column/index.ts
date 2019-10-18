@@ -18,10 +18,13 @@ export class ColumnExpression extends Expression implements IColumnExpression {
   // @override
   public name: string
 
-  constructor(json?: IColumnExpression) {
+  constructor(json?: string|IColumnExpression) {
     super()
 
-    if (json) {
+    if (typeof json === 'string') {
+      this.setColumn(json)
+    }
+    else if (json) {
       if (json.$distinct) this.setDistinct()
       if (json.table) {
         this.setColumn(json.table, json.name)

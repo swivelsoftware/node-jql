@@ -19,10 +19,13 @@ export class FunctionExpression extends Expression implements IFunctionExpressio
   // @override
   public parameters: Expression[] = []
 
-  constructor(json?: IFunctionExpression) {
+  constructor(json?: string|IFunctionExpression) {
     super()
 
-    if (json) {
+    if (typeof json === 'string') {
+      this.setFunction(json)
+    }
+    else if (json) {
       this.setFunction(json.name)
       if (json.parameters) {
         for (const param of json.parameters) this.addParameter(param)

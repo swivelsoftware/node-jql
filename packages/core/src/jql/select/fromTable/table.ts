@@ -3,7 +3,7 @@ import { JQL } from '../..'
 import { ColumnDef } from '../../create/column'
 import { IColumnDef } from '../../create/index.if'
 import { IQuery } from '../index.if'
-import { IDatabaseTable, IRemoteTable, ISelectTable, ITable } from './index.if'
+import { IRemoteTable, ISchemaTable, ISelectTable, ITable } from './index.if'
 import { register } from './parse'
 
 /**
@@ -15,31 +15,34 @@ export abstract class Table extends JQL implements ITable {
 }
 
 /**
- * {function}({database}.{table})
+ * {function}({schema}.{table})
  */
-export class DatabaseTable extends Table implements IDatabaseTable {
+export class SchemaTable extends Table implements ISchemaTable {
   // @override
-  public readonly classname = DatabaseTable.name
+  public readonly classname = SchemaTable.name
 
   // @override
   public function?: string
 
   // @override
-  public database?: string
+  public schema?: string
 
   // @override
   public table: string
 
-  constructor(json?: IDatabaseTable) {
+  constructor(json?: string|ISchemaTable) {
     super()
 
-    if (json) {
+    if (typeof json === 'string') {
+      this.setTable(json)
+    }
+    else if (json) {
       if (json.function) {
         if (!json.$as) throw new SyntaxError('Missing alias name for table')
         this.setFunction(json.function, json.$as)
       }
-      if (json.database) {
-        this.setTable(json.database, json.table)
+      if (json.schema) {
+        this.setTable(json.schema, json.table)
       }
       else {
         this.setTable(json.table)
@@ -52,7 +55,7 @@ export class DatabaseTable extends Table implements IDatabaseTable {
    * @param name [string]
    * @param $as [string]
    */
-  public setFunction(name: string, $as: string): DatabaseTable {
+  public setFunction(name: string, $as: string): SchemaTable {
     this.function = name
     this.$as = $as
     return this
@@ -62,20 +65,20 @@ export class DatabaseTable extends Table implements IDatabaseTable {
    * set table
    * @param name [string]
    */
-  public setTable(name: string): DatabaseTable
+  public setTable(name: string): SchemaTable
   /**
    * set table
-   * @param database [string]
+   * @param schema [string]
    * @param table [string]
    */
-  public setTable(database: string, table: string): DatabaseTable
-  public setTable(...args: any[]): DatabaseTable {
+  public setTable(schema: string, table: string): SchemaTable
+  public setTable(...args: any[]): SchemaTable {
     if (args.length === 1) {
-      this.database = undefined
+      this.schema = undefined
       this.table = args[0] as string
     }
     else {
-      this.database = args[0] as string
+      this.schema = args[0] as string
       this.table = args[1] as string
     }
     return this
@@ -85,18 +88,18 @@ export class DatabaseTable extends Table implements IDatabaseTable {
    * set alias name
    * @param name [string]
    */
-  public setAlias(name: string): DatabaseTable {
+  public setAlias(name: string): SchemaTable {
     this.$as = name
     return this
   }
 
   // @override
-  public toJson(): IDatabaseTable {
+  public toJson(): ISchemaTable {
     this.check()
     return {
       classname: this.classname,
       function: this.function,
-      database: this.database,
+      schema: this.schema,
       table: this.table,
       $as: this.$as,
     }
@@ -106,7 +109,7 @@ export class DatabaseTable extends Table implements IDatabaseTable {
   public toString(): string {
     this.check()
     let table = `\`${this.table}\``
-    if (this.database) table = `\`${this.database}\`.${table}`
+    if (this.schema) table = `\`${this.schema}\`.${table}`
     if (this.function) table = `${this.function}(${table})`
     if (this.$as) table = `${table} \`${this.$as}\``
     return table
@@ -174,7 +177,7 @@ export class SelectTable extends Table implements ISelectTable {
 /**
  * Table from API
  */
-export class RemoteTable<RequestConfig> extends Table implements IRemoteTable<RequestConfig> {
+export class RemoteTable<R> extends Table implements IRemoteTable<R> {
   // @override
   public readonly classname = RemoteTable.name
 
@@ -182,9 +185,9 @@ export class RemoteTable<RequestConfig> extends Table implements IRemoteTable<Re
   public columns: ColumnDef[]
 
   // @override
-  public requestConfig: RequestConfig
+  public requestConfig: R
 
-  constructor(json?: IRemoteTable<RequestConfig>) {
+  constructor(json?: IRemoteTable<R>) {
     super()
 
     if (json) {
@@ -199,7 +202,7 @@ export class RemoteTable<RequestConfig> extends Table implements IRemoteTable<Re
    * @param columns [Array<IColumnDef>]
    * @param $as [string]
    */
-  public setAPI(config: RequestConfig, columns: IColumnDef[], $as: string): RemoteTable<RequestConfig> {
+  public setAPI(config: R, columns: IColumnDef[], $as: string): RemoteTable<R> {
     this.requestConfig = config
     this.columns = columns.map(c => new ColumnDef(c))
     this.$as = $as
@@ -207,7 +210,7 @@ export class RemoteTable<RequestConfig> extends Table implements IRemoteTable<Re
   }
 
   // @override
-  public toJson(): IRemoteTable {
+  public toJson(): IRemoteTable<R> {
     return {
       classname: this.classname,
       columns: this.columns.map(c => c.toJson()),
@@ -228,6 +231,6 @@ export class RemoteTable<RequestConfig> extends Table implements IRemoteTable<Re
   }
 }
 
-register(DatabaseTable)
+register(SchemaTable)
 register(SelectTable)
 register(RemoteTable)
