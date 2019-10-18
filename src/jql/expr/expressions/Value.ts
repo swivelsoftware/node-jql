@@ -26,7 +26,7 @@ export class Value extends Expression implements IValue {
 
     // parse args
     let value: any
-    if (typeof args[0] === 'object' && value !== null && 'value' in args[0]) {
+    if (typeof args[0] === 'object' && args[0] !== null && 'value' in args[0]) {
       const json = args[0] as IValue
       value = json.value
     }
