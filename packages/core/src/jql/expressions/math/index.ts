@@ -1,8 +1,8 @@
 import format from 'string-format'
 import { Expression } from '..'
 import { Type } from '../../index.if'
+import { parse, register } from '../../parse'
 import { IExpression } from '../index.if'
-import { parse, register } from '../parse'
 import { Unknown } from '../unknown'
 import { IMathExpression, MathOperator } from './index.if'
 

@@ -75,6 +75,7 @@ export class CreateSchemaJQL extends JQL implements ICreateSchemaJQL {
     return result
   }
 
+  // @override
   protected check(): void {
     if (!this.name) throw new SyntaxError('Schema is not defined')
   }

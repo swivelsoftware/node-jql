@@ -1,4 +1,4 @@
-import { IJQL, Type } from '../index.if'
+import { IJQL } from '../index.if'
 
 /**
  * Base JQL expression interface

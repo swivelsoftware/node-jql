@@ -1,5 +1,7 @@
 /* tslint:disable:no-console */
-import { AndExpressions, BetweenExpression, BinaryExpression, CaseExpression, ColumnExpression, DropSchemaJQL, DropTableJQL, ExistsExpression, FromTable, FunctionExpression, InExpression, IsNullExpression, LikeExpression, LimitBy, MathExpression, OrderBy, Query, QueryExpression, RegexpExpression, ResultColumn, SchemaTable, Unknown, Value } from '.'
+import { AndExpressions, BetweenExpression, BinaryExpression, CaseExpression, ColumnExpression, CreateSchemaJQL, CreateSchemaTableJQL, DropSchemaJQL, DropTableJQL, ExistsExpression, FromTable, FunctionExpression, InExpression, IsNullExpression, LikeExpression, LimitBy, MathExpression, OrderBy, Query, QueryExpression, RegexpExpression, ResultColumn, SchemaTable, Unknown, Value } from '.'
+import { CreateFunctionJQL } from './jql/create/function'
+import { ColumnDef } from './jql/create/table/column'
 
 test('BetweenExpression', () => {
   const expr = new BetweenExpression()
@@ -133,8 +135,30 @@ test('Query', () => {
   console.log(`Query: ${query.toString()}`)
 })
 
+test('Create Schema', () => {
+  const jql = new CreateSchemaJQL('TEMP_DB').ifNotExists()
+  console.log(`Create Schema: ${jql.toString()}`)
+})
+
+test('Create Table', () => {
+  const jql = new CreateSchemaTableJQL('TEMP_TABLE').ifNotExists()
+  .addColumn(new ColumnDef().setColumn('id', 'number').setPrimaryKey().setAutoIncrement())
+  .addColumn(new ColumnDef().setColumn('name', 'string').setNotNull())
+  console.log(`Create Table: ${jql.toString()}`)
+})
+
+test('Create Function', () => {
+  const jql = new CreateFunctionJQL()
+    .setName('plus')
+    .addParameter('a', 'number')
+    .addParameter('b', 'number')
+    .setReturnType('number')
+    .setCode('return a + b')
+  console.log(`Create Function: ${jql.toString()}`)
+})
+
 test('Drop Table', () => {
-  let jql = new DropTableJQL('TEMP_TABLE')
+  let jql = new DropTableJQL('TEMP_TABLE').ifExists()
   console.log(`Drop Table: ${jql.toString()}`)
 
   jql = new DropTableJQL().setTable(new SchemaTable().setTable('TEMP_DB', 'TEMP_TABLE'))
@@ -142,6 +166,6 @@ test('Drop Table', () => {
 })
 
 test('Drop Schema', () => {
-  const jql = new DropSchemaJQL('TEMP_DB')
+  const jql = new DropSchemaJQL('TEMP_DB').ifExists()
   console.log(`Drop Schema: ${jql.toString()}`)
 })

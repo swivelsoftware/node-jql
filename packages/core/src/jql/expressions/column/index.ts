@@ -1,5 +1,5 @@
 import { Expression } from '..'
-import { register } from '../parse'
+import { register } from '../../parse'
 import { IColumnExpression } from './index.if'
 
 /**

@@ -1,10 +1,10 @@
 import { Query } from '..'
 import { JQL } from '../..'
-import { ColumnDef } from '../../create/column'
-import { IColumnDef } from '../../create/index.if'
+import { ColumnDef } from '../../create/table/column'
+import { IColumnDef } from '../../create/table/index.if'
+import { register } from '../../parse'
 import { IQuery } from '../index.if'
-import { IRemoteTable, ISchemaTable, ISelectTable, ITable } from './index.if'
-import { register } from './parse'
+import { IQueryTable, IRemoteTable, ISchemaTable, ITable } from './index.if'
 
 /**
  * Table interface
@@ -124,14 +124,14 @@ export class SchemaTable extends Table implements ISchemaTable {
 /**
  * Table from query
  */
-export class SelectTable extends Table implements ISelectTable {
+export class QueryTable extends Table implements IQueryTable {
   // @override
-  public readonly classname = SelectTable.name
+  public readonly classname = QueryTable.name
 
   // @override
   public query: Query
 
-  constructor(json?: ISelectTable) {
+  constructor(json?: IQueryTable) {
     super()
 
     if (json) {
@@ -145,14 +145,14 @@ export class SelectTable extends Table implements ISelectTable {
    * @param query [IQuery]
    * @param $as [string]
    */
-  public setQuery(query: IQuery, $as: string): SelectTable {
+  public setQuery(query: IQuery, $as: string): QueryTable {
     this.query = new Query(query)
     this.$as = $as
     return this
   }
 
   // @override
-  public toJson(): ISelectTable {
+  public toJson(): IQueryTable {
     this.check()
     return {
       classname: this.classname,
@@ -232,5 +232,5 @@ export class RemoteTable<R> extends Table implements IRemoteTable<R> {
 }
 
 register(SchemaTable)
-register(SelectTable)
+register(QueryTable)
 register(RemoteTable)

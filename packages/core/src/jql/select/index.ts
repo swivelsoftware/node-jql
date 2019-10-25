@@ -10,11 +10,11 @@ import { FunctionExpression } from '../expressions/function'
 import { AndExpressions, OrExpressions } from '../expressions/grouped'
 import { IConditionalExpression, IExpression } from '../expressions/index.if'
 import { MathExpression } from '../expressions/math'
-import { parse as parseExpr } from '../expressions/parse'
 import { QueryExpression } from '../expressions/query'
+import { parse } from '../parse'
 import { FromTable } from './fromTable'
 import { IFromTable } from './fromTable/index.if'
-import { RemoteTable, SchemaTable, SelectTable, Table } from './fromTable/table'
+import { QueryTable, RemoteTable, SchemaTable, Table } from './fromTable/table'
 import { IQuery } from './index.if'
 import { LimitBy } from './limitBy'
 import { ILimitBy } from './limitBy/index.if'
@@ -101,7 +101,7 @@ export class Query extends JQL implements IQuery {
    * @param expression [IExpression]
    */
   public groupBy(expression: IExpression): Query {
-    this.$group.push(parseExpr(expression))
+    this.$group.push(parse(expression))
     return this
   }
 
@@ -110,7 +110,7 @@ export class Query extends JQL implements IQuery {
    * @param expression [IConditionalExpression]
    */
   public having(expression: IConditionalExpression): Query {
-    this.$having = parseExpr(expression)
+    this.$having = parse(expression)
     return this
   }
 
@@ -119,7 +119,7 @@ export class Query extends JQL implements IQuery {
    * @param expression [IConditionalExpression]
    */
   public where(expression: IConditionalExpression): Query {
-    this.$where = parseExpr(expression)
+    this.$where = parse(expression)
     return this
   }
 
@@ -248,7 +248,7 @@ export class Query extends JQL implements IQuery {
   }
 
   private registerTable(tables: string[], table: Table): void {
-    if (table instanceof SelectTable || table instanceof RemoteTable) {
+    if (table instanceof QueryTable || table instanceof RemoteTable) {
       tables.push(table.$as as string)
     }
     else if (table instanceof SchemaTable) {

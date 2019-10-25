@@ -1,4 +1,4 @@
-import { IColumnDef } from '../../create/index.if'
+import { IColumnDef } from '../../create/table/index.if'
 import { IConditionalExpression } from '../../expressions/index.if'
 import { IJQL } from '../../index.if'
 import { IQuery } from '../index.if'
@@ -22,7 +22,7 @@ export interface ISchemaTable extends ITable {
 /**
  * Table from query
  */
-export interface ISelectTable extends ITable {
+export interface IQueryTable extends ITable {
   query: IQuery
 }
 

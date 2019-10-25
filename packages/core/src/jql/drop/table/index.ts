@@ -1,6 +1,5 @@
 import { JQL } from '../..'
 import { ISchemaTable } from '../../select/fromTable/index.if'
-import { parse } from '../../select/fromTable/parse'
 import { SchemaTable } from '../../select/fromTable/table'
 import { IDropTableJQL } from './index.if'
 
@@ -33,7 +32,7 @@ export class DropTableJQL extends JQL implements IDropTableJQL {
    * @param table [ISchemaTable]
    */
   public setTable(table: ISchemaTable): DropTableJQL {
-    this.table = parse(table)
+    this.table = new SchemaTable(table)
     return this
   }
 
@@ -62,6 +61,7 @@ export class DropTableJQL extends JQL implements IDropTableJQL {
     return `DROP TABLE ${this.$ifExists ? 'IF EXISTS ' : ''}${this.table.toString()}`
   }
 
+  // @override
   protected check(): void {
     if (!this.table) throw new SyntaxError('Table is not defined')
   }

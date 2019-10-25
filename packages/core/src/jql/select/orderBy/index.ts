@@ -1,7 +1,7 @@
 import { JQL } from '../..'
 import { Expression } from '../../expressions'
 import { IExpression } from '../../expressions/index.if'
-import { parse } from '../../expressions/parse'
+import { parse } from '../../parse'
 import { IOrderBy } from './index.if'
 
 /**

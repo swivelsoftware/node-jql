@@ -1,7 +1,7 @@
 import format from 'string-format'
 import { ConditionalExpression, Expression } from '..'
+import { parse, register } from '../../parse'
 import { IConditionalExpression, IExpression } from '../index.if'
-import { parse, register } from '../parse'
 import { ICaseExpression } from './index.if'
 
 /**
@@ -69,6 +69,7 @@ export class CaseExpression extends Expression implements ICaseExpression {
     )
   }
 
+  // @override
   protected check(): void {
     if (!this.cases.length) throw new SyntaxError('No cases is defined')
   }

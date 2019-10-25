@@ -1,7 +1,7 @@
 import { Expression } from '..'
+import { register } from '../../parse'
 import { Query } from '../../select'
 import { IQuery } from '../../select/index.if'
-import { register } from '../parse'
 import { IQueryExpression } from './index.if'
 
 /**

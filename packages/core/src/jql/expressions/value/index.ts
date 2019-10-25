@@ -1,7 +1,7 @@
 import { Expression } from '..'
 import { checkNull } from '../../../utils'
 import { Type } from '../../index.if'
-import { register } from '../parse'
+import { register } from '../../parse'
 import { IValue } from './index.if'
 
 /**

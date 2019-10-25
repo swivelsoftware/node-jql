@@ -1,7 +1,6 @@
-import { Expression } from '..'
+import { register } from '../../parse'
 import { BinaryExpression } from '../binary'
 import { BinaryOperator, IBinaryExpression } from '../binary/index.if'
-import { register } from '../parse'
 
 /**
  * {left} REGEXP {right}

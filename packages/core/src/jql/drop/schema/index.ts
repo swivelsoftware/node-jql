@@ -60,6 +60,7 @@ export class DropSchemaJQL extends JQL implements IDropSchemaJQL {
     return `DROP SCHEMA ${this.$ifExists ? 'IF EXISTS ' : ''}\`${this.name}\``
   }
 
+  // @override
   protected check(): void {
     if (!this.name) throw new SyntaxError('Schema is not defined')
   }

@@ -1,6 +1,6 @@
 import format from 'string-format'
 import { ConditionalExpression } from '..'
-import { parse, register } from '../parse'
+import { parse, register } from '../../parse'
 import { QueryExpression } from '../query'
 import { IQueryExpression } from '../query/index.if'
 import { IExistsExpression } from './index.if'

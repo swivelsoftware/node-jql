@@ -1,6 +1,6 @@
 import { ConditionalExpression } from '..'
-import { IConditionalExpression, IExpression } from '../index.if'
-import { parse, register } from '../parse'
+import { parse, register } from '../../parse'
+import { IConditionalExpression } from '../index.if'
 import { IGroupedExpressions } from './index.if'
 
 /**

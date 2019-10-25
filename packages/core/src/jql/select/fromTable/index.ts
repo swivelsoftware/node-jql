@@ -1,9 +1,8 @@
 import { JQL } from '../..'
 import { ConditionalExpression } from '../../expressions'
 import { IConditionalExpression } from '../../expressions/index.if'
-import { parse as parseExpr } from '../../expressions/parse'
+import { parse } from '../../parse'
 import { IFromTable, IJoinClause, ITable, JoinOperator } from './index.if'
-import { parse } from './parse'
 import { Table } from './table'
 
 /**
@@ -47,7 +46,7 @@ export class JoinClause extends JQL implements IJoinClause {
    */
   public setTable(table: ITable, $on: IConditionalExpression): JoinClause {
     this.table = parse(table)
-    this.$on = parseExpr($on)
+    this.$on = parse($on)
     return this
   }
 
@@ -68,6 +67,7 @@ export class JoinClause extends JQL implements IJoinClause {
     return `${this.operator} JOIN ${this.table.toString()} ON ${this.$on.toString()}`
   }
 
+  // @override
   protected check(): void {
     if (!this.table) throw new SyntaxError('Table is not defined')
   }
@@ -135,6 +135,7 @@ export class FromTable extends JQL implements IFromTable {
     return result
   }
 
+  // @override
   protected check(): void {
     if (!this.table) throw new SyntaxError('Table is not defined')
   }

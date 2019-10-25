@@ -1,7 +1,7 @@
 import format from 'string-format'
 import { ConditionalExpression, Expression } from '..'
+import { parse, register } from '../../parse'
 import { IExpression } from '../index.if'
-import { parse, register } from '../parse'
 import { Unknown } from '../unknown'
 import { IBetweenExpression } from './index.if'
 
