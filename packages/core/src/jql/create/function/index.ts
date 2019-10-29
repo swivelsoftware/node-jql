@@ -21,10 +21,13 @@ export class CreateFunctionJQL<T = Type> extends JQL implements ICreateFunctionJ
   // @override
   public code: string
 
-  constructor(json?: ICreateFunctionJQL<T>) {
+  constructor(json?: string|ICreateFunctionJQL<T>) {
     super()
 
-    if (json) {
+    if (typeof json === 'string') {
+      this.setName(json)
+    }
+    else if (json) {
       this.setName(json.name)
       if (json.parameters) for (const [name, type] of json.parameters) this.addParameter(name, type)
       this.setReturnType(json.returnType)

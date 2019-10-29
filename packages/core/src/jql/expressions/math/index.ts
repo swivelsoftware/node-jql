@@ -25,10 +25,13 @@ export class MathExpression extends Expression implements IMathExpression {
   // @override
   public right: Expression = new Unknown()
 
-  constructor(json?: IMathExpression) {
+  constructor(json?: MathOperator | IMathExpression) {
     super()
 
-    if (json) {
+    if (typeof json === 'string') {
+      this.setOperator(json)
+    }
+    else if (json) {
       this
         .setLeft(json.left)
         .setOperator(json.operator)

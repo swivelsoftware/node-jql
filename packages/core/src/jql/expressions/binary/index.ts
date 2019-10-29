@@ -7,7 +7,7 @@ import { QueryExpression } from '../query'
 import { Unknown } from '../unknown'
 import { BinaryOperator, IBinaryExpression } from './index.if'
 
-const SIMPLE_OPERATOR: BinaryOperator[] = ['=', '<>', '<', '<=', '>', '>=']
+const SIMPLE_OPERATOR: BinaryOperator[] = ['=', '<>', '<', '<=', '>', '>=', ':=']
 
 /**
  * {left} {$not} {operator} {right}
@@ -28,11 +28,14 @@ export class BinaryExpression extends ConditionalExpression implements IBinaryEx
   // @override
   public right: Expression = new Unknown()
 
-  constructor(json?: IBinaryExpression) {
+  constructor(json?: BinaryOperator|IBinaryExpression) {
     super()
 
     // parse
-    if (json) {
+    if (typeof json === 'string') {
+      this.setOperator(json)
+    }
+    else if (json) {
       this
         .setLeft(json.left)
         .setOperator(json.operator)

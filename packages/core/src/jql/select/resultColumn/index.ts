@@ -3,6 +3,7 @@ import { Expression } from '../../expressions'
 import { IExpression } from '../../expressions/index.if'
 import { parse } from '../../parse'
 import { IResultColumn } from './index.if'
+import { ColumnExpression } from '../../expressions/column'
 
 /**
  * Selected column in the result set
@@ -17,10 +18,13 @@ export class ResultColumn extends JQL implements IResultColumn {
   // @override
   public $as?: string
 
-  constructor(json?: IResultColumn) {
+  constructor(json?: string|IResultColumn) {
     super()
 
-    if (json) {
+    if (typeof json === 'string') {
+      this.setExpression(new ColumnExpression(json))
+    }
+    else if (json) {
       this
         .setExpression(json.expression)
         .setAs(json.$as)

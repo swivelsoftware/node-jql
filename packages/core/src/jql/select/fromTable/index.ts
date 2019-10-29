@@ -3,7 +3,7 @@ import { ConditionalExpression } from '../../expressions'
 import { IConditionalExpression } from '../../expressions/index.if'
 import { parse } from '../../parse'
 import { IFromTable, IJoinClause, ITable, JoinOperator } from './index.if'
-import { Table } from './table'
+import { Table, SchemaTable } from './table'
 
 /**
  * Join clauses for table
@@ -86,10 +86,13 @@ export class FromTable extends JQL implements IFromTable {
   // @override
   public joinClauses: JoinClause[] = []
 
-  constructor(json?: IFromTable) {
+  constructor(json?: string|IFromTable) {
     super()
 
-    if (json) {
+    if (typeof json === 'string') {
+      this.setTable(new SchemaTable(json))
+    }
+    else if (json) {
       this.setTable(json.table)
       if (json.joinClauses) {
         for (const joinClause of json.joinClauses) this.addJoinClause(joinClause)
