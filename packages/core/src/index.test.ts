@@ -1,5 +1,5 @@
 /* tslint:disable:no-console */
-import { AndExpressions, BetweenExpression, BinaryExpression, CaseExpression, ColumnDef, ColumnExpression, CreateFunctionJQL, CreateSchemaJQL, CreateSchemaTableJQL, DropFunctionJQL, DropSchemaJQL, DropTableJQL, ExistsExpression, FromTable, FunctionExpression, InExpression, IsNullExpression, LikeExpression, LimitBy, MathExpression, OrderBy, Query, QueryExpression, RegexpExpression, ResultColumn, SchemaTable, Unknown, Value, Variable } from '.'
+import { AndExpressions, BetweenExpression, BinaryExpression, CaseExpression, ColumnDef, ColumnExpression, CreateFunctionJQL, CreateSchemaJQL, CreateSchemaTableJQL, DropFunctionJQL, DropSchemaJQL, DropTableJQL, ExistsExpression, FromTable, FunctionExpression, InExpression, IsNullExpression, LikeExpression, LimitBy, MathExpression, OrderBy, Query, QueryExpression, RegexpExpression, ResultColumn, SchemaTable, SetVariableExpression, SetVariableJQL, Unknown, Value, Variable } from '.'
 
 test('BetweenExpression', () => {
   const expr = new BetweenExpression()
@@ -112,6 +112,12 @@ test('RegexpExpression', () => {
     .setNot()
     .setRight(new Value('kennys.ng'))
   console.log(`RegexpExpression: ${expr.toString()}`)
+})
+
+test('Set Variable', () => {
+  const jql = new SetVariableJQL()
+    .setExpression(new SetVariableExpression('var1').setRight(new Value(1)))
+  console.log(`Set Variable: ${jql.toString()}`)
 })
 
 test('Query', () => {
