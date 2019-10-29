@@ -14,11 +14,12 @@ export class RegexpExpression extends BinaryExpression implements IBinaryExpress
 
   constructor(json?: IBinaryExpression) {
     super(json ? { ...json, operator: 'REGEXP' } : undefined)
+    if (!json) this.setOperator()
   }
 
   // @override
-  public setOperator(operator: BinaryOperator): RegexpExpression {
-    throw new SyntaxError('Operator of RegexpExpression cannot be changed')
+  public setOperator(): RegexpExpression {
+    return super.setOperator('REGEXP') as RegexpExpression
   }
 }
 

@@ -14,11 +14,12 @@ export class LikeExpression extends BinaryExpression implements IBinaryExpressio
 
   constructor(json?: IBinaryExpression) {
     super(json ? { ...json, operator: 'LIKE' } : undefined)
+    if (!json) this.setOperator()
   }
 
   // @override
-  public setOperator(operator: BinaryOperator): LikeExpression {
-    throw new SyntaxError('Operator of LikeExpression cannot be changed')
+  public setOperator(): LikeExpression {
+    return super.setOperator('LIKE') as LikeExpression
   }
 }
 
