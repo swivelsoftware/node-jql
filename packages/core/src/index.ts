@@ -57,6 +57,9 @@ export { CreateTableConstraint, CreateTablePrimaryKeyConstraint, CreateTableRawC
 export { CreateFunctionJQL } from './jql/create/function'
 export { ICreateFunctionJQL } from './jql/create/function/index.if'
 
+export { DeleteJQL } from './jql/delete'
+export { IDeleteJQL } from './jql/delete/index.if'
+
 export { DropSchemaJQL } from './jql/drop/schema'
 export { IDropSchemaJQL } from './jql/drop/schema/index.if'
 export { DropTableJQL } from './jql/drop/table'

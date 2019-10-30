@@ -1,5 +1,5 @@
 /* tslint:disable:no-console */
-import { AndExpressions, BetweenExpression, BinaryExpression, CaseExpression, ColumnDef, ColumnExpression, CreateFunctionJQL, CreateSchemaJQL, CreateSchemaTableJQL, DropFunctionJQL, DropSchemaJQL, DropTableJQL, ExistsExpression, FromTable, FunctionExpression, InExpression, IsNullExpression, LikeExpression, LimitBy, MathExpression, OrderBy, Query, QueryExpression, RegexpExpression, ResultColumn, SchemaTable, SetVariableExpression, SetVariableJQL, Unknown, Value, Variable } from '.'
+import { AndExpressions, BetweenExpression, BinaryExpression, CaseExpression, ColumnDef, ColumnExpression, CreateFunctionJQL, CreateSchemaJQL, CreateSchemaTableJQL, DeleteJQL, DropFunctionJQL, DropSchemaJQL, DropTableJQL, ExistsExpression, FromTable, FunctionExpression, InExpression, IsNullExpression, LikeExpression, LimitBy, MathExpression, OrderBy, Query, QueryExpression, RegexpExpression, ResultColumn, SchemaTable, SetVariableExpression, SetVariableJQL, Unknown, Value, Variable } from '.'
 
 test('BetweenExpression', () => {
   const expr = new BetweenExpression()
@@ -165,6 +165,12 @@ test('Create Function', () => {
 test('Drop Function', () => {
   const jql = new DropFunctionJQL('plus').ifExists()
   console.log(`Drop Function: ${jql.toString()}`)
+})
+
+test('Delete From Table', () => {
+  const jql = new DeleteJQL('TEMP_TABLE')
+    .where(new BinaryExpression('=').setLeft(new ColumnExpression('id')).setRight(new Value(1)))
+  console.log(`Delete From Table: ${jql.toString()}`)
 })
 
 test('Drop Table', () => {
