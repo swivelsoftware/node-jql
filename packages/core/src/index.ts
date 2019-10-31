@@ -57,6 +57,9 @@ export { CreateTableConstraint, CreateTablePrimaryKeyConstraint, CreateTableRawC
 export { CreateFunctionJQL } from './jql/create/function'
 export { ICreateFunctionJQL } from './jql/create/function/index.if'
 
+export { InsertJQL } from './jql/insert'
+export { IInsertJQL } from './jql/insert/index.if'
+
 export { DeleteJQL } from './jql/delete'
 export { IDeleteJQL } from './jql/delete/index.if'
 

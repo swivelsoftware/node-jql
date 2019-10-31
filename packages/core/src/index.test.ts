@@ -1,5 +1,5 @@
 /* tslint:disable:no-console */
-import { AndExpressions, BetweenExpression, BinaryExpression, CaseExpression, ColumnDef, ColumnExpression, CreateFunctionJQL, CreateSchemaJQL, CreateSchemaTableJQL, DeleteJQL, DropFunctionJQL, DropSchemaJQL, DropTableJQL, ExistsExpression, FromTable, FunctionExpression, InExpression, IsNullExpression, LikeExpression, LimitBy, MathExpression, OrderBy, Query, QueryExpression, RegexpExpression, ResultColumn, SchemaTable, SetVariableExpression, SetVariableJQL, Unknown, Value, Variable } from '.'
+import { AndExpressions, BetweenExpression, BinaryExpression, CaseExpression, ColumnDef, ColumnExpression, CreateFunctionJQL, CreateSchemaJQL, CreateSchemaTableJQL, DeleteJQL, DropFunctionJQL, DropSchemaJQL, DropTableJQL, ExistsExpression, FromTable, FunctionExpression, InExpression, InsertJQL, IsNullExpression, LikeExpression, LimitBy, MathExpression, OrderBy, Query, QueryExpression, RegexpExpression, ResultColumn, SchemaTable, SetVariableExpression, SetVariableJQL, Unknown, Value, Variable } from '.'
 
 test('BetweenExpression', () => {
   const expr = new BetweenExpression()
@@ -151,6 +151,12 @@ test('Create Table', () => {
   .addColumn(new ColumnDef().setColumn('id', 'number').setPrimaryKey().setAutoIncrement())
   .addColumn(new ColumnDef().setColumn('name', 'string').setNotNull())
   console.log(`Create Table: ${jql.toString()}`)
+})
+
+test('Insert', () => {
+  const jql = new InsertJQL('TEMP_TABLE')
+    .addValue([new Variable('var1'), 'Hello, world'])
+  console.log(`Insert: ${jql.toString()}`)
 })
 
 test('Create Function', () => {
