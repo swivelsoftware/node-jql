@@ -9,7 +9,7 @@ export class LimitBy extends JQL implements ILimitBy {
   public readonly classname = LimitBy.name
 
   // @override
-  public $limit: number = Number.MAX_SAFE_INTEGER
+  public $limit = Number.MAX_SAFE_INTEGER
 
   // @override
   public $offset = 0

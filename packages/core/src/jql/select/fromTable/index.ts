@@ -3,7 +3,7 @@ import { ConditionalExpression } from '../../expressions'
 import { IConditionalExpression } from '../../expressions/index.if'
 import { parse } from '../../parse'
 import { IFromTable, IJoinClause, ITable, JoinOperator } from './index.if'
-import { Table, SchemaTable } from './table'
+import { SchemaTable, Table } from './table'
 
 /**
  * Join clauses for table

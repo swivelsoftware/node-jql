@@ -1,6 +1,6 @@
 import { JQL } from '.'
-import { CreateTableConstraint } from './create/table/constraint'
-import { ICreateTableConstraint } from './create/table/index.if'
+import { TableConstraint } from '../engine/memory/table/constraint'
+import { ITableConstraint } from './create/table/index.if'
 import { Expression } from './expressions'
 import { IExpression } from './expressions/index.if'
 import { IJQL } from './index.if'
@@ -34,7 +34,7 @@ export function parse<T extends Table>(json: ITable): T
  * Parse constraint json to constraint instance
  * @param json [ICreateTableConstraint]
  */
-export function parse<T extends CreateTableConstraint>(json: ICreateTableConstraint): T
+export function parse<T extends TableConstraint>(json: ITableConstraint): T
 
 /**
  * Parse JQL json to JQL instance

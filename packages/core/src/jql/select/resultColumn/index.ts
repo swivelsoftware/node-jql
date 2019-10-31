@@ -1,9 +1,9 @@
 import { JQL } from '../..'
 import { Expression } from '../../expressions'
+import { ColumnExpression } from '../../expressions/column'
 import { IExpression } from '../../expressions/index.if'
 import { parse } from '../../parse'
 import { IResultColumn } from './index.if'
-import { ColumnExpression } from '../../expressions/column'
 
 /**
  * Selected column in the result set

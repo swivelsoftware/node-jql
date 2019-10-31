@@ -1,8 +1,10 @@
 import { JQL } from '../..'
+import { TableDef } from '../../../engine/memory/table'
+import { ColumnDef } from '../../../engine/memory/table/column'
+import { TableConstraint, TablePrimaryKeyConstraint } from '../../../engine/memory/table/constraint'
+import { IColumnDef } from '../../../engine/memory/table/index.if'
 import { parse } from '../../parse'
-import { ColumnDef } from './column'
-import { CreateTableConstraint, CreateTablePrimaryKeyConstraint } from './constraint'
-import { IColumnDef, ICreateSchemaTableJQL, ICreateTableConstraint } from './index.if'
+import { ICreateSchemaTableJQL, ITableConstraint } from './index.if'
 
 /**
  * normally create table
@@ -24,7 +26,7 @@ export class CreateSchemaTableJQL extends JQL implements ICreateSchemaTableJQL {
   public columns: Array<ColumnDef<any>> = []
 
   // @override
-  public constraints: CreateTableConstraint[] = []
+  public constraints: TableConstraint[] = []
 
   constructor(json?: string|ICreateSchemaTableJQL) {
     super()
@@ -87,9 +89,19 @@ export class CreateSchemaTableJQL extends JQL implements ICreateSchemaTableJQL {
    * add table constraint
    * @param constraint [ICreateTableConstraint]
    */
-  public addConstraint(constraint: ICreateTableConstraint): CreateSchemaTableJQL {
+  public addConstraint(constraint: ITableConstraint): CreateSchemaTableJQL {
     this.constraints.push(parse(constraint))
     return this
+  }
+
+  /**
+   * convert to TableDef
+   */
+  public toTableDef(): TableDef {
+    const result = new TableDef(this.name)
+    for (const c of this.columns) result.addColumn(c)
+    for (const c of this.constraints) result.addConstraint(c)
+    return result
   }
 
   // @override
@@ -143,10 +155,10 @@ export class CreateSchemaTableJQL extends JQL implements ICreateSchemaTableJQL {
     if (columns.length === 1) return columns[0].name
   }
 
-  private getPrimaryConstraint(): CreateTablePrimaryKeyConstraint|undefined {
-    const constraints = this.constraints.filter(c => c instanceof CreateTablePrimaryKeyConstraint)
+  private getPrimaryConstraint(): TablePrimaryKeyConstraint|undefined {
+    const constraints = this.constraints.filter(c => c instanceof TablePrimaryKeyConstraint)
     if (!constraints.length) return
     if (constraints.length > 1) throw new SyntaxError('Multiple PRIMARY KEY constraints are defined')
-    return constraints[0] as CreateTablePrimaryKeyConstraint
+    return constraints[0] as TablePrimaryKeyConstraint
   }
 }

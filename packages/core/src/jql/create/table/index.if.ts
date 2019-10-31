@@ -1,18 +1,6 @@
-import { IJQL, Type } from '../../index.if'
+import { IColumnDef } from '../../../engine/memory/table/index.if'
+import { IJQL } from '../../index.if'
 import { Query } from '../../select'
-
-/**
- * Column definition
- */
-export interface IColumnDef<T = Type> extends IJQL {
-  name: string
-  type: T
-  length?: number
-  primaryKey?: boolean
-  defaultValue?: any
-  notNull?: boolean
-  autoIncrement?: boolean
-}
 
 /**
  * create table
@@ -28,7 +16,7 @@ export interface ICreateTable extends IJQL {
  */
 export interface ICreateSchemaTableJQL extends ICreateTable {
   columns: IColumnDef[]
-  constraints?: ICreateTableConstraint[]
+  constraints?: ITableConstraint[]
 }
 
 /**
@@ -49,20 +37,20 @@ export interface ICreateRemoteTableJQL<R> extends ICreateTable {
 /**
  * extra options for create table
  */
-export interface ICreateTableConstraint extends IJQL {
+export interface ITableConstraint extends IJQL {
 }
 
 /**
  * raw constraint
  */
-export interface ICreateTableRawConstraint extends ICreateTableConstraint {
+export interface ITableRawConstraint extends ITableConstraint {
   value: string
 }
 
 /**
  * PRIMARY KEY constraint
  */
-export interface ICreateTablePrimaryKeyConstraint extends ICreateTableConstraint {
+export interface ITablePrimaryKeyConstraint extends ITableConstraint {
   columns: string[]
 }
 

@@ -1,5 +1,5 @@
-import { JQL } from '../..'
-import { Type } from '../../index.if'
+import { JQL } from '../../../jql'
+import { Type } from '../../../jql/index.if'
 import { IColumnDef } from './index.if'
 
 /**
@@ -7,7 +7,7 @@ import { IColumnDef } from './index.if'
  */
 export class ColumnDef<T = Type> extends JQL implements IColumnDef<T> {
   // @override
-  public readonly classname: string = ColumnDef.name
+  public readonly classname = ColumnDef.name
 
   // @override
   public name: string
@@ -29,6 +29,9 @@ export class ColumnDef<T = Type> extends JQL implements IColumnDef<T> {
 
   // @override
   public autoIncrement = false
+
+  // @override
+  public options: string[] = []
 
   constructor(json?: IColumnDef<T>) {
     super()
@@ -94,6 +97,15 @@ export class ColumnDef<T = Type> extends JQL implements IColumnDef<T> {
     return this
   }
 
+  /**
+   * add extra option
+   * @param option [string]
+   */
+  public addOption(option: string): ColumnDef<T> {
+    this.options.push(option)
+    return this
+  }
+
   // @override
   public toJson(): IColumnDef<T> {
     this.check()
@@ -106,6 +118,7 @@ export class ColumnDef<T = Type> extends JQL implements IColumnDef<T> {
       defaultValue: this.defaultValue,
       notNull: this.notNull,
       autoIncrement: this.autoIncrement,
+      options: this.options,
     }
   }
 
@@ -117,6 +130,7 @@ export class ColumnDef<T = Type> extends JQL implements IColumnDef<T> {
     if (this.primaryKey) result += ' PRIMARY KEY'
     result += this.notNull ? ' NOT NULL' : ` DEFAULT ${JSON.stringify(this.defaultValue)}`
     if (this.autoIncrement) result += ' AUTO_INCREMENT'
+    for (const o of this.options) result += ` ${o}`
     return result
   }
 

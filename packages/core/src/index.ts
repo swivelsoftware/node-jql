@@ -1,4 +1,4 @@
-import './jql/create/table/__init__'
+import './engine/memory/table/__init__'
 import './jql/expressions/__init__'
 import './jql/select/fromTable/__init__'
 
@@ -51,9 +51,7 @@ export { ILimitBy } from './jql/select/limitBy/index.if'
 export { CreateSchemaJQL } from './jql/create/schema'
 export { ICreateSchemaJQL } from './jql/create/schema/index.if'
 export { CreateSchemaTableJQL } from './jql/create/table'
-export { IColumnDef, ICreateQueryTableJQL, ICreateRemoteTableJQL, ICreateSchemaTableJQL, ICreateTableConstraint, ICreateTablePrimaryKeyConstraint, ICreateTableRawConstraint } from './jql/create/table/index.if'
-export { ColumnDef } from './jql/create/table/column'
-export { CreateTableConstraint, CreateTablePrimaryKeyConstraint, CreateTableRawConstraint } from './jql/create/table/constraint'
+export { ICreateQueryTableJQL, ICreateRemoteTableJQL, ICreateSchemaTableJQL, ITableConstraint as ICreateTableConstraint, ITablePrimaryKeyConstraint as ICreateTablePrimaryKeyConstraint, ITableRawConstraint as ICreateTableRawConstraint } from './jql/create/table/index.if'
 export { CreateFunctionJQL } from './jql/create/function'
 export { ICreateFunctionJQL } from './jql/create/function/index.if'
 
@@ -72,3 +70,7 @@ export { IDropFunctionJQL } from './jql/drop/function/index.if'
 
 export { SetVariableJQL } from './jql/set'
 export { ISetVariableJQL } from './jql/set/index.if'
+
+export { ColumnDef } from './engine/memory/table/column'
+export { TableConstraint as CreateTableConstraint, TablePrimaryKeyConstraint as CreateTablePrimaryKeyConstraint, TableRawConstraint as CreateTableRawConstraint } from './engine/memory/table/constraint'
+export { IColumnDef } from './engine/memory/table/index.if'

@@ -1,5 +1,5 @@
-import { IJQL } from '../index.if'
 import { IBinaryExpression } from '../expressions/binary/index.if'
+import { IJQL } from '../index.if'
 
 /**
  * set variable

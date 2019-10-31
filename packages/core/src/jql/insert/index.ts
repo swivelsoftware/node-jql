@@ -1,8 +1,8 @@
 import { JQL } from '..'
-import { IInsertJQL, InsertValue } from './index.if'
-import { SchemaTable } from '../select/fromTable/table'
-import { ISchemaTable } from '../select/fromTable/index.if'
 import { Variable } from '../expressions/variable'
+import { ISchemaTable } from '../select/fromTable/index.if'
+import { SchemaTable } from '../select/fromTable/table'
+import { IInsertJQL, InsertValue } from './index.if'
 
 /**
  * INSERT INTO ...
@@ -60,7 +60,7 @@ export class InsertJQL extends JQL implements IInsertJQL {
       classname: this.classname,
       $into: this.$into.toJson(),
       mappings: this.mappings,
-      $values: this.$values
+      $values: this.$values,
     }
   }
 

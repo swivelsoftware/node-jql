@@ -1,8 +1,8 @@
 import { register } from '../../parse'
 import { BinaryExpression } from '../binary'
 import { BinaryOperator, IBinaryExpression } from '../binary/index.if'
-import { Variable } from '../variable'
 import { IExpression } from '../index.if'
+import { Variable } from '../variable'
 
 /**
  * {left} := {right}

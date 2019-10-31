@@ -1,24 +1,24 @@
-import { JQL } from '../..'
-import { register } from '../../parse'
-import { ICreateTableConstraint, ICreateTablePrimaryKeyConstraint, ICreateTableRawConstraint } from './index.if'
+import { JQL } from '../../../jql'
+import { ITableConstraint, ITablePrimaryKeyConstraint, ITableRawConstraint } from '../../../jql/create/table/index.if'
+import { register } from '../../../jql/parse'
 
 /**
  * extra options for create table
  */
-export abstract class CreateTableConstraint extends JQL implements ICreateTableConstraint {
+export abstract class TableConstraint extends JQL implements ITableConstraint {
 }
 
 /**
  * raw constraint
  */
-export class CreateTableRawConstraint extends CreateTableConstraint implements ICreateTableRawConstraint {
+export class TableRawConstraint extends TableConstraint implements ITableRawConstraint {
   // @override
-  public readonly classname = CreateTableRawConstraint.name
+  public readonly classname = TableRawConstraint.name
 
   // @override
   public value: string
 
-  constructor(json?: string|ICreateTableRawConstraint) {
+  constructor(json?: string|ITableRawConstraint) {
     super()
 
     if (typeof json === 'string') {
@@ -33,13 +33,13 @@ export class CreateTableRawConstraint extends CreateTableConstraint implements I
    * set value
    * @param value [string]
    */
-  public set(value: string): CreateTableRawConstraint {
+  public set(value: string): TableRawConstraint {
     this.value = value
     return this
   }
 
   // @override
-  public toJson(): ICreateTableRawConstraint {
+  public toJson(): ITableRawConstraint {
     this.check()
     return {
       classname: this.classname,
@@ -62,14 +62,14 @@ export class CreateTableRawConstraint extends CreateTableConstraint implements I
 /**
  * PRIMARY KEY constraint
  */
-export class CreateTablePrimaryKeyConstraint extends CreateTableConstraint implements ICreateTablePrimaryKeyConstraint {
+export class TablePrimaryKeyConstraint extends TableConstraint implements ITablePrimaryKeyConstraint {
   // @override
-  public readonly classname = CreateTablePrimaryKeyConstraint.name
+  public readonly classname = TablePrimaryKeyConstraint.name
 
   // @override
   public columns: string[] = []
 
-  constructor(json?: string|ICreateTablePrimaryKeyConstraint) {
+  constructor(json?: string|ITablePrimaryKeyConstraint) {
     super()
 
     if (typeof json === 'string') {
@@ -84,13 +84,13 @@ export class CreateTablePrimaryKeyConstraint extends CreateTableConstraint imple
    * add primary column
    * @param name [string]
    */
-  public addColumn(name: string): CreateTablePrimaryKeyConstraint {
+  public addColumn(name: string): TablePrimaryKeyConstraint {
     this.columns.push(name)
     return this
   }
 
   // @override
-  public toJson(): ICreateTablePrimaryKeyConstraint {
+  public toJson(): ITablePrimaryKeyConstraint {
     this.check()
     return {
       classname: this.classname,
@@ -110,5 +110,5 @@ export class CreateTablePrimaryKeyConstraint extends CreateTableConstraint imple
   }
 }
 
-register(CreateTableRawConstraint)
-register(CreateTablePrimaryKeyConstraint)
+register(TableRawConstraint)
+register(TablePrimaryKeyConstraint)

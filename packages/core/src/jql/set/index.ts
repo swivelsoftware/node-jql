@@ -1,7 +1,7 @@
 import { JQL } from '../..'
-import { ISetVariableJQL } from './index.if'
 import { IBinaryExpression } from '../expressions/binary/index.if'
 import { SetVariableExpression } from '../expressions/set-variable'
+import { ISetVariableJQL } from './index.if'
 
 /**
  * set variable

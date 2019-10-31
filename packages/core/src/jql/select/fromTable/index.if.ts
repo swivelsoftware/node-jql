@@ -1,4 +1,4 @@
-import { IColumnDef } from '../../create/table/index.if'
+import { IColumnDef } from '../../../engine/memory/table/index.if'
 import { IConditionalExpression } from '../../expressions/index.if'
 import { IJQL } from '../../index.if'
 import { IQuery } from '../index.if'

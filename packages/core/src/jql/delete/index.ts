@@ -1,10 +1,10 @@
 import { JQL } from '..'
-import { IDeleteJQL } from './index.if'
 import { ConditionalExpression } from '../expressions'
 import { IConditionalExpression } from '../expressions/index.if'
 import { parse } from '../parse'
-import { SchemaTable } from '../select/fromTable/table'
 import { ISchemaTable } from '../select/fromTable/index.if'
+import { SchemaTable } from '../select/fromTable/table'
+import { IDeleteJQL } from './index.if'
 
 /**
  * DELETE FROM ...
