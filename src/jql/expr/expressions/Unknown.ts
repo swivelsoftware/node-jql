@@ -55,6 +55,12 @@ export class Unknown extends Expression implements IUnknown {
 
   // @override
   public toSquel(): squel.FunctionBlock {
+    if (Array.isArray(this.value)) {
+      let format = ''
+      for (let i = 0, length = this.value.length; i < length; i += 1) format += (i > 0 ? ', ' : '') + '?'
+      format = `(${format})`
+      return squel.rstr(format, ...this.value)
+    }
     return squel.rstr('?', this.value)
   }
 

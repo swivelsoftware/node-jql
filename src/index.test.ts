@@ -95,6 +95,16 @@ test('SELECT c.name FROM Student `s` LEFT JOIN Class `c` ON (c.studentId = s.id)
   console.log(query.toString())
 })
 
+test('SELECT COUNT(*) FROM Student WHERE (id IN (1, 2, 3))', () => {
+  const query = new Query({
+    $select: new ResultColumn(new FunctionExpression('COUNT', new ColumnExpression('*'))),
+    $from: 'Student',
+    $where: new InExpression(new ColumnExpression('id'), false, [1, 2, 3]),
+  })
+  query.validate()
+  console.log(query.toString())
+})
+
 test('SELECT COUNT(*) FROM Student WHERE (id IN (SELECT studentId FROM ClubStudent `cs` LEFT JOIN Club `c` ON (c.id = cs.clubId) WHERE (c.name = \'Science Club\')))', () => {
   const query = new Query({
     $select: new ResultColumn(new FunctionExpression('COUNT', new ColumnExpression('*'))),
