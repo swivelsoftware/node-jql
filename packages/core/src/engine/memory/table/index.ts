@@ -24,7 +24,7 @@ export class TableDef {
   }
 
   /**
-   * add table column
+   * Add table column
    * @param column [ColumnDef]
    */
   public addColumn(column: ColumnDef): TableDef {
@@ -33,7 +33,7 @@ export class TableDef {
   }
 
   /**
-   * add table constraint
+   * Add table constraint
    * @param constraint [TableConstraint]
    */
   public addConstraint(constraint: TableConstraint): TableDef {

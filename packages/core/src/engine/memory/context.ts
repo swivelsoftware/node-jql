@@ -1,23 +1,23 @@
 import { TableDef } from './table'
 
 /**
- * Database context
+ * Engine context
  */
 export class Context {
   /**
    * Tables declared
    */
-  public tables: { [key: string]: TableDef } = {}
+  public readonly tables: { [key: string]: TableDef } = {}
 
   /**
    * Variables declared
    */
-  public variables: { [key: string]: any } = {}
+  public readonly variables: { [key: string]: any } = {}
 
   // TODO functions
 
   /**
    * Table data
    */
-  public data: { [key: string]: any[] } = {}
+  public readonly data: { [key: string]: any[] } = {}
 }

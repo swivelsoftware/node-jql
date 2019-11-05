@@ -29,7 +29,7 @@ export class CaseExpression extends Expression implements ICaseExpression {
   }
 
   /**
-   * add case statement
+   * Add case statement
    * @param when [IConditionalExpression]
    * @param then [IExpression]
    */
@@ -42,7 +42,7 @@ export class CaseExpression extends Expression implements ICaseExpression {
   }
 
   /**
-   * set ELSE expression
+   * Set ELSE expression
    * @param $else [IExpression]
    */
   public setElse($else: IExpression): CaseExpression {

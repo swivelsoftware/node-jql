@@ -2,9 +2,9 @@ import { JQL } from '../..'
 import { TableDef } from '../../../engine/memory/table'
 import { ColumnDef } from '../../../engine/memory/table/column'
 import { TableConstraint, TablePrimaryKeyConstraint } from '../../../engine/memory/table/constraint'
-import { IColumnDef } from '../../../engine/memory/table/index.if'
+import { IColumnDef, ITableConstraint } from '../../../engine/memory/table/index.if'
 import { parse } from '../../parse'
-import { ICreateSchemaTableJQL, ITableConstraint } from './index.if'
+import { ICreateSchemaTableJQL } from './index.if'
 
 /**
  * normally create table
@@ -45,12 +45,12 @@ export class CreateSchemaTableJQL extends JQL implements ICreateSchemaTableJQL {
   }
 
   /**
-   * set table
+   * Set table
    * @param name [string]
    */
   public setTable(name: string): CreateSchemaTableJQL
   /**
-   * set table
+   * Set table
    * @param schema [string]
    * @param table [string]
    */
@@ -68,7 +68,7 @@ export class CreateSchemaTableJQL extends JQL implements ICreateSchemaTableJQL {
   }
 
   /**
-   * set IF NOT EXISTS flag
+   * Set IF NOT EXISTS flag
    * @param flag [boolean]
    */
   public ifNotExists(flag = true): CreateSchemaTableJQL {
@@ -77,7 +77,7 @@ export class CreateSchemaTableJQL extends JQL implements ICreateSchemaTableJQL {
   }
 
   /**
-   * add table column
+   * Add table column
    * @param column [IColumnDef]
    */
   public addColumn<T>(column: IColumnDef<T>): CreateSchemaTableJQL {
@@ -86,7 +86,7 @@ export class CreateSchemaTableJQL extends JQL implements ICreateSchemaTableJQL {
   }
 
   /**
-   * add table constraint
+   * Add table constraint
    * @param constraint [ICreateTableConstraint]
    */
   public addConstraint(constraint: ITableConstraint): CreateSchemaTableJQL {
@@ -95,7 +95,7 @@ export class CreateSchemaTableJQL extends JQL implements ICreateSchemaTableJQL {
   }
 
   /**
-   * convert to TableDef
+   * Convert to TableDef
    */
   public toTableDef(): TableDef {
     const result = new TableDef(this.name)
@@ -162,3 +162,6 @@ export class CreateSchemaTableJQL extends JQL implements ICreateSchemaTableJQL {
     return constraints[0] as TablePrimaryKeyConstraint
   }
 }
+
+// TODO CreateQueryTableJQL
+// TODO CreateQueryTableJQL

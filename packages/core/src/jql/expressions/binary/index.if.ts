@@ -6,8 +6,23 @@ export type BinaryOperator = '='|'<>'|'<'|'<='|'>'|'>='|':='|'IN'|'IS'|'LIKE'|'R
  * {left} {$not} {operator} {right}
  */
 export interface IBinaryExpression extends IConditionalExpression {
+  /**
+   * Left expression
+   */
   left?: IExpression
+
+  /**
+   * Operator
+   */
   operator: BinaryOperator
+
+  /**
+   * NOT flag
+   */
   $not?: boolean
+
+  /**
+   * Right expression
+   */
   right?: IExpression
 }

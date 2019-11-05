@@ -4,7 +4,7 @@ import { SchemaTable } from '../../select/fromTable/table'
 import { IDropTableJQL } from './index.if'
 
 /**
- * drop table
+ * Drop table
  */
 export class DropTableJQL extends JQL implements IDropTableJQL {
   // @override
@@ -28,7 +28,7 @@ export class DropTableJQL extends JQL implements IDropTableJQL {
   }
 
   /**
-   * set table
+   * Set table
    * @param table [ISchemaTable]
    */
   public setTable(table: ISchemaTable): DropTableJQL {
@@ -37,7 +37,7 @@ export class DropTableJQL extends JQL implements IDropTableJQL {
   }
 
   /**
-   * set IF EXISTS flag
+   * Set IF EXISTS flag
    * @param flag [boolean]
    */
   public ifExists(flag = true): DropTableJQL {

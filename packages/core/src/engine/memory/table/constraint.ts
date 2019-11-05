@@ -1,15 +1,15 @@
 import { JQL } from '../../../jql'
-import { ITableConstraint, ITablePrimaryKeyConstraint, ITableRawConstraint } from '../../../jql/create/table/index.if'
 import { register } from '../../../jql/parse'
+import { ITableConstraint, ITablePrimaryKeyConstraint, ITableRawConstraint } from './index.if'
 
 /**
- * extra options for create table
+ * Extra options for creating table
  */
 export abstract class TableConstraint extends JQL implements ITableConstraint {
 }
 
 /**
- * raw constraint
+ * Raw constraint
  */
 export class TableRawConstraint extends TableConstraint implements ITableRawConstraint {
   // @override
@@ -30,7 +30,7 @@ export class TableRawConstraint extends TableConstraint implements ITableRawCons
   }
 
   /**
-   * set value
+   * Set value
    * @param value [string]
    */
   public set(value: string): TableRawConstraint {
@@ -81,7 +81,7 @@ export class TablePrimaryKeyConstraint extends TableConstraint implements ITable
   }
 
   /**
-   * add primary column
+   * Add primary column
    * @param name [string]
    */
   public addColumn(name: string): TablePrimaryKeyConstraint {

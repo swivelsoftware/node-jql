@@ -2,7 +2,7 @@ import { JQL } from '../..'
 import { IDropFunctionJQL } from './index.if'
 
 /**
- * drop function
+ * Drop function
  */
 export class DropFunctionJQL extends JQL implements IDropFunctionJQL {
   // @override
@@ -26,7 +26,7 @@ export class DropFunctionJQL extends JQL implements IDropFunctionJQL {
   }
 
   /**
-   * set function
+   * Set function
    * @param function [string]
    */
   public setFunction(name: string): DropFunctionJQL {
@@ -35,7 +35,7 @@ export class DropFunctionJQL extends JQL implements IDropFunctionJQL {
   }
 
   /**
-   * set IF EXISTS flag
+   * Set IF EXISTS flag
    * @param flag [boolean]
    */
   public ifExists(flag = true): DropFunctionJQL {

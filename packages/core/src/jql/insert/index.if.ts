@@ -11,7 +11,18 @@ export type InsertValue = Array<IVariable|any>
  * INSERT INTO ...
  */
 export interface IInsertJQL extends IJQL {
+  /**
+   * Target table
+   */
   $into: ISchemaTable
+
+  /**
+   * Columns ordering
+   */
   mappings?: string[]
+
+  /**
+   * Values
+   */
   $values: InsertValue[]
 }

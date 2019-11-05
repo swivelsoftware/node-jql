@@ -32,7 +32,7 @@ export class Unknown extends Expression implements IUnknown {
   }
 
   /**
-   * set unknown type
+   * Set unknown type
    * @param type [Type]
    */
   public setType(type: Type = 'any'): Unknown {
@@ -50,7 +50,7 @@ export class Unknown extends Expression implements IUnknown {
   }
 
   /**
-   * convert to Value expression
+   * Convert to Value expression
    */
   public toValue(): Value {
     return new Value(this.value_)

@@ -2,7 +2,7 @@ import { JQL } from '../..'
 import { IDropSchemaJQL } from './index.if'
 
 /**
- * drop schema
+ * Drop schema
  */
 export class DropSchemaJQL extends JQL implements IDropSchemaJQL {
   // @override
@@ -27,7 +27,7 @@ export class DropSchemaJQL extends JQL implements IDropSchemaJQL {
   }
 
   /**
-   * set table
+   * Set name
    * @param name [string]
    */
   public setSchema(name: string): DropSchemaJQL {
@@ -36,7 +36,7 @@ export class DropSchemaJQL extends JQL implements IDropSchemaJQL {
   }
 
   /**
-   * set IF EXISTS flag
+   * Set IF EXISTS flag
    * @param flag [boolean]
    */
   public ifExists(flag = true): DropSchemaJQL {

@@ -22,7 +22,7 @@ abstract class GroupedExpressions extends ConditionalExpression implements IGrou
   }
 
   /**
-   * add expression
+   * Add expression
    * @param expr [IConditionalExpression]
    */
   public addExpression(expr: IConditionalExpression): GroupedExpressions {

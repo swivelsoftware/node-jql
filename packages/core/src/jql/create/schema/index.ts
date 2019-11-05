@@ -2,7 +2,7 @@ import { JQL } from '../..'
 import { ICreateSchemaJQL } from './index.if'
 
 /**
- * create schema
+ * Create schema
  */
 export class CreateSchemaJQL extends JQL implements ICreateSchemaJQL {
   // @override
@@ -30,7 +30,7 @@ export class CreateSchemaJQL extends JQL implements ICreateSchemaJQL {
   }
 
   /**
-   * set table
+   * Set table
    * @param name [string]
    */
   public setSchema(name: string): CreateSchemaJQL {
@@ -39,7 +39,7 @@ export class CreateSchemaJQL extends JQL implements ICreateSchemaJQL {
   }
 
   /**
-   * set IF NOT EXISTS flag
+   * Set IF NOT EXISTS flag
    * @param flag [boolean]
    */
   public ifNotExists(flag = true): CreateSchemaJQL {
@@ -48,7 +48,7 @@ export class CreateSchemaJQL extends JQL implements ICreateSchemaJQL {
   }
 
   /**
-   * add extra option
+   * Add extra option
    * @param value [string]
    */
   public addOption(value: string): CreateSchemaJQL {

@@ -45,7 +45,7 @@ export class ColumnDef<T = Type> extends JQL implements IColumnDef<T> {
   }
 
   /**
-   * set column definition
+   * Set column definition
    * @param name [string]
    * @param type [Type]
    */
@@ -57,7 +57,7 @@ export class ColumnDef<T = Type> extends JQL implements IColumnDef<T> {
   }
 
   /**
-   * set PRIMARY KEY flag
+   * Set PRIMARY KEY flag
    * @param flag [boolean]
    */
   public setPrimaryKey(flag = true): ColumnDef<T> {
@@ -67,13 +67,13 @@ export class ColumnDef<T = Type> extends JQL implements IColumnDef<T> {
   }
 
   /**
-   * set NOT NULL flag
+   * Set NOT NULL flag
    * @param flag [boolean]
    */
   public setNotNull(flag?: true): ColumnDef<T>
 
   /**
-   * set DEFAULT value
+   * Set DEFAULT value
    * @param flag [boolean]
    * @param defaultValue [any]
    */
@@ -89,7 +89,7 @@ export class ColumnDef<T = Type> extends JQL implements IColumnDef<T> {
   }
 
   /**
-   * set AUTO_INCREMENT flag
+   * Set AUTO_INCREMENT flag
    * @param flag [boolean]
    */
   public setAutoIncrement(flag = true): ColumnDef<T> {
@@ -98,7 +98,7 @@ export class ColumnDef<T = Type> extends JQL implements IColumnDef<T> {
   }
 
   /**
-   * add extra option
+   * Add extra option
    * @param option [string]
    */
   public addOption(option: string): ColumnDef<T> {

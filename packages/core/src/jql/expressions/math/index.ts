@@ -40,7 +40,7 @@ export class MathExpression extends Expression implements IMathExpression {
   }
 
   /**
-   * set LEFT expression
+   * Set LEFT expression
    * @param expr [IExpression]
    */
   public setLeft(expr?: IExpression): MathExpression {
@@ -49,7 +49,7 @@ export class MathExpression extends Expression implements IMathExpression {
   }
 
   /**
-   * set binary operator
+   * Set binary operator
    * @param operator [MathOperator]
    */
   public setOperator(operator: MathOperator): MathExpression {
@@ -58,7 +58,7 @@ export class MathExpression extends Expression implements IMathExpression {
   }
 
   /**
-   * set RIGHT expression
+   * Set RIGHT expression
    * @param expr [IExpression]
    */
   public setRight(expr?: IExpression): MathExpression {

@@ -1,6 +1,6 @@
 import { JQL } from '.'
 import { TableConstraint } from '../engine/memory/table/constraint'
-import { ITableConstraint } from './create/table/index.if'
+import { ITableConstraint } from '../engine/memory/table/index.if'
 import { Expression } from './expressions'
 import { IExpression } from './expressions/index.if'
 import { IJQL } from './index.if'

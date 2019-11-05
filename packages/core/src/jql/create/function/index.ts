@@ -3,7 +3,7 @@ import { Type } from '../../index.if'
 import { ICreateFunctionJQL } from './index.if'
 
 /**
- * create function
+ * Create function
  */
 export class CreateFunctionJQL<T = Type> extends JQL implements ICreateFunctionJQL<T> {
   // @override
@@ -36,7 +36,7 @@ export class CreateFunctionJQL<T = Type> extends JQL implements ICreateFunctionJ
   }
 
   /**
-   * set function name
+   * Set function name
    * @param name [string]
    */
   public setName(name: string): CreateFunctionJQL<T> {
@@ -45,7 +45,7 @@ export class CreateFunctionJQL<T = Type> extends JQL implements ICreateFunctionJ
   }
 
   /**
-   * add parameter definition
+   * Add parameter definition
    * @param name [string]
    * @param type [T]
    */
@@ -55,7 +55,7 @@ export class CreateFunctionJQL<T = Type> extends JQL implements ICreateFunctionJ
   }
 
   /**
-   * set return data type
+   * Set return data type
    * @param type [T]
    */
   public setReturnType(type: T): CreateFunctionJQL<T> {
@@ -64,7 +64,7 @@ export class CreateFunctionJQL<T = Type> extends JQL implements ICreateFunctionJ
   }
 
   /**
-   * set function code
+   * Set function code
    * @param code [string]
    */
   public setCode(code: string): CreateFunctionJQL<T> {

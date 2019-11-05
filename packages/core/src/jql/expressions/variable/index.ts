@@ -24,7 +24,7 @@ export class Variable extends Expression implements IVariable {
   }
 
   /**
-   * set variable name
+   * Set variable name
    * @param name [string]
    */
   public setName(name: string): Variable {

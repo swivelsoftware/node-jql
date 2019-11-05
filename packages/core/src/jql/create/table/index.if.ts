@@ -1,57 +1,68 @@
-import { IColumnDef } from '../../../engine/memory/table/index.if'
+import { IColumnDef, ITableConstraint } from '../../../engine/memory/table/index.if'
 import { IJQL } from '../../index.if'
 import { Query } from '../../select'
 
 /**
- * create table
+ * Create table
  */
 export interface ICreateTable extends IJQL {
+  /**
+   * Schema name
+   */
   schema?: string
+
+  /**
+   * Table name
+   */
   name: string
+
+  /**
+   * Suppress error if table exists
+   */
   $ifNotExists?: boolean
+
+  /**
+   * Engine used
+   */
+  engine?: string
 }
 
 /**
- * normally create table
+ * Normally create table
  */
 export interface ICreateSchemaTableJQL extends ICreateTable {
+  /**
+   * Table columns
+   */
   columns: IColumnDef[]
+
+  /**
+   * Table options
+   */
   constraints?: ITableConstraint[]
 }
 
 /**
- * create table from query
+ * Create table from query
  */
 export interface ICreateQueryTableJQL extends ICreateTable {
+  /**
+   * Query
+   */
   $as: Query
 }
 
 /**
- * create table from API
+ * Create table from API
  */
 export interface ICreateRemoteTableJQL<R> extends ICreateTable {
+  /**
+   * Table columns
+   */
   columns: IColumnDef[]
+
+  /**
+   * Request options
+   */
   requestConfig: R
 }
-
-/**
- * extra options for create table
- */
-export interface ITableConstraint extends IJQL {
-}
-
-/**
- * raw constraint
- */
-export interface ITableRawConstraint extends ITableConstraint {
-  value: string
-}
-
-/**
- * PRIMARY KEY constraint
- */
-export interface ITablePrimaryKeyConstraint extends ITableConstraint {
-  columns: string[]
-}
-
-// TODO FOREIGN KEY constraint

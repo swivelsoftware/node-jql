@@ -32,7 +32,7 @@ export class DeleteJQL extends JQL implements IDeleteJQL {
   }
 
   /**
-   * set table source
+   * Set table source
    * @param table [ISchemaTable]
    */
   public from(table: ISchemaTable): DeleteJQL {
@@ -41,7 +41,7 @@ export class DeleteJQL extends JQL implements IDeleteJQL {
   }
 
   /**
-   * set where clause
+   * Set WHERE clause
    * @param expression [IConditionalExpression]
    */
   public where(expression: IConditionalExpression): DeleteJQL {

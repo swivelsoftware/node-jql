@@ -45,7 +45,7 @@ export class BinaryExpression extends ConditionalExpression implements IBinaryEx
   }
 
   /**
-   * set LEFT expression
+   * Set LEFT expression
    * @param expr [IExpression]
    */
   public setLeft(expr?: IExpression): BinaryExpression {
@@ -54,7 +54,7 @@ export class BinaryExpression extends ConditionalExpression implements IBinaryEx
   }
 
   /**
-   * set binary operator
+   * Set binary operator
    * @param operator [BinaryOperator]
    */
   public setOperator(operator: BinaryOperator): BinaryExpression {
@@ -65,7 +65,7 @@ export class BinaryExpression extends ConditionalExpression implements IBinaryEx
   }
 
   /**
-   * set NOT flag
+   * Set NOT flag
    * @param expr [IExpression]
    */
   public setNot(flag = true): BinaryExpression {
@@ -77,7 +77,7 @@ export class BinaryExpression extends ConditionalExpression implements IBinaryEx
   }
 
   /**
-   * set RIGHT expression
+   * Set RIGHT expression
    * @param expr [IExpression]
    */
   public setRight(expr?: IExpression): BinaryExpression {

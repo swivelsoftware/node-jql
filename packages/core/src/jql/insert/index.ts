@@ -32,7 +32,7 @@ export class InsertJQL extends JQL implements IInsertJQL {
   }
 
   /**
-   * set table
+   * Set table
    * @param table [ISchemaTable]
    * @param mappings [Array<string>]
    */
@@ -44,7 +44,7 @@ export class InsertJQL extends JQL implements IInsertJQL {
   }
 
   /**
-   * add value
+   * Add value
    * @param value [InsertValue]
    */
   public addValue(value: InsertValue): InsertJQL {

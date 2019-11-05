@@ -29,7 +29,7 @@ export class ExistsExpression extends ConditionalExpression implements IExistsEx
   }
 
   /**
-   * set NOT flag
+   * Set NOT flag
    * @param expr [IExpression]
    */
   public setNot(flag = true): ExistsExpression {
@@ -38,7 +38,7 @@ export class ExistsExpression extends ConditionalExpression implements IExistsEx
   }
 
   /**
-   * set query
+   * Set query
    * @param query [IQueryExpression]
    */
   public setQuery(query: IQueryExpression): ExistsExpression {

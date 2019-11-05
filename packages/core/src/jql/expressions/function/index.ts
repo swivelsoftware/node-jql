@@ -34,7 +34,7 @@ export class FunctionExpression extends Expression implements IFunctionExpressio
   }
 
   /**
-   * set function
+   * Set function
    * @param name [string]
    */
   public setFunction(name: string): FunctionExpression {
@@ -43,7 +43,7 @@ export class FunctionExpression extends Expression implements IFunctionExpressio
   }
 
   /**
-   * add parameter
+   * Add parameter
    * @param expr [IExpression]
    */
   public addParameter(expr: IExpression): FunctionExpression {

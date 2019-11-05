@@ -37,7 +37,7 @@ export class BetweenExpression extends ConditionalExpression implements IBetween
   }
 
   /**
-   * set LEFT expression
+   * Set LEFT expression
    * @param expr [IExpression]
    */
   public setLeft(expr?: IExpression): BetweenExpression {
@@ -46,7 +46,7 @@ export class BetweenExpression extends ConditionalExpression implements IBetween
   }
 
   /**
-   * set NOT flag
+   * Set NOT flag
    * @param expr [IExpression]
    */
   public setNot(flag = true): BetweenExpression {
@@ -55,7 +55,7 @@ export class BetweenExpression extends ConditionalExpression implements IBetween
   }
 
   /**
-   * set START expression
+   * Set START expression
    * @param expr [IExpression]
    */
   public setStart(expr?: IExpression): BetweenExpression {
@@ -64,7 +64,7 @@ export class BetweenExpression extends ConditionalExpression implements IBetween
   }
 
   /**
-   * set END expression
+   * Set END expression
    * @param expr [IExpression]
    */
   public setEnd(expr?: IExpression): BetweenExpression {

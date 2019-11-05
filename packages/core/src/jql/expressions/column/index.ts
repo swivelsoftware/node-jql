@@ -36,14 +36,14 @@ export class ColumnExpression extends Expression implements IColumnExpression {
   }
 
   /**
-   * check if wildcard column
+   * Check if wildcard column
    */
   get isWildcard(): boolean {
     return this.name === '*'
   }
 
   /**
-   * set distinct flag
+   * Set distinct flag
    * @param flag [boolean]
    */
   public setDistinct(flag = true): ColumnExpression {
@@ -52,12 +52,12 @@ export class ColumnExpression extends Expression implements IColumnExpression {
   }
 
   /**
-   * set column
+   * Set column
    * @param name [string]
    */
   public setColumn(name: string): ColumnExpression
   /**
-   * set column
+   * Set column
    * @param table [string]
    * @param name [string]
    */
