@@ -21,6 +21,9 @@ export class CreateFunctionJQL<T = Type> extends JQL implements ICreateFunctionJ
   // @override
   public code: string
 
+  // @override
+  public engine?: string
+
   constructor(json?: string|ICreateFunctionJQL<T>) {
     super()
 
@@ -81,6 +84,7 @@ export class CreateFunctionJQL<T = Type> extends JQL implements ICreateFunctionJ
       parameters: this.parameters,
       returnType: this.returnType,
       code: this.code,
+      engine: this.engine,
     }
   }
 

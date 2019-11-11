@@ -23,4 +23,9 @@ export interface ICreateFunctionJQL<T = Type> extends IJQL {
    * Function script
    */
   code: string
+
+  /**
+   * Targeted engine
+   */
+  engine?: string
 }

@@ -20,17 +20,18 @@
     "dist"
   ],
   "devDependencies": {
-    "@types/jest": "^24.0.18",
-    "@types/node": "^12.7.5",
+    "@types/jest": "^24.0.22",
+    "@types/node": "^12.12.6",
     "@types/string-format": "^2.0.0",
     "jest": "^24.9.0",
     "ts-jest": "^24.1.0",
     "ts-node": "^8.4.1",
-    "tslint": "^5.20.0",
-    "typescript": "^3.6.3"
+    "tslint": "^5.20.1",
+    "typescript": "^3.7.2"
   },
   "dependencies": {
     "moment": "^2.24.0",
-    "string-format": "^2.0.0"
+    "string-format": "^2.0.0",
+    "wolfy87-eventemitter": "^5.2.8"
   }
 }

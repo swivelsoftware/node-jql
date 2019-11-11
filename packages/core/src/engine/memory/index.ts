@@ -10,7 +10,6 @@ import { Query } from '../../jql/select'
 import { SetVariableJQL } from '../../jql/set'
 import { Context } from './context'
 import { IEngineOptions } from './options'
-import { ReadWriteLock } from './table/lock'
 
 /**
  * In-memory SQL database engine
@@ -21,14 +20,7 @@ export class MemoryDatabaseEngine extends DatabaseEngine {
    */
   protected readonly context = new Context()
 
-  /**
-   * Table locks
-   */
-  protected readonly tableLocks: { [key: string]: ReadWriteLock } = {}
-
   constructor(
-    name: string,
-
     /**
      * Schema options
      */

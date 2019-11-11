@@ -1,10 +1,11 @@
+import EventEmitter from 'wolfy87-eventemitter'
 import { JQL } from '../jql'
 import { Query } from '../jql/select'
 
 /**
  * Database engine
  */
-export abstract class DatabaseEngine {
+export abstract class DatabaseEngine extends EventEmitter {
   /**
    * Run query
    * @param tid [string]

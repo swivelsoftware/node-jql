@@ -1,6 +1,6 @@
-import { IColumnDef, ITableConstraint } from '../../../engine/memory/table/index.if'
+import { IColumnDef, ITableConstraint, ITablePrimaryKeyConstraint } from '../../../engine/memory/table/index.if'
 import { IJQL } from '../../index.if'
-import { Query } from '../../select'
+import { IQuery } from '../../select/index.if'
 
 /**
  * Create table
@@ -47,20 +47,20 @@ export interface ICreateSchemaTableJQL extends ICreateTable {
  */
 export interface ICreateQueryTableJQL extends ICreateTable {
   /**
+   * PRIMARY KEY options
+   */
+  constraint?: ITablePrimaryKeyConstraint
+
+  /**
    * Query
    */
-  $as: Query
+  $as: IQuery
 }
 
 /**
  * Create table from API
  */
-export interface ICreateRemoteTableJQL<R> extends ICreateTable {
-  /**
-   * Table columns
-   */
-  columns: IColumnDef[]
-
+export interface ICreateRemoteTableJQL<R> extends ICreateSchemaTableJQL {
   /**
    * Request options
    */
