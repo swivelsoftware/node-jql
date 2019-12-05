@@ -66,7 +66,7 @@ export class ColumnExpression extends Expression implements IColumnExpression {
 
   // @override
   public toSquel(): squel.FunctionBlock {
-    return squel.rstr(`${this.table ? `${this.table}.` : ''}${this.name}`)
+    return squel.rstr(`${this.table ? `\`${this.table}\`.` : ''}\`${this.name}\``)
   }
 
   // @override
