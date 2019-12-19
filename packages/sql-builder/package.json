@@ -1,0 +1,36 @@
+{
+  "name": "@node-jql/sql-builder",
+  "version": "0.0.1",
+  "description": "SQL builder in JSON. Known as JQL",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://kennysng@github.com/kennysng/node-jql.git"
+  },
+  "author": "Kennys Ng <kennysng@hotmail.com.hk>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/kennysng/node-jql/issues"
+  },
+  "files": [
+    "build"
+  ],
+  "dependencies": {
+    "@types/jest": "^24.0.22",
+    "@types/lodash": "^4.14.149",
+    "@types/node": "^12.12.6",
+    "@types/node-sql-parser": "^1.1.0",
+    "@types/string-format": "^2.0.0",
+    "jest": "^24.9.0",
+    "lodash": "^4.17.15",
+    "moment": "^2.24.0",
+    "node-sql-parser": "^1.6.10",
+    "string-format": "^2.0.0",
+    "ts-jest": "^24.1.0",
+    "ts-node": "^8.4.1",
+    "tslint": "^5.20.1",
+    "typescript": "^3.7.2"
+  }
+}

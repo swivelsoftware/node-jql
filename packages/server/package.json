@@ -2,8 +2,8 @@
   "name": "@node-jql/server",
   "version": "0.0.1",
   "description": "The server component of node-jql based on WebSocket",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
   "scripts": {
   },
   "repository": {
@@ -16,6 +16,6 @@
     "url": "https://github.com/kennysng/node-jql/issues"
   },
   "files": [
-    "dist"
+    "build"
   ]
 }

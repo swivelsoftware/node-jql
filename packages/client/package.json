@@ -1,9 +1,9 @@
 {
-  "name": "@node-jql/memory",
+  "name": "@node-jql/client",
   "version": "0.0.1",
   "description": "The API for connecting node-jql server",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
   "scripts": {
   },
   "repository": {
@@ -16,6 +16,6 @@
     "url": "https://github.com/kennysng/node-jql/issues"
   },
   "files": [
-    "dist"
+    "build"
   ]
 }
