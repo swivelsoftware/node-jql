@@ -38,4 +38,5 @@ export interface IFromFunctionTable extends IDatasource {
 export interface IQuery extends ISQL {
   select?: IResultColumn[]
   from?: IDatasource[]
+  where?: IExpression
 }

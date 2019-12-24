@@ -49,11 +49,21 @@ export class Column implements IColumn, IStringify {
   public readonly typeArgs: any[] = []
   public readonly options: string[] = []
 
-  constructor(json: IColumn) {
-    this.name = json.name
-    this.type = json.type
-    if (json.typeArgs) this.typeArgs = json.typeArgs
-    if (json.options) this.options = json.options
+  constructor(name: string, type: string, ...typeArgs: any[])
+  constructor(json: IColumn)
+  constructor(...args: any[]) {
+    if (args.length === 1) {
+      const json = args[0] as IColumn
+      this.name = json.name
+      this.type = json.type
+      if (json.typeArgs) this.typeArgs = json.typeArgs
+      if (json.options) this.options = json.options
+    }
+    else {
+      this.name = args[0]
+      this.type = args[1]
+      this.typeArgs = args.slice(2)
+    }
   }
 
   // @override

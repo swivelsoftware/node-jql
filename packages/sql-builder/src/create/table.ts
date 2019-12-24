@@ -19,11 +19,16 @@ abstract class BaseCreateTable implements IBaseCreateTable, IStringify {
   public readonly name: string
   public readonly options: string[] = []
 
-  constructor(json: IBaseCreateTable) {
-    if (json.ifNotExists) this.ifNotExists = json.ifNotExists
-    if (json.database) this.database = json.database
-    this.name = json.name
-    if (json.options) this.options = json.options
+  constructor(json: IBaseCreateTable|string) {
+    if (typeof json === 'string') {
+      this.name = json
+    }
+    else {
+      if (json.ifNotExists) this.ifNotExists = json.ifNotExists
+      if (json.database) this.database = json.database
+      this.name = json.name
+      if (json.options) this.options = json.options
+    }
   }
 
   // @override
@@ -133,10 +138,12 @@ export class CreateTable extends BaseCreateTable implements ICreateTable {
   public readonly columns: Column[]
   public readonly constraints: Constraint[] = []
 
-  constructor(json: ICreateTable) {
+  constructor(json: ICreateTable|string) {
     super(json)
-    this.columns = json.columns.map(json => new Column(json))
-    if (json.constraints) this.constraints = json.constraints.map(json => parse(json))
+    if (typeof json !== 'string') {
+      this.columns = json.columns.map(json => new Column(json))
+      if (json.constraints) this.constraints = json.constraints.map(json => parse(json))
+    }
   }
 
   // @override
@@ -258,12 +265,20 @@ export class CreateTableSelect extends BaseCreateTable implements ICreateTableSe
   public readonly whenDuplicate?: 'IGNORE'|'REPLACE'
   public readonly query: Query
 
-  constructor(json: ICreateTableSelect) {
-    super(json)
-    if (json.columns) this.columns = json.columns.map(json => new Column(json))
-    if (json.constraints) this.constraints = json.constraints.map(json => parse(json))
-    if (json.whenDuplicate) this.whenDuplicate = json.whenDuplicate
-    this.query = new Query(json.query)
+  constructor(name: string, query: IQuery)
+  constructor(json: ICreateTableSelect)
+  constructor(...args: any[]) {
+    super(typeof args[0] === 'string' ? { classname: CreateTableSelect.name, name: args[0] } : args[0])
+    if (args.length > 1) {
+      this.query = new Query(args[1])
+    }
+    else {
+      const json = args[0] as ICreateTableSelect
+      if (json.columns) this.columns = json.columns.map(json => new Column(json))
+      if (json.constraints) this.constraints = json.constraints.map(json => parse(json))
+      if (json.whenDuplicate) this.whenDuplicate = json.whenDuplicate
+      this.query = new Query(json.query)
+    }
   }
 
   // @override

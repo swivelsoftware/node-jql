@@ -63,3 +63,6 @@ typings/
 # build folder
 dist
 *.code-workspace
+
+# mac-specific
+.DS_Store

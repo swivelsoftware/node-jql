@@ -4,7 +4,9 @@
   "description": "SQL builder in JSON. Known as JQL",
   "main": "build/index.js",
   "types": "build/index.d.ts",
-  "scripts": {},
+  "scripts": {
+    "test": "jest"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://kennysng@github.com/kennysng/node-jql.git"

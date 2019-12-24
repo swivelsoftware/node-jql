@@ -63,10 +63,15 @@ export class CreateSchema implements ICreateSchema, IStringify {
   public ifNotExists: boolean = false
   public options: string[] = []
 
-  constructor(json: ICreateSchema) {
-    this.name = json.name
-    if (json.ifNotExists) this.ifNotExists = json.ifNotExists
-    if (json.options) this.options = json.options
+  constructor(json: ICreateSchema|string) {
+    if (typeof json === 'string') {
+      this.name = json
+    }
+    else {
+      this.name = json.name
+      if (json.ifNotExists) this.ifNotExists = json.ifNotExists
+      if (json.options) this.options = json.options
+    }
   }
 
   // @override
