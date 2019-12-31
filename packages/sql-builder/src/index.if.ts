@@ -1,4 +1,16 @@
-import { IColumnExpression } from './expression/index.if';
+import { Expression } from './expression'
+import { IColumnExpression } from './expression/index.if'
+
+/**
+ * Configurations for different DB types
+ */
+export interface IDBConfig {
+  functions?: {
+    formats?: { [key: string]: string },
+    validations?: { [key: string]: (args: Expression[]) => boolean },
+  }
+  stringify?: { [key: string]: (json: IStringify) => string }
+}
 
 /**
  * SQL builder interface

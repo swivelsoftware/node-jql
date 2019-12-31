@@ -25,6 +25,7 @@
     "@types/node": "^13.1.2",
     "@types/node-sql-parser": "^1.1.0",
     "@types/string-format": "^2.0.0",
+    "deepmerge": "^4.2.2",
     "jest": "^24.9.0",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
@@ -34,5 +35,8 @@
     "ts-node": "^8.4.1",
     "tslint": "^5.20.1",
     "typescript": "^3.7.4"
+  },
+  "devDependencies": {
+    "@types/deepmerge": "^2.2.0"
   }
 }

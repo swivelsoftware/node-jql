@@ -1,5 +1,5 @@
 import { Expression } from '.'
-import { isUndefined } from '..'
+import { isUndefined, stringify } from '..'
 import { register } from '../parse'
 import { IValue } from './index.if'
 
@@ -22,7 +22,7 @@ export class Value extends Expression implements IValue {
 
   // @override
   public toString(): string {
-    return isUndefined(this.value) ? 'NULL' : JSON.stringify(this.value)
+    return isUndefined(this.value) ? 'NULL' : stringify(this.value)
   }
 
   // @override
