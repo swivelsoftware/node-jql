@@ -10,23 +10,18 @@ export class ColumnExpression extends Expression implements IColumnExpression {
   public readonly table?: string
   public readonly name: string
 
-  constructor(json: IColumnExpression)
-  constructor(table: string, name: string)
-  constructor(name: string)
-
-  constructor(...args: any) {
+  constructor(json: [string, string]|string|IColumnExpression) {
     super()
-    if (typeof args[0] === 'object') {
-      const json: IColumnExpression = args[0]
-      if (this.table) this.table = json.table
-      this.name = json.name
+    if (Array.isArray(json)) {
+      this.table = json[0]
+      this.name = json[1]
     }
-    else if (args.length === 2) {
-      this.table = args[0]
-      this.name = args[1]
+    else if (typeof json === 'string') {
+      this.name = json
     }
     else {
-      this.name = args[0]
+      if (json.table) this.table = json.table
+      this.name = json.name
     }
   }
 

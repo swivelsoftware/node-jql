@@ -19,7 +19,7 @@ abstract class BaseCreateTable implements IBaseCreateTable, IStringify {
   public readonly name: string
   public readonly options: string[] = []
 
-  constructor(json: IBaseCreateTable|string) {
+  constructor(json: string|IBaseCreateTable) {
     if (typeof json === 'string') {
       this.name = json
     }
@@ -138,7 +138,7 @@ export class CreateTable extends BaseCreateTable implements ICreateTable {
   public readonly columns: Column[]
   public readonly constraints: Constraint[] = []
 
-  constructor(json: ICreateTable|string) {
+  constructor(json: string|ICreateTable) {
     super(json)
     if (typeof json !== 'string') {
       this.columns = json.columns.map(json => new Column(json))

@@ -1,4 +1,5 @@
-import { IExpression } from '../index.if'
+import { IColumn, IExpression } from '../index.if'
+import { IQuery } from '../select/index.if'
 
 /**
  * [left] (NOT) BETWEEN [start] AND [end]
@@ -42,6 +43,13 @@ export interface ICaseExpression extends IExpression {
 }
 
 /**
+ * Column definition
+ */
+export interface IColumnDefExpression extends IExpression {
+  column: IColumn
+}
+
+/**
  * Column expression
  */
 export interface IColumnExpression extends IExpression {
@@ -82,6 +90,21 @@ export interface IMathExpression extends IExpression {
   left?: IExpression
   operator: MathOperator
   right?: IExpression
+}
+
+/**
+ * Query
+ */
+export interface IQueryExpression extends IExpression {
+  query: IQuery
+}
+
+/**
+ * (NOT) EXISTS [query]
+ */
+export interface IExistsExpression extends IExpression {
+  not?: boolean
+  query: IQueryExpression
 }
 
 /**

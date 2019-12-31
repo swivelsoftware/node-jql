@@ -33,17 +33,24 @@ export const validations = {
   mysql: {
     JSON_TABLE(args: Expression[]): boolean {
       const $0 = args[0]
-      if (
-        !($0 instanceof Value && isJSON($0.value)) || // Simple JSON string
-        !($0 instanceof ColumnExpression) ||          // A column with JSON string. Used after another table
-        !($0 instanceof FunctionExpression)           // A function call returning JSON string
-      ) {
+      if (!(
+        ($0 instanceof Value && isJSON($0.value)) ||  // Simple JSON string
+        ($0 instanceof ColumnExpression) ||           // A column with JSON string. Used after another table
+        ($0 instanceof FunctionExpression)            // A function call returning JSON string
+      )) {
         return false
       }
+
+      const $1 = args[1]
+      if (!($1 instanceof Value && typeof $1.value === 'string')) {
+        return false
+      }
+
       const $2 = args[2]
-      if (!($2 instanceof FunctionExpression && $2.name.toLocaleUpperCase() !== 'COLUMNS')) {
+      if (!($2 instanceof FunctionExpression && $2.name.toLocaleUpperCase() === 'COLUMNS')) {
         return false
       }
+
       return true
     },
   },

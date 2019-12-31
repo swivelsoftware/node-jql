@@ -20,19 +20,19 @@
     "build"
   ],
   "dependencies": {
-    "@types/jest": "^24.0.22",
+    "@types/jest": "^24.0.25",
     "@types/lodash": "^4.14.149",
-    "@types/node": "^12.12.6",
+    "@types/node": "^13.1.2",
     "@types/node-sql-parser": "^1.1.0",
     "@types/string-format": "^2.0.0",
     "jest": "^24.9.0",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
-    "node-sql-parser": "^1.6.10",
+    "node-sql-parser": "^1.6.18",
     "string-format": "^2.0.0",
     "ts-jest": "^24.1.0",
     "ts-node": "^8.4.1",
     "tslint": "^5.20.1",
-    "typescript": "^3.7.2"
+    "typescript": "^3.7.4"
   }
 }

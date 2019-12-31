@@ -9,13 +9,13 @@ export class Variable extends Expression implements IVariable {
   public readonly classname: string = Variable.name
   public readonly name: string
 
-  constructor(json: IVariable|string) {
+  constructor(json: string|IVariable) {
     super()
-    if (typeof json === 'object') {
-      this.name = json.name
+    if (typeof json === 'string') {
+      this.name = json
     }
     else {
-      this.name = json
+      this.name = json.name
     }
   }
 

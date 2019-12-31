@@ -33,10 +33,28 @@ export interface IFromFunctionTable extends IDatasource {
 }
 
 /**
+ * Groupping criteria
+ */
+export interface IGroupBy {
+  expr: IExpression
+  having?: IExpression
+}
+
+/**
+ * Ordering criteria
+ */
+export interface IOrderBy {
+  expr: IExpression
+  order?: 'ASC'|'DESC'
+}
+
+/**
  * SELECT
  */
 export interface IQuery extends ISQL {
   select?: IResultColumn[]
   from?: IDatasource[]
+  groupBy?: IGroupBy
   where?: IExpression
+  orderBy?: IOrderBy[]
 }

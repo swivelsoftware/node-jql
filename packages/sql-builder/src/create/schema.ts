@@ -63,7 +63,7 @@ export class CreateSchema implements ICreateSchema, IStringify {
   public ifNotExists: boolean = false
   public options: string[] = []
 
-  constructor(json: ICreateSchema|string) {
+  constructor(json: string|ICreateSchema) {
     if (typeof json === 'string') {
       this.name = json
     }

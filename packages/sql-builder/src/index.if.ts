@@ -1,3 +1,5 @@
+import { IColumnExpression } from './expression/index.if';
+
 /**
  * SQL builder interface
  */
@@ -63,4 +65,11 @@ export interface IColumn {
  */
 export interface IConstraint extends IParseable {
   value: string
+}
+
+/**
+ * PRIMAYR KEY constraint
+ */
+export interface IPrimaryKeyConstraint extends IConstraint {
+  columns: IColumnExpression[]
 }

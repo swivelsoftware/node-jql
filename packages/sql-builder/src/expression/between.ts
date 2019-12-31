@@ -2,6 +2,7 @@ import _ = require('lodash')
 import { Expression } from '.'
 import { IBuilder, IExpression } from '../index.if'
 import { parse, register } from '../parse'
+import { ColumnExpression } from './column'
 import { IBetweenExpression } from './index.if'
 import { isUnknown, Unknown } from './unknown'
 
@@ -12,9 +13,10 @@ class Builder implements IBuilder<BetweenExpression> {
 
   /**
    * Set `left` expression
-   * @param json [IExpression]
+   * @param json [IExpression|string]
    */
-  public left(json: IExpression): Builder {
+  public left(json: IExpression|string): Builder {
+    if (typeof json === 'string') json = new ColumnExpression(json)
     this.json.left = json
     return this
   }
@@ -30,18 +32,20 @@ class Builder implements IBuilder<BetweenExpression> {
 
   /**
    * Set `start` expression
-   * @param json [IExpression]
+   * @param json [IExpression|string]
    */
-  public start(json: IExpression): Builder {
+  public start(json: IExpression|string): Builder {
+    if (typeof json === 'string') json = new ColumnExpression(json)
     this.json.start = json
     return this
   }
 
   /**
    * Set `end` expression
-   * @param json [IExpression]
+   * @param json [IExpression|string]
    */
-  public end(json: IExpression): Builder {
+  public end(json: IExpression|string): Builder {
+    if (typeof json === 'string') json = new ColumnExpression(json)
     this.json.end = json
     return this
   }
@@ -69,7 +73,7 @@ export class BetweenExpression extends Expression implements IBetweenExpression 
   public readonly start: Expression = new Unknown()
   public readonly end: Expression = new Unknown()
 
-  constructor(json: IBetweenExpression = { classname: BetweenExpression.name }) {
+  constructor(json: IBetweenExpression) {
     super()
     if (json.left) this.left = parse(json.left)
     if (json.not) this.not = json.not

@@ -2,9 +2,11 @@ import _ = require('lodash')
 import { Expression } from '.'
 import { IBuilder, IExpression } from '../index.if'
 import { parse, register } from '../parse'
+import { ColumnExpression } from './column'
 import { BinaryOperator, IBinaryExpression, IValue } from './index.if'
 import { isUnknown, Unknown } from './unknown'
 import { Value } from './value'
+import { Variable } from './variable'
 
 class Builder implements IBuilder<BinaryExpression> {
   private json: IBinaryExpression
@@ -18,9 +20,11 @@ class Builder implements IBuilder<BinaryExpression> {
 
   /**
    * Set `left` expression
-   * @param json [IExpression]
+   * @param json [IExpression|string]
    */
-  public left(json: IExpression): Builder {
+  public left(json: IExpression|string): Builder {
+    if (typeof json === 'string') json = this.json.operator === ':=' ? new Variable(json) : new ColumnExpression(json)
+
     // check := operator
     if (this.json.operator === ':=' && json.classname !== 'Variable') {
       throw new SyntaxError(`Left expression must be variable for operator ':='`)
@@ -34,7 +38,7 @@ class Builder implements IBuilder<BinaryExpression> {
    * Set `not` flag
    * @param value [boolean]
    */
-  public not(value: boolean = false): Builder {
+  public not(value: boolean = true): Builder {
     switch (this.json.operator) {
       case 'IS':
         this.right(new Value(null))
@@ -51,9 +55,11 @@ class Builder implements IBuilder<BinaryExpression> {
 
   /**
    * Set `right` expression
-   * @param json [IExpression]
+   * @param json [IExpression|string]
    */
-  public right(json: IExpression): Builder {
+  public right(json: IExpression|string): Builder {
+    if (typeof json === 'string') json = new ColumnExpression(json)
+
     // check IS NULL
     if (this.json.operator === 'IS') {
       throw new SyntaxError(`Right expression is fixed to be NULL for operator 'IS'`)

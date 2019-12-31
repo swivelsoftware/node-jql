@@ -2,6 +2,7 @@ import _ = require('lodash')
 import { Expression } from '.'
 import { IBuilder, IExpression } from '../index.if'
 import { parse, register } from '../parse'
+import { ColumnExpression } from './column'
 import { IMathExpression, MathOperator } from './index.if'
 import { isUnknown, Unknown } from './unknown'
 
@@ -17,18 +18,20 @@ class Builder implements IBuilder<MathExpression> {
 
   /**
    * Set `left` expression
-   * @param json [IExpression]
+   * @param json [IExpression|string]
    */
-  public left(json: IExpression): Builder {
+  public left(json: IExpression|string): Builder {
+    if (typeof json === 'string') json = new ColumnExpression(json)
     this.json.left = json
     return this
   }
 
   /**
    * Set `right` expression
-   * @param json [IExpression]
+   * @param json [IExpression|string]
    */
-  public right(json: IExpression): Builder {
+  public right(json: IExpression|string): Builder {
+    if (typeof json === 'string') json = new ColumnExpression(json)
     this.json.right = json
     return this
   }
