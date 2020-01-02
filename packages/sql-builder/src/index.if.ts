@@ -1,4 +1,3 @@
-import { Expression } from './expression'
 import { IColumnExpression } from './expression/index.if'
 
 /**

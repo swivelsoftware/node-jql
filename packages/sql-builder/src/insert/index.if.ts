@@ -1,11 +1,12 @@
 import { ISQL } from '../index.if'
-import { IFromTable, IQuery } from '../select/index.if'
+import { IQuery } from '../select/index.if'
 
 /**
  * INSERT INTO
  */
 export interface IInsert extends ISQL {
-  into: IFromTable
+  database?: string
+  name: string
   columns?: string[]
   values: any
 }

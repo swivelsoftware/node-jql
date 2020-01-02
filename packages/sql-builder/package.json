@@ -37,6 +37,7 @@
     "typescript": "^3.7.4"
   },
   "devDependencies": {
-    "@types/deepmerge": "^2.2.0"
+    "@types/deepmerge": "^2.2.0",
+    "madge": "^3.6.0"
   }
 }

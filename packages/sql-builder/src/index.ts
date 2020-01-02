@@ -46,17 +46,10 @@ export function stringify(value: any): string {
   }
 }
 
-export { CreateSchema } from './create/schema'
-export { CreateTable, CreateTableSelect } from './create/table'
-export { Column } from './column'
-export { Constraint, PrimaryKeyConstraint } from './constraint'
-
-export { Datasource, FromFunctionTable, FromTable, Query, ResultColumn } from './select'
-export { Insert, InsertSelect } from './insert'
-
 export { BetweenExpression } from './expression/between'
 export { BinaryExpression } from './expression/binary'
 export { CaseExpression } from './expression/case'
+export { ColumnDefExpression } from './expression/column-def'
 export { ColumnExpression } from './expression/column'
 export { ExistsExpression } from './expression/exists'
 export { FunctionExpression } from './expression/function'
@@ -66,3 +59,18 @@ export { QueryExpression } from './expression/query'
 export { Unknown } from './expression/unknown'
 export { Value } from './expression/value'
 export { Variable } from './expression/variable'
+
+export { CreateSchema } from './create/schema'
+export { CreateTable, CreateTableSelect } from './create/table'
+export { Column } from './column'
+export { Constraint, PrimaryKeyConstraint } from './constraint'
+
+export { Delete } from './delete'
+
+export { DropSchema } from './drop/schema'
+export { DropTable } from './drop/table'
+
+export { Datasource, FromFunctionTable, FromTable, Query, ResultColumn } from './select'
+export { Insert, InsertSelect } from './insert'
+
+export { Update } from './update'

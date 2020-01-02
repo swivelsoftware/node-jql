@@ -1,5 +1,4 @@
-import { BinaryExpression, Column, CreateSchema, CreateTable, FromFunctionTable, FromTable, FunctionExpression, PrimaryKeyConstraint, Query, ResultColumn, Value } from '.'
-import { ColumnDefExpression } from './expression/column-def'
+import { BinaryExpression, Column, ColumnDefExpression, CreateSchema, CreateTable, FromFunctionTable, FromTable, FunctionExpression, PrimaryKeyConstraint, Query, ResultColumn, Value } from '.'
 
 test('CreateSchema', () => {
   const sql = new CreateSchema.Builder('TEMP_DB')

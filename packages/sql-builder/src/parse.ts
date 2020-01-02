@@ -1,4 +1,4 @@
-import { IExpression, IParseable, ISQL } from './index.if'
+import { IParseable, ISQL } from './index.if'
 
 // registered parseable class
 const registered: { [key: string]: new (...args: any[]) => ISQL } = {}

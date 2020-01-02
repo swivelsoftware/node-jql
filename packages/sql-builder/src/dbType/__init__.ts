@@ -1,5 +1,5 @@
 import { use } from '.'
-import './mysql'
+import './supported/mysql'
 
 // use mysql by default
 use('mysql')

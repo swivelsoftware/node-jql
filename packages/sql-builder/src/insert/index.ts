@@ -1,7 +1,7 @@
 import { stringify } from '../dbType/stringify'
 import { IStringify } from '../index.if'
 import { register } from '../parse'
-import { FromTable, Query } from '../select'
+import { Query } from '../select'
 import { IInsert, IInsertSelect } from './index.if'
 
 /**
@@ -9,12 +9,14 @@ import { IInsert, IInsertSelect } from './index.if'
  */
 export class Insert implements IInsert, IStringify {
   public readonly classname: string = Insert.name
-  public readonly into: FromTable
+  public readonly database?: string
+  public readonly name: string
   public readonly columns: string[] = []
   public readonly values: any[]
 
   constructor(json: IInsert) {
-    this.into = new FromTable(json.into)
+    this.database = json.database
+    this.name = json.name
     if (json.columns) this.columns = json.columns
     this.values = Array.isArray(json.values) ? json.values : [json.values]
 
@@ -32,9 +34,10 @@ export class Insert implements IInsert, IStringify {
   public toJson(): IInsert {
     const json: IInsert = {
       classname: this.classname,
-      into: this.into.toJson(),
+      name: this.name,
       values: this.values,
     }
+    if (this.database) json.database = this.database
     if (this.columns.length) json.columns = this.columns
     return json
   }

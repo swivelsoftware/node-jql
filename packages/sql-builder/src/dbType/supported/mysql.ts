@@ -1,9 +1,9 @@
-import { isJSON } from '..'
-import { register } from '../dbType'
-import { Expression } from '../expression'
-import { ColumnExpression } from '../expression/column'
-import { FunctionExpression } from '../expression/function'
-import { Value } from '../expression/value'
+import { register } from '..'
+import { isJSON } from '../..'
+import { Expression } from '../../expression'
+import { ColumnExpression } from '../../expression/column'
+import { FunctionExpression } from '../../expression/function'
+import { Value } from '../../expression/value'
 
 /**
  * Register mysql
