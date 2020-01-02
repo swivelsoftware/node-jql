@@ -1,5 +1,5 @@
 import _ = require('lodash')
-import { stringify } from '.'
+import { stringify } from './dbType/stringify'
 import { IBuilder, IColumn, IStringify } from './index.if'
 
 class Builder implements IBuilder<Column> {
@@ -69,10 +69,7 @@ export class Column implements IColumn, IStringify {
 
   // @override
   public toString(): string {
-    let str = `\`${this.name}\` ${this.type}`
-    if (this.typeArgs.length) str += `(${this.typeArgs.map(arg => stringify(arg)).join(', ')})`
-    if (this.options.length) str += ` ${this.options.join(' ')}`
-    return str
+    return stringify(Column.name, this)
   }
 
   // @override

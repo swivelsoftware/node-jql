@@ -1,15 +1,32 @@
 import _ = require('lodash')
 import { Expression } from '.'
+import * as $ from '../dbType'
 import { IBuilder, IExpression } from '../index.if'
 import { parse, register } from '../parse'
 import { ColumnExpression } from './column'
-import { IMathExpression, MathOperator } from './index.if'
+import { IMathExpression } from './index.if'
 import { isUnknown, Unknown } from './unknown'
+
+/**
+ * Default set of operators supported, based on mysql
+ */
+const DEFAULT_OPERATORS = [
+  '+',
+  '-',
+  '*',
+  '/',
+  '%',
+  'MOD',
+  'DIV',
+]
 
 class Builder implements IBuilder<MathExpression> {
   private json: IMathExpression
 
-  constructor(operator: MathOperator) {
+  constructor(operator: string) {
+    const SUPPORTED_OPERATORS = _.get($.dbConfigs, [$.dbType, 'mathOperators'], DEFAULT_OPERATORS)
+    if (SUPPORTED_OPERATORS.indexOf(operator) === -1) throw new SyntaxError(`Unsupported operator '${operator}'`)
+
     this.json = {
       classname: MathExpression.name,
       operator,
@@ -55,7 +72,7 @@ export class MathExpression extends Expression implements IMathExpression {
 
   public readonly classname: string = MathExpression.name
   public readonly left: Expression = new Unknown()
-  public readonly operator: MathOperator
+  public readonly operator: string
   public readonly right: Expression = new Unknown()
 
   constructor(json: IMathExpression) {
@@ -63,11 +80,6 @@ export class MathExpression extends Expression implements IMathExpression {
     if (json.left) this.left = parse(json.left)
     this.operator = json.operator
     if (json.right) this.right = parse(json.right)
-  }
-
-  // @override
-  public toString(): string {
-    return `${this.left.toString()} ${this.operator} ${this.right.toString()}`
   }
 
   // @override

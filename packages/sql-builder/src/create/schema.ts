@@ -1,4 +1,5 @@
 import _ = require('lodash')
+import { stringify } from '../dbType/stringify'
 import { IStringify } from '../index.if'
 import { IBuilder } from '../index.if'
 import { register } from '../parse'
@@ -76,9 +77,7 @@ export class CreateSchema implements ICreateSchema, IStringify {
 
   // @override
   public toString(): string {
-    let str = `${this.ifNotExists ? 'CREATE SCHEMA IF NOT EXISTS' : 'CREATE SCHEMA'} \`${this.name}\``
-    if (this.options) str += ` ${this.options.join(' ')}`
-    return str
+    return stringify(CreateSchema.name, this)
   }
 
   // @override

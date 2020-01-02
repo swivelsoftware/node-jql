@@ -1,4 +1,5 @@
 import _ = require('lodash')
+import { stringify } from '../dbType/stringify'
 import { Expression } from '../expression'
 import { ColumnExpression } from '../expression/column'
 import { FunctionExpression } from '../expression/function'
@@ -115,7 +116,7 @@ export class ResultColumn implements IResultColumn, IStringify {
 
   // @override
   public toString(): string {
-    return `${this.expr.toString()}${this.as ? ` AS \`${this.as}\`` : ''}`
+    return stringify(ResultColumn.name, this)
   }
 
   // @override
@@ -140,7 +141,9 @@ export abstract class Datasource implements IDatasource, IStringify {
   }
 
   // @override
-  public abstract toString(): string
+  public toString(): string {
+    return stringify(this.classname, this)
+  }
 
   // @override
   public toJson(): IDatasource {
@@ -181,11 +184,6 @@ export class FromTable extends Datasource implements IFromTable {
       if (json.database) this.database = json.database
       this.name = json.name
     }
-  }
-
-  // @override
-  public toString(): string {
-    return `${this.database ? `\`${this.database}\`.\`${this.name}\`` : `\`${this.name}\``}${this.as ? ` AS \`${this.as}\`` : ''}`
   }
 
   // @override
@@ -230,11 +228,6 @@ export class FromFunctionTable extends Datasource implements IFromFunctionTable 
   }
 
   // @override
-  public toString(): string {
-    return `${this.expr.toString()}${this.as ? ` AS \`${this.as}\`` : ''}`
-  }
-
-  // @override
   public toJson(): IFromFunctionTable {
     return {
       ...super.toJson(),
@@ -259,9 +252,7 @@ export class GroupBy implements IGroupBy, IStringify {
 
   // @override
   public toString(): string {
-    let str = this.expr.toString()
-    if (this.having) str += ` HAVING ${this.having.toString()}`
-    return str
+    return stringify(GroupBy.name, this)
   }
 
   // @override
@@ -288,7 +279,7 @@ export class OrderBy implements IOrderBy, IStringify {
 
   // @override
   public toString(): string {
-    return `${this.expr.toString()} ${this.order}`
+    return stringify(OrderBy.name, this)
   }
 
   // @override
@@ -324,12 +315,7 @@ export class Query implements IQuery, IStringify {
 
   // @override
   public toString(): string {
-    let str = this.select.length ? `SELECT ${this.select.map(sel => sel.toString()).join(', ')}` : 'SELECT *'
-    if (this.from) str += ` FROM ${this.from.map(fr => fr.toString()).join(', ')}`
-    if (this.groupBy) str += ` GROUP BY ${this.groupBy.toString()}`
-    if (this.where) str += ` WHERE ${this.where.toString()}`
-    if (this.orderBy.length) str += ` ORDER BY ${this.orderBy.map(ord => ord.toString()).join(', ')}`
-    return str
+    return stringify(this.classname, this)
   }
 
   // @override
@@ -348,3 +334,4 @@ export class Query implements IQuery, IStringify {
 
 register(FromTable)
 register(FromFunctionTable)
+register(Query)

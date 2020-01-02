@@ -23,11 +23,6 @@ export class ExistsExpression extends Expression implements IExistsExpression {
   }
 
   // @override
-  public toString(): string {
-    return `EXISTS ${this.query.toString()}`
-  }
-
-  // @override
   public toJson(): IQueryExpression {
     return {
       classname: this.classname,

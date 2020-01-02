@@ -73,11 +73,6 @@ export class CaseExpression extends Expression implements ICaseExpression {
   }
 
   // @override
-  public toString(): string {
-    return `CASE ${this.cases.map(({ when, then }) => `WHEN ${when.toString()} THEN ${then.toString()}`).join(' ')} ELSE ${this.else.toString()}`
-  }
-
-  // @override
   public toJson(): ICaseExpression {
     const json: ICaseExpression = {
       classname: this.classname,

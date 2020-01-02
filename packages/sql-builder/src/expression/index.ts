@@ -1,3 +1,4 @@
+import { stringify } from '../dbType/stringify'
 import { IExpression, IStringify } from '../index.if'
 
 /**
@@ -8,7 +9,9 @@ export abstract class Expression implements IExpression, IStringify {
   public readonly classname: string
 
   // @override
-  public abstract toString(): string
+  public toString(): string {
+    return stringify(this.classname, this)
+  }
 
   // @override
   public abstract toJson(): IExpression

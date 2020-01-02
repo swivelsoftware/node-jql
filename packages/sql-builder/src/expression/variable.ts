@@ -20,11 +20,6 @@ export class Variable extends Expression implements IVariable {
   }
 
   // @override
-  public toString(): string {
-    return `@${this.name}`
-  }
-
-  // @override
   public toJson(): IVariable {
     return {
       classname: this.classname,

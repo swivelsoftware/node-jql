@@ -1,6 +1,7 @@
 import _ = require('lodash')
 import { Column } from '../column'
 import { Constraint } from '../constraint'
+import { stringify } from '../dbType/stringify'
 import { IColumn, IConstraint, IStringify } from '../index.if'
 import { IBuilder } from '../index.if'
 import { parse } from '../parse'
@@ -33,7 +34,7 @@ abstract class BaseCreateTable implements IBaseCreateTable, IStringify {
 
   // @override
   public toString(): string {
-    return `${this.ifNotExists ? 'CREATE TABLE IF NOT EXISTS' : 'CREATE TABLE'} ${this.database ? `\`${this.database}\`.\`${this.name}\`` : `\`${this.name}\``}`
+    return stringify(this.classname, this)
   }
 
   // @override
@@ -144,14 +145,6 @@ export class CreateTable extends BaseCreateTable implements ICreateTable {
       this.columns = json.columns.map(json => new Column(json))
       if (json.constraints) this.constraints = json.constraints.map(json => parse(json))
     }
-  }
-
-  // @override
-  public toString(): string {
-    const columns: IStringify[] = [...this.columns, ...this.constraints]
-    let str = `${super.toString()} (${columns.map(col => col.toString()).join(', ')})`
-    if (this.options.length) str += ` ${this.options.join(' ')}`
-    return str
   }
 
   // @override
@@ -279,17 +272,6 @@ export class CreateTableSelect extends BaseCreateTable implements ICreateTableSe
       if (json.whenDuplicate) this.whenDuplicate = json.whenDuplicate
       this.query = new Query(json.query)
     }
-  }
-
-  // @override
-  public toString(): string {
-    let str = super.toString()
-    const columns: IStringify[] = [...this.columns, ...this.constraints]
-    if (columns.length) str += ` (${columns.map(col => col.toString()).join(', ')})`
-    if (this.options.length) str += ` ${this.options.join(' ')}`
-    if (this.whenDuplicate) str += ` ${this.whenDuplicate}`
-    str += ` AS ${this.query.toString()}`
-    return str
   }
 
   // @override

@@ -53,13 +53,6 @@ export class GroupExpression extends Expression implements IGroupExpression {
   }
 
   // @override
-  public toString(): string {
-    let result = this.expressions.map(e => e.toString()).join(` ${this.operator} `)
-    if (this.expressions.length > 1) result = `(${result})`
-    return result
-  }
-
-  // @override
   public toJson(): IGroupExpression {
     return {
       classname: this.classname,

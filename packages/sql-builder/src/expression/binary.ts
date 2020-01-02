@@ -1,17 +1,38 @@
 import _ = require('lodash')
 import { Expression } from '.'
+import * as $ from '../dbType'
 import { IBuilder, IExpression } from '../index.if'
 import { parse, register } from '../parse'
 import { ColumnExpression } from './column'
-import { BinaryOperator, IBinaryExpression, IValue } from './index.if'
+import { IBinaryExpression, IValue } from './index.if'
 import { isUnknown, Unknown } from './unknown'
 import { Value } from './value'
 import { Variable } from './variable'
 
+/**
+ * Default set of operators supported, based on mysql
+ */
+const DEFAULT_OPERATORS = [
+  '=',
+  '<>',
+  '<',
+  '<=',
+  '>',
+  '>=',
+  ':=',
+  'IN',
+  'IS',
+  'LIKE',
+  'REGEXP',
+]
+
 class Builder implements IBuilder<BinaryExpression> {
   private json: IBinaryExpression
 
-  constructor(operator: BinaryOperator) {
+  constructor(operator: string) {
+    const SUPPORTED_OPERATORS = _.get($.dbConfigs, [$.dbType, 'binaryOperators'], DEFAULT_OPERATORS)
+    if (SUPPORTED_OPERATORS.indexOf(operator) === -1) throw new SyntaxError(`Unsupported operator '${operator}'`)
+
     this.json = {
       classname: BinaryExpression.name,
       operator,
@@ -97,7 +118,7 @@ export class BinaryExpression extends Expression implements IBinaryExpression {
   public readonly classname: string = BinaryExpression.name
   public readonly left: Expression = new Unknown()
   public readonly not: boolean = false
-  public readonly operator: BinaryOperator
+  public readonly operator: string
   public readonly right: Expression = new Unknown()
 
   constructor(json: IBinaryExpression) {
@@ -106,11 +127,6 @@ export class BinaryExpression extends Expression implements IBinaryExpression {
     if (json.not) this.not = json.not
     this.operator = json.operator
     if (json.right) this.right = parse(json.right)
-  }
-
-  // @override
-  public toString(): string {
-    return `${this.left.toString()} ${this.not ? this.operator === 'IS' ? `IS NOT` : `NOT ${this.operator}` : this.operator} ${this.right.toString()}`
   }
 
   // @override

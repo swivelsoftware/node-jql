@@ -1,5 +1,4 @@
 import _ = require('lodash')
-import format = require('string-format')
 import { Expression } from '.'
 import { isUndefined } from '..'
 import * as $ from '../dbType'
@@ -80,17 +79,6 @@ export class FunctionExpression extends Expression implements IFunctionExpressio
       if (key.toLocaleLowerCase() === name) return $formats[key]
     }
     return null
-  }
-
-  // @override
-  public toString(): string {
-    const parameters_ = this.arguments.map(expr => expr.toString())
-    if (isUndefined(this.argsFormat)) {
-      return `${this.name.toLocaleUpperCase()}(${parameters_.join(', ')})`
-    }
-    else {
-      return `${this.name.toLocaleUpperCase()}(${format(this.argsFormat, ...parameters_)})`
-    }
   }
 
   // @override

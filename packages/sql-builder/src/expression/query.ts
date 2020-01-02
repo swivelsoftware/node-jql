@@ -22,11 +22,6 @@ export class QueryExpression extends Expression implements IQueryExpression {
   }
 
   // @override
-  public toString(): string {
-    return this.query.toString()
-  }
-
-  // @override
   public toJson(): IQueryExpression {
     return {
       classname: this.classname,

@@ -82,11 +82,6 @@ export class BetweenExpression extends Expression implements IBetweenExpression 
   }
 
   // @override
-  public toString(): string {
-    return `${this.left.toString()} ${this.not ? 'NOT BETWEEN' : 'BETWEEN'} ${this.start.toString()} AND ${this.end.toString()}`
-  }
-
-  // @override
   public toJson(): IBetweenExpression {
     const json: IBetweenExpression = { classname: this.classname }
     if (!isUnknown(this.left)) json.left = this.left.toJson()

@@ -12,17 +12,12 @@ export interface IBetweenExpression extends IExpression {
 }
 
 /**
- * Supported binary operators
- */
-export type BinaryOperator = '='|'<>'|'<'|'<='|'>'|'>='|':='|'IN'|'IS'|'LIKE'|'REGEXP'
-
-/**
  * [left] (NOT) [operator] [right]
  */
 export interface IBinaryExpression extends IExpression {
   left?: IExpression
   not?: boolean
-  operator: BinaryOperator
+  operator: string
   right?: IExpression
 }
 
@@ -79,16 +74,11 @@ export interface IGroupExpression extends IExpression {
 }
 
 /**
- * Supported math operators
- */
-export type MathOperator = '+'|'-'|'*'|'/'|'%'|'MOD'|'DIV'
-
-/**
  * [left] [operator] [right]
  */
 export interface IMathExpression extends IExpression {
   left?: IExpression
-  operator: MathOperator
+  operator: string
   right?: IExpression
 }
 

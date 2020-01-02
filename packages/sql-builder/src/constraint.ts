@@ -1,3 +1,4 @@
+import { stringify } from './dbType/stringify'
 import { ColumnExpression } from './expression/column'
 import { IConstraint, IPrimaryKeyConstraint, IStringify } from './index.if'
 import { register } from './parse'
@@ -25,7 +26,7 @@ export class Constraint implements IConstraint, IStringify {
 
   // @override
   public toString(): string {
-    return this.value
+    return stringify(this.classname, this)
   }
 
   // @override
@@ -56,7 +57,7 @@ export class PrimaryKeyConstraint extends Constraint implements IPrimaryKeyConst
 
   // @override
   get value(): string {
-    return `PRIMARY KEY(${this.columns.map(col => col.toString()).join(', ')})`
+    return this.toString()
   }
 
   // @override

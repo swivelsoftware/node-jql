@@ -22,11 +22,6 @@ export class ColumnDefExpression extends Expression implements IColumnDefExpress
   }
 
   // @override
-  public toString(): string {
-    return this.column.toString()
-  }
-
-  // @override
   public toJson(): IColumnDefExpression {
     return {
       classname: this.classname,

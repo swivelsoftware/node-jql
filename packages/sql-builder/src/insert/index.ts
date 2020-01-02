@@ -1,4 +1,4 @@
-import { stringify } from '..'
+import { stringify } from '../dbType/stringify'
 import { IStringify } from '../index.if'
 import { register } from '../parse'
 import { FromTable, Query } from '../select'
@@ -25,16 +25,7 @@ export class Insert implements IInsert, IStringify {
 
   // @override
   public toString(): string {
-    let str = `INSERT INTO ${this.into.toString()}`
-    if (this.columns.length) {
-      str += `(${this.columns.map(c => `\`${c}\``).join(', ')})`
-      str += ` VALUES ${this.values.map(row => `(${this.columns.map(c => stringify(row[c])).join(', ')})`).join(', ')}`
-    }
-    else {
-      const values = this.values as any[][]
-      str += ` VALUES ${values.map(row => `(${row.map(v => stringify(v)).join(', ')})`).join(', ')}`
-    }
-    return str
+    return stringify(this.classname, this)
   }
 
   // @override
@@ -59,16 +50,6 @@ export class InsertSelect extends Insert implements IInsertSelect {
   constructor(json: IInsertSelect) {
     super(json)
     this.query = new Query(json)
-  }
-
-  // @override
-  public toString(): string {
-    let str = `INSERT INTO ${this.into.toString()}`
-    if (this.columns.length) {
-      str += `(${this.columns.map(c => `\`${c}\``).join(', ')})`
-    }
-    str += ` ${this.query.toString()}`
-    return str
   }
 
   // @override

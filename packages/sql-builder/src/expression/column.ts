@@ -26,11 +26,6 @@ export class ColumnExpression extends Expression implements IColumnExpression {
   }
 
   // @override
-  public toString(): string {
-    return this.table ? `\`${this.table}\`.\`${this.name}\`` : `\`${this.name}\``
-  }
-
-  // @override
   public toJson(): IColumnExpression {
     const json: IColumnExpression = {
       classname: this.classname,
