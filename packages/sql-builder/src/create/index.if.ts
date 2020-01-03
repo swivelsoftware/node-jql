@@ -1,4 +1,4 @@
-import { IColumn, IConstraint, ISQL } from '../index.if'
+import { IColumn, IConstraint, ISQL, IType } from '../index.if'
 import { IQuery } from '../select/index.if'
 
 /**
@@ -36,4 +36,15 @@ export interface ICreateTableSelect extends IBaseCreateTable {
   constraints?: IConstraint[]
   whenDuplicate?: 'IGNORE'|'REPLACE'
   query: IQuery
+}
+
+/**
+ * CREATE FUNCTION
+ */
+export interface ICreateFunction extends ISQL {
+  name: string
+  parameters?: Array<[string, IType]>
+  returnType: IType,
+  code: string
+  deterministic?: boolean
 }

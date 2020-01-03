@@ -14,6 +14,9 @@ export interface IInsert extends ISQL {
 /**
  * INSERT INTO SELECT
  */
-export interface IInsertSelect extends IInsert {
+export interface IInsertSelect extends ISQL {
+  database?: string
+  name: string
+  columns?: string[]
   query: IQuery
 }

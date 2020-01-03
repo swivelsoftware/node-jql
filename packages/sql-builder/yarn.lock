@@ -2661,11 +2661,6 @@ module-lookup-amd@^6.1.0:
     requirejs "^2.3.5"
     requirejs-config-file "^3.1.1"
 
-moment@^2.24.0:
-  version "2.24.0"
-  resolved "https://registry.yarnpkg.com/moment/-/moment-2.24.0.tgz#0d055d53f5052aa653c9f6eb68bb5d12bf5c2b5b"
-  integrity sha512-bV7f+6l2QigeBBZSM/6yTNq4P2fNpSWj/0e7jQcy87A8e7o2nAfP/34/2ky5Vw4B9S446EtIhodAzkFCcR4dQg==
-
 ms@2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.0.0.tgz#5608aeadfc00be6c2901df5f9861788de0d597c8"
@@ -2746,7 +2741,7 @@ node-source-walk@^4.0.0, node-source-walk@^4.2.0:
   dependencies:
     "@babel/parser" "^7.0.0"
 
-node-sql-parser@*, node-sql-parser@^1.6.18:
+node-sql-parser@*:
   version "1.6.18"
   resolved "https://registry.yarnpkg.com/node-sql-parser/-/node-sql-parser-1.6.18.tgz#a7546e052bbbaa27cd4799f654335c1771cdbd8d"
   integrity sha512-kxY6owAS/bGlkcF02L3IEaywlgKNWbQ2NMuYPLyCYcIcaFfrzqEKrYw6lZ8bglkqYn6g8gGrUNEjKNNg/o1vgg==

@@ -1,10 +1,11 @@
 {
   "name": "@node-jql/sql-builder",
-  "version": "0.0.1",
-  "description": "SQL builder in JSON. Known as JQL",
+  "version": "1.0.0-rc.1",
+  "description": "Represent SQL in JSON format for building SQL string",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "scripts": {
+    "recursive": "madge --circular --extensions ts src",
     "test": "jest"
   },
   "repository": {
@@ -20,24 +21,22 @@
     "build"
   ],
   "dependencies": {
+    "deepmerge": "^4.2.2",
+    "lodash": "^4.17.15",
+    "string-format": "^2.0.0",
+    "ts-node": "^8.4.1",
+    "typescript": "^3.7.4"
+  },
+  "devDependencies": {
+    "@types/deepmerge": "^2.2.0",
     "@types/jest": "^24.0.25",
     "@types/lodash": "^4.14.149",
     "@types/node": "^13.1.2",
     "@types/node-sql-parser": "^1.1.0",
     "@types/string-format": "^2.0.0",
-    "deepmerge": "^4.2.2",
     "jest": "^24.9.0",
-    "lodash": "^4.17.15",
-    "moment": "^2.24.0",
-    "node-sql-parser": "^1.6.18",
-    "string-format": "^2.0.0",
+    "madge": "^3.6.0",
     "ts-jest": "^24.1.0",
-    "ts-node": "^8.4.1",
-    "tslint": "^5.20.1",
-    "typescript": "^3.7.4"
-  },
-  "devDependencies": {
-    "@types/deepmerge": "^2.2.0",
-    "madge": "^3.6.0"
+    "tslint": "^5.20.1"
   }
 }

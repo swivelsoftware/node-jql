@@ -1,10 +1,11 @@
 import format = require('string-format')
 import * as $ from '.'
 import { isUndefined, stringify as valStringify } from '..'
-import { ICreateSchema, ICreateTable, ICreateTableSelect } from '../create/index.if'
+import { ICreateFunction, ICreateSchema, ICreateTable, ICreateTableSelect } from '../create/index.if'
+import { Delete } from '../delete'
 import { IDropSchema, IDropTable } from '../drop/index.if'
 import { IBetweenExpression, IBinaryExpression, ICaseExpression, IColumnDefExpression, IColumnExpression, IExistsExpression, IFunctionExpression, IGroupExpression, IMathExpression, IQueryExpression, IUnknown, IValue, IVariable } from '../expression/index.if'
-import { IColumn, IConstraint, IPrimaryKeyConstraint, IStringify } from '../index.if'
+import { IColumn, IConstraint, IPrimaryKeyConstraint, IStringify, IType } from '../index.if'
 import { IInsert, IInsertSelect } from '../insert/index.if'
 import { IFromFunctionTable, IFromTable, IGroupBy, IOrderBy, IQuery, IResultColumn } from '../select/index.if'
 import { IUpdate } from '../update/index.if'
@@ -13,9 +14,13 @@ import { IUpdate } from '../update/index.if'
  * Default set of stringify methods, based on mysql
  */
 const _default: { [key: string]: (json: any) => string } = {
+  Type(json: IType): string {
+    let str = json.name
+    if (json.args && json.args.length) str += `(${json.args.map(v => valStringify(v)).join(', ')})`
+    return str
+  },
   Column(json: IColumn): string {
-    let str = `\`${json.name}\` ${json.type}`
-    if (json.typeArgs.length) str += `(${json.typeArgs.map(arg => valStringify(arg)).join(', ')})`
+    let str = `\`${json.name}\` ${json.type.toString()}`
     if (json.options.length) str += ` ${json.options.join(' ')}`
     return str
   },
@@ -27,6 +32,13 @@ const _default: { [key: string]: (json: any) => string } = {
   },
 
   // create
+  CreateFunction(json: ICreateFunction): string {
+    let str = `CREATE FUNCTION \`${json.name}\` (${json.parameters.map(([name, type]) => `\`${name}\` ${type.toString()}`).join(', ')})`
+    str += ` RETURNS ${json.returnType.toString()}`
+    if (json.deterministic) str += ' DETERMINISTIC'
+    str += ` ${json.code}`
+    return str
+  },
   CreateSchema(json: ICreateSchema): string {
     let str = `${json.ifNotExists ? 'CREATE SCHEMA IF NOT EXISTS' : 'CREATE SCHEMA'} \`${json.name}\``
     if (json.options) str += ` ${json.options.join(' ')}`
@@ -45,6 +57,13 @@ const _default: { [key: string]: (json: any) => string } = {
     if (json.options.length) str += ` ${json.options.join(' ')}`
     if (json.whenDuplicate) str += ` ${json.whenDuplicate}`
     str += ` AS ${json.query.toString()}`
+    return str
+  },
+
+  // delete
+  Delete(json: Delete): string {
+    let str = `DELETE FROM ${json.database ? `\`${json.database}\`.\`${json.name}\`` : `\`${json.name}\``}`
+    if (json.where) str += ` WHERE ${json.where.toString()}`
     return str
   },
 

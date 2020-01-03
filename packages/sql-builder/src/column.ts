@@ -1,13 +1,18 @@
 import _ = require('lodash')
+import { Type } from '.'
 import { stringify } from './dbType/stringify'
-import { IBuilder, IColumn, IStringify } from './index.if'
+import { IBuilder, IColumn, IStringify, IType } from './index.if'
 
 class Builder implements IBuilder<Column> {
   private json: IColumn
 
-  constructor(name: string, type: string, ...typeArgs: any[]) {
-    this.json = { name, type }
-    if (typeArgs.length) this.json.typeArgs = typeArgs
+  constructor(name: string, type: IType)
+  constructor(name: string, type: string, ...typeArgs: any[])
+  constructor(...args: any[]) {
+    this.json = {
+      name: args[0],
+      type: new Type(args[1], ...args.slice(2)).toJson(),
+    }
   }
 
   /**
@@ -46,24 +51,22 @@ export class Column implements IColumn, IStringify {
   public static Builder = Builder
 
   public readonly name: string
-  public readonly type: string
-  public readonly typeArgs: any[] = []
+  public readonly type: Type
   public readonly options: string[] = []
 
+  constructor(name: string, type: IType)
   constructor(name: string, type: string, ...typeArgs: any[])
   constructor(json: IColumn)
   constructor(...args: any[]) {
     if (args.length === 1) {
       const json = args[0] as IColumn
       this.name = json.name
-      this.type = json.type
-      if (json.typeArgs) this.typeArgs = json.typeArgs
+      this.type = new Type(json.type)
       if (json.options) this.options = json.options
     }
     else {
       this.name = args[0]
-      this.type = args[1]
-      this.typeArgs = args.slice(2)
+      this.type = new Type(args[1], ...args.slice(2))
     }
   }
 
@@ -76,9 +79,8 @@ export class Column implements IColumn, IStringify {
   public toJson(): IColumn {
     const json: IColumn = {
       name: this.name,
-      type: this.type,
+      type: this.type.toJson(),
     }
-    if (this.typeArgs.length) json.typeArgs = this.typeArgs
     if (this.options.length) json.options = this.options
     return json
   }

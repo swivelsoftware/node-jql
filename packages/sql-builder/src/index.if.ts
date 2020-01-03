@@ -1,6 +1,14 @@
 import { IColumnExpression } from './expression/index.if'
 
 /**
+ * Type
+ */
+export interface IType {
+  name: string
+  args?: any[]
+}
+
+/**
  * SQL builder interface
  */
 export interface IBuilder<T extends IStringify> {
@@ -55,8 +63,7 @@ export interface IExpression extends ISQL {
  */
 export interface IColumn {
   name: string
-  type: string
-  typeArgs?: any[]
+  type: IType
   options?: string[]
 }
 

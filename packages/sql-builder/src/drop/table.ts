@@ -1,4 +1,5 @@
 import _ = require('lodash')
+import { stringify } from '../dbType/stringify'
 import { IStringify } from '../index.if'
 import { IBuilder } from '../index.if'
 import { register } from '../parse'
@@ -63,6 +64,11 @@ export class DropTable implements IDropTable, IStringify {
       this.database = json.database
       this.name = json.name
     }
+  }
+
+  // @override
+  public toString(): string {
+    return stringify(this.classname, this)
   }
 
   // @override

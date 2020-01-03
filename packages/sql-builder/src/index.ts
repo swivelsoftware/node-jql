@@ -1,5 +1,43 @@
 import './dbType/__init__'
+import { stringify as jsonStringify } from './dbType/stringify'
 import './expression/__init__'
+import { IStringify, IType } from './index.if'
+
+/**
+ * Type
+ */
+export class Type implements IType, IStringify {
+  public readonly name: string
+  public readonly args: any[] = []
+
+  constructor(name: string, ...args: any[])
+  constructor(json: IType)
+  constructor(...args: any[]) {
+    if (typeof args[0] === 'string') {
+      this.name = args[0]
+      if (args.length > 1) this.args = args.slice(1)
+    }
+    else {
+      const json = args[0] as IType
+      this.name = json.name
+      if (json.args) this.args = json.args
+    }
+  }
+
+  // @override
+  public toString(): string {
+    return jsonStringify(Type.name, this)
+  }
+
+  // @override
+  public toJson(): IType {
+    const json: IType = {
+      name: this.name,
+    }
+    if (this.args.length) json.args = this.args
+    return json
+  }
+}
 
 /**
  * Check whether this is an undefined value

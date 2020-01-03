@@ -1,13 +1,74 @@
+import _ = require('lodash')
 import { stringify } from '../dbType/stringify'
-import { IStringify } from '../index.if'
+import { IBuilder, IStringify } from '../index.if'
 import { register } from '../parse'
 import { Query } from '../select'
+import { IQuery } from '../select/index.if'
 import { IInsert, IInsertSelect } from './index.if'
+
+class InsertBuilder implements IBuilder<Insert> {
+  private json: IInsert
+
+  constructor(name: string) {
+    this.json = {
+      classname: Insert.name,
+      name,
+      values: [],
+    }
+  }
+
+  /**
+   * Set `database` for the table
+   * @param database [string]
+   */
+  public database(database: string): InsertBuilder {
+    this.json.database = database
+    return this
+  }
+
+  /**
+   * Set columns order
+   * @param columns [Array<string>]
+   */
+  public columns(...columns: string[]): InsertBuilder {
+    if (columns.length) {
+      this.json.columns = columns
+    }
+    else {
+      delete this.json.columns
+    }
+    this.json.values = []
+    return this
+  }
+
+  public value(row: any|any[]): InsertBuilder {
+    if (!this.json.columns && !Array.isArray(row)) {
+      throw new SyntaxError('You must provide a 2D array as values in case you have not specified the order of columns')
+    }
+    else if (this.json.columns && Array.isArray(row)) {
+      throw new SyntaxError('You must provide an object as values in case you have specified the order of columns')
+    }
+    this.json.values.push(row)
+    return this
+  }
+
+  // @override
+  public build(): Insert {
+    return new Insert(this.json)
+  }
+
+  // @override
+  public toJson(): IInsert {
+    return _.cloneDeep(this.json)
+  }
+}
 
 /**
  * INSERT INTO
  */
 export class Insert implements IInsert, IStringify {
+  public static Builder = InsertBuilder
+
   public readonly classname: string = Insert.name
   public readonly database?: string
   public readonly name: string
@@ -19,10 +80,6 @@ export class Insert implements IInsert, IStringify {
     this.name = json.name
     if (json.columns) this.columns = json.columns
     this.values = Array.isArray(json.values) ? json.values : [json.values]
-
-    if (!this.columns && !Array.isArray(this.values[0])) {
-      throw new SyntaxError('You must provide a 2D array as values in case you have not specified the order of columns')
-    }
   }
 
   // @override
@@ -43,25 +100,95 @@ export class Insert implements IInsert, IStringify {
   }
 }
 
-/**
- * INSERT INTO SELECT
- */
-export class InsertSelect extends Insert implements IInsertSelect {
-  public readonly classname: string = InsertSelect.name
-  public readonly query: Query
+class InsertSelectBuilder implements IBuilder<InsertSelect> {
+  private json: IInsertSelect
 
-  constructor(json: IInsertSelect) {
-    super(json)
-    this.query = new Query(json)
+  constructor(name: string) {
+    this.json = {
+      classname: Insert.name,
+      name,
+      query: { classname: 'Query' },
+    }
+  }
+
+  /**
+   * Set `database` for the table
+   * @param database [string]
+   */
+  public database(database: string): InsertSelectBuilder {
+    this.json.database = database
+    return this
+  }
+
+  /**
+   * Set columns order
+   * @param columns [Array<string>]
+   */
+  public columns(...columns: string[]): InsertSelectBuilder {
+    if (columns.length) {
+      this.json.columns = columns
+    }
+    else {
+      delete this.json.columns
+    }
+    return this
+  }
+
+  /**
+   * Set query
+   * @param query [IQuery]
+   */
+  public query(query: IQuery): InsertSelectBuilder {
+    this.json.query = query
+    return this
+  }
+
+  // @override
+  public build(): InsertSelect {
+    if (!this.json.query.select && !this.json.query.from) throw new SyntaxError('You must specify a Query')
+    return new InsertSelect(this.json)
   }
 
   // @override
   public toJson(): IInsertSelect {
-    return {
-      ...super.toJson(),
+    return _.cloneDeep(this.json)
+  }
+}
+
+/**
+ * INSERT INTO SELECT
+ */
+export class InsertSelect implements IInsertSelect, IStringify {
+  public static Builder = InsertSelectBuilder
+
+  public readonly classname: string = InsertSelect.name
+  public readonly database?: string
+  public readonly name: string
+  public readonly columns: string[] = []
+  public readonly query: Query
+
+  constructor(json: IInsertSelect) {
+    this.database = json.database
+    this.name = json.name
+    if (json.columns) this.columns = json.columns
+    this.query = new Query(json.query)
+  }
+
+  // @override
+  public toString(): string {
+    return stringify(this.classname, this)
+  }
+
+  // @override
+  public toJson(): IInsertSelect {
+    const json: IInsertSelect = {
       classname: this.classname,
+      name: this.name,
       query: this.query.toJson(),
     }
+    if (this.database) json.database = this.database
+    if (this.columns.length) json.columns = this.columns
+    return json
   }
 }
 
