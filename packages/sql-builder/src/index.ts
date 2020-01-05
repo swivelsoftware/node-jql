@@ -1,3 +1,4 @@
+import * as $ from './dbType'
 import './dbType/__init__'
 import { stringify as jsonStringify } from './dbType/stringify'
 import './expression/__init__'
@@ -83,6 +84,8 @@ export function stringify(value: any): string {
       return JSON.stringify(value)
   }
 }
+
+export default $
 
 export { BetweenExpression } from './expression/between'
 export { BinaryExpression } from './expression/binary'

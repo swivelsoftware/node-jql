@@ -1,6 +1,6 @@
 {
   "name": "@node-jql/sql-builder",
-  "version": "1.0.0-rc.2",
+  "version": "1.0.0-rc.3",
   "description": "Represent SQL in JSON format for building SQL string",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -32,7 +32,7 @@
     "@types/deepmerge": "^2.2.0",
     "@types/jest": "^24.0.25",
     "@types/lodash": "^4.14.149",
-    "@types/node": "^13.1.2",
+    "@types/node": "^13.1.4",
     "@types/string-format": "^2.0.0",
     "jest": "^24.9.0",
     "madge": "^3.6.0",

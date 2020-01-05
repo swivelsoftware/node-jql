@@ -1,4 +1,4 @@
-import { BetweenExpression, BinaryExpression, CaseExpression, Column, ColumnDefExpression, CreateSchema, CreateTable, Delete, DropSchema, DropTable, FromFunctionTable, FromTable } from '.'
+import { BetweenExpression, BinaryExpression, Column, ColumnDefExpression, CreateSchema, CreateTable, Delete, DropSchema, DropTable, FromFunctionTable, FromTable } from '.'
 import { FunctionExpression, GroupExpression, Insert, InsertSelect, PrimaryKeyConstraint, Query, ResultColumn, Value } from '.'
 
 test('Create Schema', () => {
