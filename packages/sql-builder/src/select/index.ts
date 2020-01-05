@@ -247,7 +247,7 @@ export class GroupBy implements IGroupBy, IStringify {
 
   constructor(json: IGroupBy) {
     this.expr = parse(json.expr)
-    if (json.having) this.having = parse(json.having)
+    if (json.having) this.having = parse<Expression>(json.having)
   }
 
   // @override
@@ -309,7 +309,7 @@ export class Query implements IQuery, IStringify {
     if (json.select) this.select = json.select.map(json => new ResultColumn(json))
     if (json.from) this.from = json.from.map(json => parse(json))
     if (json.groupBy) this.groupBy = new GroupBy(json.groupBy)
-    if (json.where) this.where = parse(json.where)
+    if (json.where) this.where = parse<Expression>(json.where)
     if (json.orderBy) this.orderBy = json.orderBy.map(json => new OrderBy(json))
   }
 

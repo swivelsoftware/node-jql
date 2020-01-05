@@ -1,10 +1,11 @@
 {
   "name": "@node-jql/sql-builder",
-  "version": "1.0.0-rc.1",
+  "version": "1.0.0-rc.2",
   "description": "Represent SQL in JSON format for building SQL string",
-  "main": "build/index.js",
-  "types": "build/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
+    "build": "tsc",
     "recursive": "madge --circular --extensions ts src",
     "test": "jest"
   },
@@ -32,7 +33,6 @@
     "@types/jest": "^24.0.25",
     "@types/lodash": "^4.14.149",
     "@types/node": "^13.1.2",
-    "@types/node-sql-parser": "^1.1.0",
     "@types/string-format": "^2.0.0",
     "jest": "^24.9.0",
     "madge": "^3.6.0",

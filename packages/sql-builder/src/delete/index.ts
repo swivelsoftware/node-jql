@@ -75,7 +75,7 @@ export class Delete implements IDelete, IStringify {
     else {
       this.database = json.database
       this.name = json.name
-      this.where = parse(json.where)
+      if (json.where) this.where = parse<Expression>(json.where)
     }
   }
 

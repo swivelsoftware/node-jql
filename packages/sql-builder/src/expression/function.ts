@@ -21,7 +21,7 @@ class Builder implements IBuilder<FunctionExpression> {
    * @param json [IExpression]
    */
   public arg(json: IExpression): Builder {
-    if (isUndefined(this.json.arguments)) this.json.arguments = []
+    if (!this.json.arguments) this.json.arguments = []
     this.json.arguments.push(json)
     return this
   }

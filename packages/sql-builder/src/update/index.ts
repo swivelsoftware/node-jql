@@ -90,7 +90,7 @@ export class Update implements IUpdate, IStringify {
       this.database = json.database
       this.name = json.name
       this.set = json.set.map(json => new BinaryExpression(json))
-      this.where = parse(json.where)
+      if (json.where) this.where = parse<Expression>(json.where)
     }
   }
 

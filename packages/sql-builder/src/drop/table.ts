@@ -60,7 +60,7 @@ export class DropTable implements IDropTable, IStringify {
       this.name = json
     }
     else {
-      this.ifExists = json.ifExists
+      if (json.ifExists) this.ifExists = json.ifExists
       this.database = json.database
       this.name = json.name
     }

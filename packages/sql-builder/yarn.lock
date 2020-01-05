@@ -363,13 +363,6 @@
   resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.149.tgz#1342d63d948c6062838fbf961012f74d4e638440"
   integrity sha512-ijGqzZt/b7BfzcK9vTrS6MFljQRPn5BFWOx8oE0GYxribu6uV+aA9zZuXI1zc/etK9E8nrgdoF2+LgUw7+9tJQ==
 
-"@types/node-sql-parser@^1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@types/node-sql-parser/-/node-sql-parser-1.1.0.tgz#916d16864e21723e5818c9a603d7ccb1c26ea0ac"
-  integrity sha512-Y5hmrXH9+tVA/tJkel12XVMPPgv07UQv44oAt/8l/TI3raKlxbyFYPDLqo71HTQSN4hEbqlXA/ZAZy0AASsz6w==
-  dependencies:
-    node-sql-parser "*"
-
 "@types/node@^13.1.2":
   version "13.1.2"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-13.1.2.tgz#fe94285bf5e0782e1a9e5a8c482b1c34465fa385"
@@ -647,11 +640,6 @@ bcrypt-pbkdf@^1.0.0:
   integrity sha1-pDAdOJtqQ/m2f/PKEaP2Y342Dp4=
   dependencies:
     tweetnacl "^0.14.3"
-
-big-integer@^1.6.45:
-  version "1.6.48"
-  resolved "https://registry.yarnpkg.com/big-integer/-/big-integer-1.6.48.tgz#8fd88bd1632cba4a1c8c3e3d7159f08bb95b4b9e"
-  integrity sha512-j51egjPa7/i+RdiRuJbPdJ2FIUYYPhvYLjzoYbcMMm62ooO6F94fETG4MTs46zPAF9Brs04OajboA/qTGuz78w==
 
 bindings@^1.5.0:
   version "1.5.0"
@@ -2740,14 +2728,6 @@ node-source-walk@^4.0.0, node-source-walk@^4.2.0:
   integrity sha512-hPs/QMe6zS94f5+jG3kk9E7TNm4P2SulrKiLWMzKszBfNZvL/V6wseHlTd7IvfW0NZWqPtK3+9yYNr+3USGteA==
   dependencies:
     "@babel/parser" "^7.0.0"
-
-node-sql-parser@*:
-  version "1.6.18"
-  resolved "https://registry.yarnpkg.com/node-sql-parser/-/node-sql-parser-1.6.18.tgz#a7546e052bbbaa27cd4799f654335c1771cdbd8d"
-  integrity sha512-kxY6owAS/bGlkcF02L3IEaywlgKNWbQ2NMuYPLyCYcIcaFfrzqEKrYw6lZ8bglkqYn6g8gGrUNEjKNNg/o1vgg==
-  dependencies:
-    big-integer "^1.6.45"
-    has "^1.0.3"
 
 normalize-package-data@^2.3.2:
   version "2.5.0"
