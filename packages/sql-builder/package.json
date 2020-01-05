@@ -1,6 +1,6 @@
 {
   "name": "@node-jql/sql-builder",
-  "version": "1.0.0-rc.3",
+  "version": "1.0.0-rc.4",
   "description": "Represent SQL in JSON format for building SQL string",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -19,7 +19,7 @@
     "url": "https://github.com/kennysng/node-jql/issues"
   },
   "files": [
-    "build"
+    "dist"
   ],
   "dependencies": {
     "deepmerge": "^4.2.2",
