@@ -1,4 +1,3 @@
-import * as $ from './dbType'
 import './dbType/__init__'
 import { stringify as jsonStringify } from './dbType/stringify'
 import './expression/__init__'
@@ -85,7 +84,8 @@ export function stringify(value: any): string {
   }
 }
 
-export default $
+export default './index'
+export { IColumn, IConstraint, IExpression, ISQL } from './index.if'
 
 export { BetweenExpression } from './expression/between'
 export { BinaryExpression } from './expression/binary'
