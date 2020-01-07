@@ -1,6 +1,6 @@
 import _ = require('lodash')
 import { Expression } from '.'
-import * as $ from '../dbType'
+import { dbConfigs, dbType } from '../dbType'
 import { IBuilder, IExpression } from '../index.if'
 import { parse, register } from '../parse'
 import { ColumnExpression } from './column'
@@ -24,7 +24,7 @@ class Builder implements IBuilder<MathExpression> {
   private json: IMathExpression
 
   constructor(operator: string) {
-    const SUPPORTED_OPERATORS = _.get($.dbConfigs, [$.dbType, 'mathOperators'], DEFAULT_OPERATORS)
+    const SUPPORTED_OPERATORS = _.get(dbConfigs, [dbType, 'mathOperators'], DEFAULT_OPERATORS)
     if (SUPPORTED_OPERATORS.indexOf(operator) === -1) throw new SyntaxError(`Unsupported operator '${operator}'`)
 
     this.json = {

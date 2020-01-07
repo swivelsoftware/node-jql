@@ -1,7 +1,6 @@
 import _ = require('lodash')
 import { Expression } from '.'
-import { isUndefined } from '..'
-import * as $ from '../dbType'
+import { dbConfigs, dbType } from '../dbType'
 import { IBuilder, IExpression } from '../index.if'
 import { parse, register } from '../parse'
 import { IFunctionExpression } from './index.if'
@@ -62,7 +61,7 @@ export class FunctionExpression extends Expression implements IFunctionExpressio
    */
   get isValid(): boolean {
     const name = this.name.toLocaleLowerCase()
-    const $validations = _.get($.dbConfigs, [$.dbType, 'functions', 'validations'], {})
+    const $validations = _.get(dbConfigs, [dbType, 'functions', 'validations'], {})
     for (const key of Object.keys($validations)) {
       if (key.toLocaleLowerCase() === name) return $validations[key](this.arguments)
     }
@@ -74,7 +73,7 @@ export class FunctionExpression extends Expression implements IFunctionExpressio
    */
   get argsFormat(): string|null {
     const name = this.name.toLocaleLowerCase()
-    const $formats = _.get($.dbConfigs, [$.dbType, 'functions', 'formats'], {})
+    const $formats = _.get(dbConfigs, [dbType, 'functions', 'formats'], {})
     for (const key of Object.keys($formats)) {
       if (key.toLocaleLowerCase() === name) return $formats[key]
     }

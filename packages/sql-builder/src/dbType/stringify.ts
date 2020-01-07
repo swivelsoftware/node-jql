@@ -1,6 +1,6 @@
 import _ = require('lodash')
 import format = require('string-format')
-import * as $ from '.'
+import { dbConfigs, dbType } from '.'
 import { isUndefined, stringify as valStringify } from '..'
 import { ICreateFunction, ICreateSchema, ICreateTable, ICreateTableSelect } from '../create/index.if'
 import { Delete } from '../delete'
@@ -188,7 +188,7 @@ const _default: { [key: string]: (json: any) => string } = {
  * @param json [IStringify]
  */
 export function stringify<T extends IStringify>(classname: string, json: T): string {
-  return _.has($.dbConfigs, [$.dbType, 'stringify', classname])
-    ? _.get($.dbConfigs, [$.dbType, 'stringify', classname])(json)
+  return _.has(dbConfigs, [dbType, 'stringify', classname])
+    ? _.get(dbConfigs, [dbType, 'stringify', classname])(json)
     : _default[classname](json)
 }
