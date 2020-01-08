@@ -140,6 +140,16 @@ export interface IExistsExpression extends IConditionalExpression {
 }
 
 /**
+ * Query expression
+ */
+export interface IQueryExpression extends IExpression {
+  /**
+   * Sub-query
+   */
+  query: IQuery
+}
+
+/**
  * Raw JQL defining function expression
  */
 export interface IFunctionExpression extends IExpression {
