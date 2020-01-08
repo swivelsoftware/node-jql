@@ -139,12 +139,10 @@ export class CreateTable extends BaseCreateTable implements ICreateTable {
   public readonly columns: Column[]
   public readonly constraints: Constraint[] = []
 
-  constructor(json: string|ICreateTable) {
+  constructor(json: ICreateTable) {
     super(json)
-    if (typeof json !== 'string') {
-      this.columns = json.columns.map(json => new Column(json))
-      if (json.constraints) this.constraints = json.constraints.map(json => parse(json))
-    }
+    this.columns = json.columns.map(json => new Column(json))
+    if (json.constraints) this.constraints = json.constraints.map(json => parse(json))
   }
 
   // @override
