@@ -124,7 +124,7 @@ export interface IRemoteTable extends AxiosRequestConfig {
     name: string,
     type?: Type,
     $as?: string,
-    nullable?: boolean
+    nullable?: boolean,
   }>
 }
 

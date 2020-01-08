@@ -194,8 +194,8 @@ export class Query extends JQL implements IQuery {
   }
 
   // @override
-  public toSquel(): squel.Select {
-    let builder = squel.select()
+  public toSquel(rawNesting?: boolean): squel.Select {
+    let builder = squel.select({ rawNesting })
     if (this.$distinct) builder.distinct()
     if (this.$from) for (const table of this.$from) builder = table.apply(builder)
     if (!this.isSimpleWildcard) for (const { expression, $as } of this.$select) builder = builder.field(expression.toSquel(), $as)
@@ -208,26 +208,8 @@ export class Query extends JQL implements IQuery {
       }
     }
     if (this.$limit) builder = squel.select({}, [...builder.blocks, new squel.cls.StringBlock({}, this.$limit.toString())]) as squel.Select
-    if (this.$union) builder = builder.union(this.$union.toSquel())
+    if (this.$union) builder = builder.union(this.$union.toSquel(true))
     return builder
-  }
-
-  // @override
-  public toString(): string {
-    let builder = squel.select()
-    if (this.$distinct) builder.distinct()
-    if (this.$from) for (const table of this.$from) builder = table.apply(builder)
-    if (!this.isSimpleWildcard) for (const { expression, $as } of this.$select) builder = builder.field(expression.toSquel(), $as)
-    if (this.$where) builder = builder.where(this.$where.toSquel(false) as squel.Expression)
-    if (this.$group) builder = this.$group.apply(builder)
-    if (this.$order) {
-      for (const { expression, order } of this.$order) {
-        const { text, values } = expression.toSquel().toParam()
-        builder = builder.order(text, order === 'ASC', ...values)
-      }
-    }
-    if (this.$limit) builder = squel.select({}, [...builder.blocks, new squel.cls.StringBlock({}, this.$limit.toString())]) as squel.Select
-    return this.$union ? `${builder.toString()} UNION ${this.$union.toString()}` : builder.toString()
   }
 
   // @override
