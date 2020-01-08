@@ -213,6 +213,24 @@ export class Query extends JQL implements IQuery {
   }
 
   // @override
+  public toString(): string {
+    let builder = squel.select()
+    if (this.$distinct) builder.distinct()
+    if (this.$from) for (const table of this.$from) builder = table.apply(builder)
+    if (!this.isSimpleWildcard) for (const { expression, $as } of this.$select) builder = builder.field(expression.toSquel(), $as)
+    if (this.$where) builder = builder.where(this.$where.toSquel(false) as squel.Expression)
+    if (this.$group) builder = this.$group.apply(builder)
+    if (this.$order) {
+      for (const { expression, order } of this.$order) {
+        const { text, values } = expression.toSquel().toParam()
+        builder = builder.order(text, order === 'ASC', ...values)
+      }
+    }
+    if (this.$limit) builder = squel.select({}, [...builder.blocks, new squel.cls.StringBlock({}, this.$limit.toString())]) as squel.Select
+    return this.$union ? `${builder.toString()} UNION ${this.$union.toString()}` : builder.toString()
+  }
+
+  // @override
   public toJson(): IQuery {
     const result: IQuery = { classname: this.classname }
     if (this.$distinct) result.$distinct = true
