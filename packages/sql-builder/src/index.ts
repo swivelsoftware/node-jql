@@ -86,6 +86,7 @@ export function stringify(value: any): string {
 }
 
 export default $
+export { parse } from './parse'
 export { IColumn, IConstraint, IExpression, ISQL } from './index.if'
 
 export { BetweenExpression } from './expression/between'

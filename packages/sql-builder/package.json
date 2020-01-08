@@ -1,13 +1,14 @@
 {
   "name": "@node-jql/sql-builder",
-  "version": "1.0.0-rc.6",
+  "version": "1.0.0-rc.8",
   "description": "Represent SQL in JSON format for building SQL string",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
     "recursive": "madge --circular --extensions ts src",
-    "test": "jest"
+    "test": "jest",
+    "prepublishOnly": "yarn build"
   },
   "repository": {
     "type": "git",
