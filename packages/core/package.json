@@ -1,10 +1,12 @@
 {
   "name": "@node-jql/core",
-  "version": "0.0.1",
-  "description": "The core of a MySQL-like RDBMS written in TypeScript",
+  "version": "1.0.0-rc.1",
+  "description": "Node JQL core",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
+    "build": "tsc",
+    "recursive": "madge --circular --extensions ts src",
     "test": "jest"
   },
   "repository": {
@@ -17,21 +19,28 @@
     "url": "https://github.com/kennysng/node-jql/issues"
   },
   "files": [
-    "dist"
+    "build"
   ],
-  "devDependencies": {
-    "@types/jest": "^24.0.22",
-    "@types/node": "^12.12.6",
-    "@types/string-format": "^2.0.0",
-    "jest": "^24.9.0",
-    "ts-jest": "^24.1.0",
-    "ts-node": "^8.4.1",
-    "tslint": "^5.20.1",
-    "typescript": "^3.7.2"
-  },
   "dependencies": {
+    "@types/uuid": "^3.4.6",
+    "axios": "^0.19.0",
+    "lodash": "^4.17.15",
     "moment": "^2.24.0",
-    "string-format": "^2.0.0",
+    "ts-node": "^8.4.1",
+    "typescript": "^3.7.4",
+    "uuid": "^3.3.3",
     "wolfy87-eventemitter": "^5.2.8"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.25",
+    "@types/lodash": "^4.14.149",
+    "@types/node": "^13.1.2",
+    "jest": "^24.9.0",
+    "madge": "^3.6.0",
+    "ts-jest": "^24.1.0",
+    "tslint": "^5.20.1"
+  },
+  "peerDependencies": {
+    "@node-jql/sql-builder": "^1.0.0-rc.10"
   }
 }

@@ -1,0 +1,24 @@
+# internal scripts
+scripts
+
+# testing files
+test
+jest.config.js
+tsconfig.test.json
+
+# typescript config file
+tsconfig.json
+
+# source
+**/*.ts
+*.ts
+
+# definitions
+!**/*.d.ts
+!*.d.ts
+
+# configuration
+package-lock.json
+yarn.lock
+tslint.json
+tsconfig.json
