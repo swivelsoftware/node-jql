@@ -15,21 +15,18 @@ import { IBaseCreateTable, ICreateTable, ICreateTableSelect } from './index.if'
 abstract class BaseCreateTable implements IBaseCreateTable, IStringify {
   public readonly classname: string = BaseCreateTable.name
 
+  public readonly temporary: boolean = false
   public readonly ifNotExists: boolean = false
   public readonly database?: string
   public readonly name: string
   public readonly options: string[] = []
 
-  constructor(json: string|IBaseCreateTable) {
-    if (typeof json === 'string') {
-      this.name = json
-    }
-    else {
-      if (json.ifNotExists) this.ifNotExists = json.ifNotExists
-      if (json.database) this.database = json.database
-      this.name = json.name
-      if (json.options) this.options = json.options
-    }
+  constructor(json: IBaseCreateTable) {
+    if (json.temporary) this.temporary = json.temporary
+    if (json.ifNotExists) this.ifNotExists = json.ifNotExists
+    if (json.database) this.database = json.database
+    this.name = json.name
+    if (json.options) this.options = json.options
   }
 
   // @override
@@ -59,6 +56,15 @@ class CreateTableBuilder implements IBuilder<CreateTable> {
       name,
       columns: [],
     }
+  }
+
+  /**
+   * Set `temporary` flag
+   * @param value [boolean]
+   */
+  public temporary(value: boolean = true): CreateTableBuilder {
+    this.json.temporary = value
+    return this
   }
 
   /**
