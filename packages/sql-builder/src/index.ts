@@ -107,6 +107,7 @@ export { CreateSchema } from './create/schema'
 export { CreateTable, CreateTableSelect } from './create/table'
 export { Column } from './column'
 export { Constraint, PrimaryKeyConstraint } from './constraint'
+export { CreateFunction } from './create/function'
 
 export { Delete } from './delete'
 
