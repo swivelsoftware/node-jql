@@ -16,11 +16,11 @@ class Builder implements IBuilder<DropTable> {
   }
 
   /**
-   * Set `database` for the table
-   * @param database [string]
+   * Set `schema` for the table
+   * @param schema [string]
    */
-  public database(database: string): Builder {
-    this.json.database = database
+  public schema(schema: string): Builder {
+    this.json.schema = schema
     return this
   }
 
@@ -52,7 +52,7 @@ export class DropTable implements IDropTable, IStringify {
 
   public readonly classname: string = DropTable.name
   public readonly ifExists: boolean = false
-  public readonly database?: string
+  public readonly schema?: string
   public readonly name: string
 
   constructor(json: string|IDropTable) {
@@ -61,7 +61,7 @@ export class DropTable implements IDropTable, IStringify {
     }
     else {
       if (json.ifExists) this.ifExists = json.ifExists
-      this.database = json.database
+      this.schema = json.schema
       this.name = json.name
     }
   }
@@ -77,7 +77,7 @@ export class DropTable implements IDropTable, IStringify {
       classname: this.classname,
       name: this.name,
     }
-    if (this.database) json.database = this.database
+    if (this.schema) json.schema = this.schema
     if (this.ifExists) json.ifExists = this.ifExists
     return json
   }

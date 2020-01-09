@@ -16,7 +16,7 @@ export interface ICreateSchema extends ISQL {
 export interface IBaseCreateTable extends ISQL {
   temporary?: boolean
   ifNotExists?: boolean
-  database?: string
+  schema?: string
   name: string
   options?: string[]
 }

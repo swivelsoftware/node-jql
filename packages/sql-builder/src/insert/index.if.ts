@@ -5,7 +5,7 @@ import { IQuery } from '../select/index.if'
  * INSERT INTO
  */
 export interface IInsert extends ISQL {
-  database?: string
+  schema?: string
   name: string
   columns?: string[]
   values: any
@@ -15,7 +15,7 @@ export interface IInsert extends ISQL {
  * INSERT INTO SELECT
  */
 export interface IInsertSelect extends ISQL {
-  database?: string
+  schema?: string
   name: string
   columns?: string[]
   query: IQuery

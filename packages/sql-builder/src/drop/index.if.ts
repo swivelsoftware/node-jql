@@ -13,7 +13,7 @@ export interface IDropSchema extends ISQL {
  */
 export interface IDropTable extends ISQL {
   ifExists?: boolean
-  database?: string
+  schema?: string
   name: string
 }
 

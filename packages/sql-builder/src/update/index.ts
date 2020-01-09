@@ -20,11 +20,11 @@ class Builder implements IBuilder<Update> {
   }
 
   /**
-   * Set `database` for the table
-   * @param database [string]
+   * Set `schema` for the table
+   * @param schema [string]
    */
-  public database(database: string): Builder {
-    this.json.database = database
+  public schema(schema: string): Builder {
+    this.json.schema = schema
     return this
   }
 
@@ -77,7 +77,7 @@ export class Update implements IUpdate, IStringify {
   public static Builder = Builder
 
   public readonly classname: string = Update.name
-  public readonly database?: string
+  public readonly schema?: string
   public readonly name: string
   public readonly set: BinaryExpression[]
   public readonly where?: Expression
@@ -87,7 +87,7 @@ export class Update implements IUpdate, IStringify {
       this.name = json
     }
     else {
-      this.database = json.database
+      this.schema = json.schema
       this.name = json.name
       this.set = json.set.map(json => new BinaryExpression(json))
       if (json.where) this.where = parse<Expression>(json.where)
@@ -106,7 +106,7 @@ export class Update implements IUpdate, IStringify {
       name: this.name,
       set: this.set.map(expr => expr.toJson()),
     }
-    if (this.database) json.database = this.database
+    if (this.schema) json.schema = this.schema
     if (this.where) json.where = this.where.toJson()
     return json
   }

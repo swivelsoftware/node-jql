@@ -159,7 +159,7 @@ export abstract class Datasource implements IDatasource, IStringify {
  */
 export class FromTable extends Datasource implements IFromTable {
   public readonly classname: string = FromTable.name
-  public readonly database?: string
+  public readonly schema?: string
   public readonly name: string
   public readonly as?: string
 
@@ -173,7 +173,7 @@ export class FromTable extends Datasource implements IFromTable {
     )
 
     if (Array.isArray(args[0])) {
-      this.database = args[0][0]
+      this.schema = args[0][0]
       this.name = args[0][1]
     }
     else if (typeof args[0] === 'string') {
@@ -181,7 +181,7 @@ export class FromTable extends Datasource implements IFromTable {
     }
     else {
       const json = args[0] as IFromTable
-      if (json.database) this.database = json.database
+      if (json.schema) this.schema = json.schema
       this.name = json.name
     }
   }
@@ -193,7 +193,7 @@ export class FromTable extends Datasource implements IFromTable {
       classname: this.classname,
       name: this.name,
     }
-    if (this.database) json.database = this.database
+    if (this.schema) json.schema = this.schema
     return json
   }
 }

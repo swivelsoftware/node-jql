@@ -18,11 +18,11 @@ class Builder implements IBuilder<Delete> {
   }
 
   /**
-   * Set `database` for the table
-   * @param database [string]
+   * Set `schema` for the table
+   * @param schema [string]
    */
-  public database(database: string): Builder {
-    this.json.database = database
+  public schema(schema: string): Builder {
+    this.json.schema = schema
     return this
   }
 
@@ -64,7 +64,7 @@ export class Delete implements IDelete, IStringify {
   public static Builder = Builder
 
   public readonly classname = Delete.name
-  public readonly database?: string
+  public readonly schema?: string
   public readonly name: string
   public readonly where?: Expression
 
@@ -73,7 +73,7 @@ export class Delete implements IDelete, IStringify {
       this.name = json
     }
     else {
-      this.database = json.database
+      this.schema = json.schema
       this.name = json.name
       if (json.where) this.where = parse<Expression>(json.where)
     }
@@ -90,7 +90,7 @@ export class Delete implements IDelete, IStringify {
       classname: this.classname,
       name: this.name,
     }
-    if (this.database) json.database = this.database
+    if (this.schema) json.schema = this.schema
     if (this.where) json.where = this.where.toJson()
     return json
   }

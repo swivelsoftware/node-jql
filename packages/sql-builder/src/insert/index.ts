@@ -18,11 +18,11 @@ class InsertBuilder implements IBuilder<Insert> {
   }
 
   /**
-   * Set `database` for the table
-   * @param database [string]
+   * Set `schema` for the table
+   * @param schema [string]
    */
-  public database(database: string): InsertBuilder {
-    this.json.database = database
+  public schema(schema: string): InsertBuilder {
+    this.json.schema = schema
     return this
   }
 
@@ -70,13 +70,13 @@ export class Insert implements IInsert, IStringify {
   public static Builder = InsertBuilder
 
   public readonly classname: string = Insert.name
-  public readonly database?: string
+  public readonly schema?: string
   public readonly name: string
   public readonly columns: string[] = []
   public readonly values: any[]
 
   constructor(json: IInsert) {
-    this.database = json.database
+    this.schema = json.schema
     this.name = json.name
     if (json.columns) this.columns = json.columns
     this.values = Array.isArray(json.values) ? json.values : [json.values]
@@ -94,7 +94,7 @@ export class Insert implements IInsert, IStringify {
       name: this.name,
       values: this.values,
     }
-    if (this.database) json.database = this.database
+    if (this.schema) json.schema = this.schema
     if (this.columns.length) json.columns = this.columns
     return json
   }
@@ -112,11 +112,11 @@ class InsertSelectBuilder implements IBuilder<InsertSelect> {
   }
 
   /**
-   * Set `database` for the table
-   * @param database [string]
+   * Set `schema` for the table
+   * @param schema [string]
    */
-  public database(database: string): InsertSelectBuilder {
-    this.json.database = database
+  public schema(schema: string): InsertSelectBuilder {
+    this.json.schema = schema
     return this
   }
 
@@ -162,13 +162,13 @@ export class InsertSelect implements IInsertSelect, IStringify {
   public static Builder = InsertSelectBuilder
 
   public readonly classname: string = InsertSelect.name
-  public readonly database?: string
+  public readonly schema?: string
   public readonly name: string
   public readonly columns: string[] = []
   public readonly query: Query
 
   constructor(json: IInsertSelect) {
-    this.database = json.database
+    this.schema = json.schema
     this.name = json.name
     if (json.columns) this.columns = json.columns
     this.query = new Query(json.query)
@@ -186,7 +186,7 @@ export class InsertSelect implements IInsertSelect, IStringify {
       name: this.name,
       query: this.query.toJson(),
     }
-    if (this.database) json.database = this.database
+    if (this.schema) json.schema = this.schema
     if (this.columns.length) json.columns = this.columns
     return json
   }

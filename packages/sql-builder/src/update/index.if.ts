@@ -5,7 +5,7 @@ import { IExpression, ISQL } from '../index.if'
  * UPDATE SET
  */
 export interface IUpdate extends ISQL {
-  database?: string
+  schema?: string
   name: string
   set: IBinaryExpression[]
   where?: IExpression

@@ -17,14 +17,14 @@ abstract class BaseCreateTable implements IBaseCreateTable, IStringify {
 
   public readonly temporary: boolean = false
   public readonly ifNotExists: boolean = false
-  public readonly database?: string
+  public readonly schema?: string
   public readonly name: string
   public readonly options: string[] = []
 
   constructor(json: IBaseCreateTable) {
     if (json.temporary) this.temporary = json.temporary
     if (json.ifNotExists) this.ifNotExists = json.ifNotExists
-    if (json.database) this.database = json.database
+    if (json.schema) this.schema = json.schema
     this.name = json.name
     if (json.options) this.options = json.options
   }
@@ -41,7 +41,7 @@ abstract class BaseCreateTable implements IBaseCreateTable, IStringify {
       name: this.name,
     }
     if (this.ifNotExists) json.ifNotExists = this.ifNotExists
-    if (this.database) json.database = this.database
+    if (this.schema) json.schema = this.schema
     if (this.options.length) json.options = this.options
     return json
   }
@@ -68,11 +68,11 @@ class CreateTableBuilder implements IBuilder<CreateTable> {
   }
 
   /**
-   * Set `database` for the table
-   * @param database [string]
+   * Set `schema` for the table
+   * @param schema [string]
    */
-  public database(database: string): CreateTableBuilder {
-    this.json.database = database
+  public schema(schema: string): CreateTableBuilder {
+    this.json.schema = schema
     return this
   }
 
@@ -175,11 +175,11 @@ class CreateTableSelectBuilder implements IBuilder<CreateTableSelect> {
   }
 
   /**
-   * Set `database` for the table
-   * @param database [string]
+   * Set `schema` for the table
+   * @param schema [string]
    */
-  public database(database: string): CreateTableSelectBuilder {
-    this.json.database = database
+  public schema(schema: string): CreateTableSelectBuilder {
+    this.json.schema = schema
     return this
   }
 

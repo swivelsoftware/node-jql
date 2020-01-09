@@ -47,12 +47,12 @@ const _default: { [key: string]: (json: any) => string } = {
   },
   CreateTable(json: ICreateTable): string {
     const columns: any[] = [...json.columns, ...(json.constraints || [])]
-    let str = `${json.ifNotExists ? 'CREATE TABLE IF NOT EXISTS' : 'CREATE TABLE'} ${json.database ? `\`${json.database}\`.\`${json.name}\`` : `\`${json.name}\``} (${columns.map(col => col.toString()).join(', ')})`
+    let str = `${json.ifNotExists ? 'CREATE TABLE IF NOT EXISTS' : 'CREATE TABLE'} ${json.schema ? `\`${json.schema}\`.\`${json.name}\`` : `\`${json.name}\``} (${columns.map(col => col.toString()).join(', ')})`
     if (json.options && json.options.length) str += ` ${json.options.join(' ')}`
     return str
   },
   CreateTableSelect(json: ICreateTableSelect): string {
-    let str = `${json.ifNotExists ? 'CREATE TABLE IF NOT EXISTS' : 'CREATE TABLE'} ${json.database ? `\`${json.database}\`.\`${json.name}\`` : `\`${json.name}\``}`
+    let str = `${json.ifNotExists ? 'CREATE TABLE IF NOT EXISTS' : 'CREATE TABLE'} ${json.schema ? `\`${json.schema}\`.\`${json.name}\`` : `\`${json.name}\``}`
     const columns: any[] = [...(json.columns || []), ...(json.constraints || [])]
     if (columns.length) str += ` (${columns.map(col => col.toString()).join(', ')})`
     if (json.options && json.options.length) str += ` ${json.options.join(' ')}`
@@ -63,7 +63,7 @@ const _default: { [key: string]: (json: any) => string } = {
 
   // delete
   Delete(json: Delete): string {
-    let str = `DELETE FROM ${json.database ? `\`${json.database}\`.\`${json.name}\`` : `\`${json.name}\``}`
+    let str = `DELETE FROM ${json.schema ? `\`${json.schema}\`.\`${json.name}\`` : `\`${json.name}\``}`
     if (json.where) str += ` WHERE ${json.where.toString()}`
     return str
   },
@@ -73,7 +73,7 @@ const _default: { [key: string]: (json: any) => string } = {
     return `${json.ifExists ? 'DROP SCHEMA IF EXISTS' : 'DROP SCHEMA'} \`${json.name}\``
   },
   DropTable(json: IDropTable): string {
-    return `${json.ifExists ? 'DROP TABLE IF EXISTS' : 'DROP TABLE'} ${json.database ? `\`${json.database}\`.\`${json.name}\`` : `\`${json.name}\``}`
+    return `${json.ifExists ? 'DROP TABLE IF EXISTS' : 'DROP TABLE'} ${json.schema ? `\`${json.schema}\`.\`${json.name}\`` : `\`${json.name}\``}`
   },
   DropFunction(json: IDropFunction): string {
     return `${json.ifExists ? 'DROP FUNCTION IF EXISTS' : 'DROP FUNCTION'} \`${json.name}\``
@@ -130,7 +130,7 @@ const _default: { [key: string]: (json: any) => string } = {
 
   // insert
   Insert(json: IInsert): string {
-    let str = `INSERT INTO ${json.database ? `\`${json.database}\`.\`${json.name}\`` : `\`${json.name}\``}`
+    let str = `INSERT INTO ${json.schema ? `\`${json.schema}\`.\`${json.name}\`` : `\`${json.name}\``}`
     if (json.columns && json.columns.length) {
       str += `(${json.columns.map(c => `\`${c}\``).join(', ')})`
       str += ` VALUES ${json.values.map(row => `(${(json.columns || []).map(c => valStringify(row[c])).join(', ')})`).join(', ')}`
@@ -142,7 +142,7 @@ const _default: { [key: string]: (json: any) => string } = {
     return str
   },
   InsertSelect(json: IInsertSelect): string {
-    let str = `INSERT INTO ${json.database ? `\`${json.database}\`.\`${json.name}\`` : `\`${json.name}\``}`
+    let str = `INSERT INTO ${json.schema ? `\`${json.schema}\`.\`${json.name}\`` : `\`${json.name}\``}`
     if (json.columns && json.columns.length) {
       str += `(${json.columns.map(c => `\`${c}\``).join(', ')})`
     }
@@ -155,7 +155,7 @@ const _default: { [key: string]: (json: any) => string } = {
     return `${json.expr.toString()}${json.as ? ` AS \`${json.as}\`` : ''}`
   },
   FromTable(json: IFromTable): string {
-    return `${json.database ? `\`${json.database}\`.\`${json.name}\`` : `\`${json.name}\``}${json.as ? ` AS \`${json.as}\`` : ''}`
+    return `${json.schema ? `\`${json.schema}\`.\`${json.name}\`` : `\`${json.name}\``}${json.as ? ` AS \`${json.as}\`` : ''}`
   },
   FromFunctionTable(json: IFromFunctionTable): string {
     return `${json.expr.toString()}${json.as ? ` AS \`${json.as}\`` : ''}`
@@ -179,7 +179,7 @@ const _default: { [key: string]: (json: any) => string } = {
 
   // update
   Update(json: IUpdate): string {
-    let str = `UPDATE ${json.database ? `\`${json.database}\`.\`${json.name}\`` : `\`${json.name}\``} SET ${json.set.map(expr => expr.toString()).join(', ')}`
+    let str = `UPDATE ${json.schema ? `\`${json.schema}\`.\`${json.name}\`` : `\`${json.name}\``} SET ${json.set.map(expr => expr.toString()).join(', ')}`
     if (json.where) str += ` WHERE ${json.where.toString()}`
     return str
   },

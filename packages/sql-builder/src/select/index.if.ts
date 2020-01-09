@@ -20,7 +20,7 @@ export interface IDatasource extends IParseable {
  * Table data source
  */
 export interface IFromTable extends IDatasource {
-  database?: string
+  schema?: string
   name: string
 }
 
