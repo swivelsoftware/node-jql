@@ -59,7 +59,7 @@ export class CaseExpression extends Expression implements ICaseExpression {
     const params = [] as any[]
     this.cases.forEach(({ $when, $then }) => params.push($when.toSquel(), $then.toSquel()))
     if (this.$else) params.push(this.$else.toSquel())
-    return squel.expr().and(`CASE ${this.cases.map(() => 'WHEN ? THEN ?').join(' ')}${this.$else ? ' ELSE ?' : ''}`, ...params)
+    return squel.expr().and(`CASE ${this.cases.map(() => 'WHEN ? THEN ?').join(' ')}${this.$else ? ' ELSE ?' : ''} END`, ...params)
   }
 
   // @override
