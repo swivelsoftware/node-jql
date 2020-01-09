@@ -4,7 +4,7 @@ import { dbConfigs, dbType } from '.'
 import { isUndefined, stringify as valStringify } from '..'
 import { ICreateFunction, ICreateSchema, ICreateTable, ICreateTableSelect } from '../create/index.if'
 import { Delete } from '../delete'
-import { IDropSchema, IDropTable } from '../drop/index.if'
+import { IDropFunction, IDropSchema, IDropTable } from '../drop/index.if'
 import { IBetweenExpression, IBinaryExpression, ICaseExpression, IColumnDefExpression, IColumnExpression, IExistsExpression, IFunctionExpression, IGroupExpression, IMathExpression, IQueryExpression, IUnknown, IValue, IVariable } from '../expression/index.if'
 import { IColumn, IConstraint, IExpression, IPrimaryKeyConstraint, IStringify, IType } from '../index.if'
 import { IInsert, IInsertSelect } from '../insert/index.if'
@@ -74,6 +74,9 @@ const _default: { [key: string]: (json: any) => string } = {
   },
   DropTable(json: IDropTable): string {
     return `${json.ifExists ? 'DROP TABLE IF EXISTS' : 'DROP TABLE'} ${json.database ? `\`${json.database}\`.\`${json.name}\`` : `\`${json.name}\``}`
+  },
+  DropFunction(json: IDropFunction): string {
+    return `${json.ifExists ? 'DROP FUNCTION IF EXISTS' : 'DROP FUNCTION'} \`${json.name}\``
   },
 
   // expression

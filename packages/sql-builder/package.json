@@ -1,6 +1,6 @@
 {
   "name": "@node-jql/sql-builder",
-  "version": "1.0.0-rc.9",
+  "version": "1.0.0-rc.10",
   "description": "Represent SQL in JSON format for building SQL string",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

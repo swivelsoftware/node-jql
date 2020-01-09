@@ -113,6 +113,7 @@ export { Delete } from './delete'
 
 export { DropSchema } from './drop/schema'
 export { DropTable } from './drop/table'
+export { DropFunction } from './drop/function'
 
 export { Datasource, FromFunctionTable, FromTable, Query, ResultColumn } from './select'
 export { Insert, InsertSelect } from './insert'

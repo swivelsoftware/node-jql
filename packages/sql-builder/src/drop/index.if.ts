@@ -16,3 +16,11 @@ export interface IDropTable extends ISQL {
   database?: string
   name: string
 }
+
+/**
+ * DROP FUNCTION
+ */
+export interface IDropFunction extends ISQL {
+  ifExists?: boolean
+  name: string
+}
