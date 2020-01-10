@@ -9,7 +9,7 @@ export class DropTableJQL extends DropTable {
 
   constructor(sql: DropTable, options: IJQLOptions) {
     super(sql)
-    const schema = sql.database || options.schema
+    const schema = sql.schema || options.schema
     if (!schema) throw new SyntaxError('No default schema is selected')
     this.schema = schema
   }

@@ -5,14 +5,14 @@ let app: CoreApplication
 let sessionId: string
 
 test('Initialize', async done => {
-  app = new CoreApplication()
+  app = new CoreApplication({ logLevel: 'debug' })
   sessionId = await app.createSession()
   done()
 })
 
 test('Create schema', done => {
   app.update(new CreateSchema('TEMP_DB'), { sessionId })
-    .on('complete', ({ rowsAffected, sql }) => {
+    .on('complete', ({ rowsAffected }) => {
       expect(rowsAffected).toBe(1)
       done()
     })
@@ -43,7 +43,7 @@ test('Create table', done => {
       sessionId,
     },
   )
-    .on('complete', ({ rowsAffected, sql }) => {
+    .on('complete', ({ rowsAffected }) => {
       expect(rowsAffected).toBe(1)
       done()
     })
@@ -60,16 +60,16 @@ test('Drop table', done => {
       sessionId,
     },
   )
-    .on('complete', ({ rowsAffected, sql }) => {
+    .on('complete', ({ rowsAffected }) => {
       expect(rowsAffected).toBe(1)
       done()
     })
     .on('error', err => { throw err })
 })
 
-test('DROP schema', done => {
+test('Drop schema', done => {
   app.update(new DropSchema('TEMP_DB'), { sessionId })
-    .on('complete', ({ rowsAffected, sql }) => {
+    .on('complete', ({ rowsAffected }) => {
       expect(rowsAffected).toBe(1)
       done()
     })

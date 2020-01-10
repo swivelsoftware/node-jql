@@ -86,6 +86,9 @@ export class MemoryEngine extends Engine {
   public dropTable(jql: DropTableJQL, sessionId: string): Task<Partial<IUpdateResult>> {
     return new PromiseTask<Partial<IUpdateResult>>(async task => {
       const { schema, name, ifExists } = jql
+      const readonlyContext = getContext(sessionId, 'readonly')
+      const lock = readonlyContext.getLock(schema, name)
+
       const globalContext = getContext(sessionId, 'global')
       const sessionContext = getContext(sessionId, 'session')
       const isNormalTable = globalContext.hasTable(schema, name)
@@ -96,10 +99,22 @@ export class MemoryEngine extends Engine {
         throw new Error(`Table '${name}' does not exist`)
       }
       else {
-        (isTempTable ? sessionContext : globalContext).dropTable(schema, name)
+        await lock.write(sessionId)
+        const context = isTempTable ? sessionContext : globalContext
+        context.dropTable(schema, name)
+        lock.close()
         return { rowsAffected: 1 }
       }
     })
+  }
+
+  // @override
+  public async dropSchema(name: string, sessionId: string) {
+    const readonlyContext = getContext(sessionId, 'readonly')
+    const tables = Object.keys(readonlyContext.tables[name])
+    tables.map(table => readonlyContext.getLock(name, table).close())
+    getContext(sessionId, 'session').dropSchema(name)
+    getContext(sessionId, 'global').dropSchema(name)
   }
 
   // @override

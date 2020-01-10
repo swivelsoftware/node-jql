@@ -292,10 +292,10 @@
     "@types/istanbul-reports" "^1.1.1"
     "@types/yargs" "^13.0.0"
 
-"@node-jql/sql-builder@^1.0.0-rc.10":
-  version "1.0.0-rc.10"
-  resolved "https://registry.yarnpkg.com/@node-jql/sql-builder/-/sql-builder-1.0.0-rc.10.tgz#9d75d9c805d15a1850e31ddad6da0e27770ef3ee"
-  integrity sha512-LmiV1ipnufrmRBAUSlYiKI9m2jAWafutJ21G2jDALbTxcMptNRM+/jLwZEA3l1k+ZmAuQ+t0UvIGkqCj78Lgig==
+"@node-jql/sql-builder@^1.0.0-rc.11":
+  version "1.0.0-rc.11"
+  resolved "https://registry.yarnpkg.com/@node-jql/sql-builder/-/sql-builder-1.0.0-rc.11.tgz#3b1301f23c3de962de90ea46e736681bef3d666a"
+  integrity sha512-FYVJ/wYdls5X/XihK7Tz1KKx49CVRgcpyjUG8GoFUM7xTiu2FhUo+5tnPPERwMeAXzhT6NIqR21Y7TVaOxZztA==
   dependencies:
     deepmerge "^4.2.2"
     lodash "^4.17.15"

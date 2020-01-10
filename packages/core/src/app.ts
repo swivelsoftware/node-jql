@@ -1,4 +1,4 @@
-import { CreateFunction, CreateSchema, CreateTable, DropFunction, DropSchema, DropTable, ISQL, parse, Query } from '@node-jql/sql-builder'
+import { CreateFunction, CreateSchema, CreateTable, DropSchema, DropTable, ISQL, parse, Query } from '@node-jql/sql-builder'
 import uuid from 'uuid/v4'
 import { Engine } from './engine'
 import { IApplicationOptions, IQueryOptions, IQueryResult, IUpdateOptions, IUpdateResult } from './index.if'
@@ -148,7 +148,7 @@ export class CoreApplication {
     else if (sql instanceof DropSchema) {
       const start = Date.now()
       return new ExtendTask<Partial<IUpdateResult>, IUpdateResult>(
-        this.dropSchema(sql.name, sql.ifExists),
+        this.dropSchema(options.sessionId, sql.name, sql.ifExists),
         result => ({
           elpased: Date.now() - start,
           sql: sql.toString(),
@@ -173,13 +173,15 @@ export class CoreApplication {
     })
   }
 
-  private dropSchema(name: string, ifExists: boolean = false): Task<Partial<IUpdateResult>> {
+  private dropSchema(sessionId: string, name: string, ifExists: boolean = false): Task<Partial<IUpdateResult>> {
     return new PromiseTask(async task => {
       if (!this.tableEngines[name]) {
         if (ifExists) return { rowsAffected: 0 }
         throw new Error(`Schema '${name}' does not exist`)
       }
       else {
+        const engineNames = Object.keys(engines)
+        await Promise.all(engineNames.map(engine => engines[engine].dropSchema(name, sessionId)))
         delete this.tableEngines[name]
         return { rowsAffected: 1 }
       }

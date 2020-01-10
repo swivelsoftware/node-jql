@@ -10,17 +10,20 @@ import { Task } from './task'
 export abstract class Engine {
   /**
    * Create session
+   * @param sessionId [string]
    */
   public abstract async createSession(sessionId: string)
 
   /**
    * Kill session
+   * @param sessionId [string]
    */
   public abstract async killSession(sessionId: string)
 
   /**
    * CREATE TABLE
    * @param jql [CreateTableJQL]
+   * @param sessionId [string]
    */
   public abstract createTable(jql: CreateTableJQL, sessionId: string): Task<Partial<IUpdateResult>>
 
@@ -33,12 +36,21 @@ export abstract class Engine {
   /**
    * DROP TABLE
    * @param jql [DropTableJQL]
+   * @param sessionId [string]
    */
   public abstract dropTable(jql: DropTableJQL, sessionId: string): Task<Partial<IUpdateResult>>
 
   /**
+   * DROP SCHEMA
+   * @param name [string]
+   * @param sessionId [string]
+   */
+  public abstract async dropSchema(name: string, sessionId: string)
+
+  /**
    * CREATE SCHEMA when creating table
    * @param name [string]
+   * @param sessionId [string]
    */
   protected abstract async createSchema(name: string, sessionId: string)
 }

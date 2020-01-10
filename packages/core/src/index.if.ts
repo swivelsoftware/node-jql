@@ -11,6 +11,11 @@ export interface IApplicationOptions {
    * Default engine to be used. Default to be 'MemoryEngine'
    */
   defaultEngine?: string
+
+  /**
+   * Tick interval for lock checking. Default to be 100ms
+   */
+  lockCheckInterval?: number
 }
 
 /**
