@@ -13,7 +13,7 @@ class Builder implements IBuilder<CreateFunction> {
     this.json = {
       classname: CreateFunction.name,
       name: args[0],
-      returnType: new Type(args[1], args.slice(2)).toJson(),
+      returnType: new Type(args[1], ...args.slice(2)).toJson(),
       code: '',
     }
   }

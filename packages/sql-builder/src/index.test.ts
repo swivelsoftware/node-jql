@@ -1,5 +1,13 @@
-import { BetweenExpression, BinaryExpression, Column, ColumnDefExpression, CreateSchema, CreateTable, Delete, DropSchema, DropTable, FromFunctionTable, FromTable } from '.'
-import { FunctionExpression, GroupExpression, Insert, InsertSelect, PrimaryKeyConstraint, Query, ResultColumn, Value } from '.'
+import { BetweenExpression, BinaryExpression, Column, ColumnDefExpression, CreateFunction, CreateSchema, CreateTable, Delete, DropFunction, DropSchema, DropTable } from '.'
+import { FromFunctionTable, FromTable, FunctionExpression, GroupExpression, Insert, InsertSelect, PrimaryKeyConstraint, Query, ResultColumn, Value } from '.'
+
+test('Create Function', () => {
+  const sql = new CreateFunction.Builder('TEST', 'string')
+    .code(function() { return 'Hello, World' })
+    .build()
+    .toString()
+  console.log(sql)
+})
 
 test('Create Schema', () => {
   const sql = new CreateSchema.Builder('TEMP_DB')
@@ -157,5 +165,10 @@ test('Drop Schema', () => {
     .ifExists()
     .build()
     .toString()
+  console.log(sql)
+})
+
+test('Drop Function', () => {
+  const sql = new DropFunction('TEST').toString()
   console.log(sql)
 })

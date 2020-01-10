@@ -16,7 +16,9 @@ export class Type implements IType, IStringify {
   constructor(...args: any[]) {
     if (typeof args[0] === 'string') {
       this.name = args[0]
-      if (args.length > 1) this.args = args.slice(1)
+      if (args.length > 1) {
+        this.args = args.slice(1)
+      }
     }
     else {
       const json = args[0] as IType
