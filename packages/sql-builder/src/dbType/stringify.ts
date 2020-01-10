@@ -171,8 +171,8 @@ const _default: { [key: string]: (json: any) => string } = {
   Query(json: IQuery): string {
     let str = json.select && json.select.length ? `SELECT ${json.select.map(sel => sel.toString()).join(', ')}` : 'SELECT *'
     if (json.from) str += ` FROM ${json.from.map(fr => fr.toString()).join(', ')}`
-    if (json.groupBy) str += ` GROUP BY ${json.groupBy.toString()}`
     if (json.where) str += ` WHERE ${json.where.toString()}`
+    if (json.groupBy) str += ` GROUP BY ${json.groupBy.toString()}`
     if (json.orderBy && json.orderBy.length) str += ` ORDER BY ${json.orderBy.map(ord => ord.toString()).join(', ')}`
     return str
   },

@@ -35,17 +35,6 @@ class Builder implements IBuilder<Query> {
   }
 
   /**
-   * Set GROUP BY constraint
-   * @param expr [IExpression|string]
-   * @param having [IExpression]
-   */
-  public groupBy(expr: IExpression|string, having?: IExpression): Builder {
-    if (typeof expr === 'string') expr = new ColumnExpression(expr)
-    this.json.groupBy = { expr, having }
-    return this
-  }
-
-  /**
    * Add WHERE expression
    * @param expr [IExpression]
    */
@@ -62,6 +51,17 @@ class Builder implements IBuilder<Query> {
     else {
       this.json.where = expr
     }
+    return this
+  }
+
+  /**
+   * Set GROUP BY constraint
+   * @param expr [IExpression|string]
+   * @param having [IExpression]
+   */
+  public groupBy(expr: IExpression|string, having?: IExpression): Builder {
+    if (typeof expr === 'string') expr = new ColumnExpression(expr)
+    this.json.groupBy = { expr, having }
     return this
   }
 
@@ -301,15 +301,15 @@ export class Query implements IQuery, IStringify {
   public readonly classname: string = Query.name
   public readonly select: ResultColumn[] = []
   public readonly from?: Datasource[]
-  public readonly groupBy?: GroupBy
   public readonly where?: Expression
+  public readonly groupBy?: GroupBy
   public readonly orderBy: OrderBy[] = []
 
   constructor(json: IQuery) {
     if (json.select) this.select = json.select.map(json => new ResultColumn(json))
     if (json.from) this.from = json.from.map(json => parse(json))
-    if (json.groupBy) this.groupBy = new GroupBy(json.groupBy)
     if (json.where) this.where = parse<Expression>(json.where)
+    if (json.groupBy) this.groupBy = new GroupBy(json.groupBy)
     if (json.orderBy) this.orderBy = json.orderBy.map(json => new OrderBy(json))
   }
 
@@ -325,8 +325,8 @@ export class Query implements IQuery, IStringify {
     }
     if (this.select.length) json.select = this.select.map(sel => sel.toJson())
     if (this.from) json.from = this.from.map(fr => fr.toJson())
-    if (this.groupBy) json.groupBy = this.groupBy.toJson()
     if (this.where) json.where = this.where.toJson()
+    if (this.groupBy) json.groupBy = this.groupBy.toJson()
     if (this.orderBy.length) json.orderBy = this.orderBy.map(ord => ord.toJson())
     return json
   }

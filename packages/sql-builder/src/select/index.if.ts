@@ -54,7 +54,7 @@ export interface IOrderBy {
 export interface IQuery extends ISQL {
   select?: IResultColumn[]
   from?: IDatasource[]
-  groupBy?: IGroupBy
   where?: IExpression
+  groupBy?: IGroupBy
   orderBy?: IOrderBy[]
 }
