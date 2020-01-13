@@ -80,3 +80,11 @@ export interface IConstraint extends IParseable {
 export interface IPrimaryKeyConstraint extends IConstraint {
   columns: IColumnExpression[]
 }
+
+/**
+ * START TRANSACTION ... COMMIT
+ */
+export interface ITransaction extends ISQL {
+  sqls: ISQL[]
+  mode?: 'writeonly'|'readonly'|'readwrite'
+}

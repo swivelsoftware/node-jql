@@ -89,7 +89,7 @@ export function stringify(value: any): string {
 
 export default $
 export { parse } from './parse'
-export { IColumn, IConstraint, IExpression, ISQL } from './index.if'
+export { IColumn, IConstraint, IExpression, ISQL, ITransaction } from './index.if'
 
 export { BetweenExpression } from './expression/between'
 export { BinaryExpression } from './expression/binary'
@@ -122,3 +122,5 @@ export { IQuery } from './select/index.if'
 export { Insert, InsertSelect } from './insert'
 
 export { Update } from './update'
+
+export { Transaction } from './transaction'

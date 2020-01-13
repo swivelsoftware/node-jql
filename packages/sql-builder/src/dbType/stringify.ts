@@ -6,7 +6,7 @@ import { ICreateFunction, ICreateSchema, ICreateTable, ICreateTableSelect } from
 import { Delete } from '../delete'
 import { IDropFunction, IDropSchema, IDropTable } from '../drop/index.if'
 import { IBetweenExpression, IBinaryExpression, ICaseExpression, IColumnDefExpression, IColumnExpression, IExistsExpression, IFunctionExpression, IGroupExpression, IMathExpression, IQueryExpression, IUnknown, IValue, IVariable } from '../expression/index.if'
-import { IColumn, IConstraint, IExpression, IPrimaryKeyConstraint, IStringify, IType } from '../index.if'
+import { IColumn, IConstraint, IExpression, IPrimaryKeyConstraint, IStringify, ITransaction, IType } from '../index.if'
 import { IInsert, IInsertSelect } from '../insert/index.if'
 import { IFromFunctionTable, IFromTable, IGroupBy, IOrderBy, IQuery, IResultColumn } from '../select/index.if'
 import { IUpdate } from '../update/index.if'
@@ -181,6 +181,22 @@ const _default: { [key: string]: (json: any) => string } = {
   Update(json: IUpdate): string {
     let str = `UPDATE ${json.schema ? `\`${json.schema}\`.\`${json.name}\`` : `\`${json.name}\``} SET ${json.set.map(expr => expr.toString()).join(', ')}`
     if (json.where) str += ` WHERE ${json.where.toString()}`
+    return str
+  },
+
+  // transaction
+  Transaction(json: ITransaction): string {
+    let str = 'BEGIN TRANSACTION'
+    switch (json.mode) {
+      case 'readonly':
+        str += ' READ ONLY'
+        break
+      case 'readwrite':
+        str += ' READ WRITE'
+        break
+    }
+    str += `; ${json.sqls.map(sql => sql.toString()).join('; ')}`
+    str += '; COMMIT'
     return str
   },
 }
