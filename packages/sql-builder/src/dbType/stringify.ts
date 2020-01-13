@@ -42,7 +42,7 @@ const _default: { [key: string]: (json: any) => string } = {
   },
   CreateSchema(json: ICreateSchema): string {
     let str = `${json.ifNotExists ? 'CREATE SCHEMA IF NOT EXISTS' : 'CREATE SCHEMA'} \`${json.name}\``
-    if (json.options) str += ` ${json.options.join(' ')}`
+    if (json.options && json.options.length) str += ` ${json.options.join(' ')}`
     return str
   },
   CreateTable(json: ICreateTable): string {
