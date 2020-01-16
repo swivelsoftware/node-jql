@@ -1,4 +1,3 @@
-import uuid from 'uuid/v4'
 import { logger } from '../app'
 import { JQLFunction } from './function'
 import { CreateFunctionJQL } from './jql/create/function'
@@ -6,25 +5,15 @@ import { TableLock } from './lock'
 import { Table } from './table'
 
 /**
- * Global session ID
- * Used in case a session ID is required but none is provided
- */
-export const DEFAULT_SESSION_ID = uuid()
-
-/**
  * Memory context
- * Read-only if session ID is provided
  */
-class Context {
+export class Context {
   public readonly functions: { [key: string]: JQLFunction } = {}
   public readonly tables: { [key: string]: { [key: string]: Table } } = {}
   public readonly data: { [key: string]: { [key: string]: any[] } } = {}
   public readonly locks: { [key: string]: { [key: string]: TableLock } } = {}
 
-  constructor(public readonly sessionId?: string, public readonly isReadonly = false) {
-    if (sessionId && isReadonly) {
-      this.merge(globalContext, sessionContexts[sessionId])
-    }
+  constructor(public readonly isReadonly?: boolean, public readonly sessionId?: string) {
   }
 
   /**
@@ -119,14 +108,25 @@ class Context {
     this.checkReadonly()
     if (this.hasFunction(jql.name)) throw new Error(`Function '${jql.name}' already exists`)
     this.functions[jql.name] = new JQLFunction(jql)
-    logger.debug({ tag: 'context.ts', sessionId: this.sessionId || 'global', msg: [`Function '${jql.name}' created`] })
+    logger.debug({ tag: 'context.ts', sessionId: 'global', msg: [`Function '${jql.name}' created`] })
+  }
+
+  /**
+   * Drop function
+   * @param name [string]
+   */
+  public dropFunction(name: string) {
+    this.checkReadonly()
+    if (!this.hasFunction(name)) throw new Error(`Function '${name}' does not exist`)
+    delete this.functions[name]
+    logger.debug({ tag: 'context.ts', sessionId: 'global', msg: [`Function '${name}' dropped`] })
   }
 
   /**
    * Merge multiple contexts
    * @param contexts [Array<Context>]
    */
-  private merge(...contexts: Context[]) {
+  public merge(...contexts: Context[]): Context {
     for (const { functions, tables, data, locks } of contexts) {
       const schemas = Object.keys(tables)
       for (const schema of schemas) {
@@ -139,6 +139,7 @@ class Context {
       }
       Object.assign(this.functions, functions)
     }
+    return this
   }
 
   /**
@@ -152,12 +153,12 @@ class Context {
 /**
  * Global context (exists throughout the whole application life)
  */
-export const globalContext = new Context()
+const globalContext = new Context()
 
 /**
  * Session context (exists until the session is closed)
  */
-export const sessionContexts: { [key: string]: Context } = {}
+const sessionContexts: { [key: string]: Context } = {}
 
 /**
  * Useful function for getting memory context
@@ -165,25 +166,82 @@ export const sessionContexts: { [key: string]: Context } = {}
  * @param mode [string]
  * @param action [string]
  */
-export function getContext(sessionId: string, mode: 'readonly'|'global'|'session', action?: 'create'|'delete'): Context {
+export function getContext(mode: 'global'): Context
+export function getContext(mode: 'session', sessionId: string, action?: 'create'|'delete'): Context
+export function getContext(mode: 'readonly', sessionId: string): Context
+export function getContext(mode: 'global'|'session'|'readonly', sessionId?: string, action?: 'create'|'delete'): Context {
   switch (mode) {
-    case 'readonly':
-      return new Context(sessionId, true)
     case 'global':
       return globalContext
-    case 'session':
-      let context = sessionContexts[sessionId]
+    case 'session': {
+      let context = sessionContexts[sessionId as string]
       if (!context && action !== 'create') throw new Error(`Session '${sessionId}' is not available`)
       switch (action) {
         case 'create':
-          context = sessionContexts[sessionId] = new Context(sessionId)
+          context = sessionContexts[sessionId as string] = new Context(false, sessionId)
           logger.debug({ tag: 'context.ts', sessionId, msg: [`Context created`] })
           break
         case 'delete':
-          delete sessionContexts[sessionId]
+          delete sessionContexts[sessionId as string]
           logger.debug({ tag: 'context.ts', sessionId, msg: [`Context deleted`] })
           break
       }
       return context
+    }
+    case 'readonly':
+      const context = new Context(true)
+      context.merge(globalContext, getContext('session', sessionId as string))
+      return context
+  }
+}
+
+/**
+ * Memory context. Changes will not be applied at once
+ */
+export class DirtyContext extends Context {
+  private readonly funcsDeleted: string[] = []
+  private readonly tablesDeleted: Array<[string, string]> = []
+
+  constructor(sessionId: string) {
+    super(false, sessionId)
+  }
+
+  // @override
+  public dropTable(schema: string, name: string) {
+    this.tablesDeleted.push([schema, name])
+  }
+
+  /**
+   * Apply changes to the target context
+   * @param context [Context]
+   */
+  public applyTo(context: Context): Context {
+    const schemas = Object.keys(this.tables)
+    for (const schema of schemas) {
+      // apply tables
+      if (!context.tables[schema]) context.tables[schema] = {}
+      if (!context.data[schema]) context.data[schema] = {}
+      if (!context.locks[schema]) context.locks[schema] = {}
+      Object.assign(context.tables[schema], this.tables[schema] || {})
+      Object.assign(context.data[schema], this.data[schema] || {})
+
+      // add missing locks
+      const tables = Object.keys(this.tables[schema])
+      for (const name of tables) {
+        if (!context.locks[schema][name]) context.locks[schema][name] = new TableLock(name)
+      }
+    }
+
+    // delete tables
+    for (const [schema, name] of this.tablesDeleted) {
+      context.dropTable(schema, name)
+    }
+
+    // functions created within a sandbox will not be applied
+
+    // delete functions
+    for (const name of this.funcsDeleted) context.dropFunction(name)
+
+    return context
   }
 }

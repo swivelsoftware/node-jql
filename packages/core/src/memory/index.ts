@@ -1,12 +1,10 @@
-import { CreateFunction, Type } from '@node-jql/sql-builder'
+import { CreateFunction, CreateTable, DropFunction, DropTable, Insert, Type } from '@node-jql/sql-builder'
 import { Engine } from '../engine'
 import { IUpdateResult } from '../index.if'
 import { PromiseTask, Task } from '../task'
-import { DEFAULT_SESSION_ID, getContext } from './context'
+import { getContext } from './context'
 import { CreateFunctionJQL } from './jql/create/function'
-import { CreateTableJQL } from './jql/create/table'
-import { DropTableJQL } from './jql/drop/table'
-import { Table } from './table'
+import { Sandbox } from './sandbox'
 
 /**
  * Default value of the given type
@@ -39,87 +37,59 @@ export function getDefaultValue(type: Type): any {
 export class MemoryEngine extends Engine {
   // @override
   public async createSession(sessionId: string) {
-    getContext(sessionId, 'session', 'create')
+    getContext('session', sessionId, 'create')
   }
 
   // @override
   public async killSession(sessionId: string) {
-    getContext(sessionId, 'session', 'delete')
+    getContext('session', sessionId, 'delete')
   }
 
   // @override
-  public createTable(jql: CreateTableJQL, sessionId: string): Task<Partial<IUpdateResult>> {
-    return new PromiseTask<Partial<IUpdateResult>>(async task => {
-      const { temporary, schema, name, ifNotExists } = jql
-      let readContext = getContext(sessionId, 'readonly')
-      const writeContext = getContext(sessionId, temporary ? 'session' : 'global')
-
-      // check if schema exists
-      if (!readContext.hasSchema(schema)) {
-        await this.createSchema(schema, sessionId)
-        readContext = getContext(sessionId, 'readonly')
-      }
-
-      const table = new Table(jql)
-      if (writeContext.hasTable(table.schema, table.name)) {
-        if (ifNotExists) return { rowsAffected: 0 }
-        throw new Error(`Table '${name}' already exists`)
-      }
-      else {
-        writeContext.createTable(new Table(jql))
-        return { rowsAffected: 1 }
-      }
-    })
+  public createTable(sql: CreateTable, sessionId: string): Task<Partial<IUpdateResult>> {
+    return new Sandbox(sessionId, true).createTable(sql)
   }
 
   // @override
   public createFunction(sql: CreateFunction): Task<Partial<IUpdateResult>> {
     return new PromiseTask<Partial<IUpdateResult>>(async task => {
       const jql = new CreateFunctionJQL(sql)
-      const writeContext = getContext(DEFAULT_SESSION_ID, 'global')
-      writeContext.createFunction(jql)
+      getContext('global').createFunction(jql)
       return { rowsAffected: 1 }
     })
   }
 
   // @override
-  public dropTable(jql: DropTableJQL, sessionId: string): Task<Partial<IUpdateResult>> {
+  public dropFunction(sql: DropFunction): Task<Partial<IUpdateResult>> {
     return new PromiseTask<Partial<IUpdateResult>>(async task => {
-      const { schema, name, ifExists } = jql
-      const readonlyContext = getContext(sessionId, 'readonly')
-      const lock = readonlyContext.getLock(schema, name)
-
-      const globalContext = getContext(sessionId, 'global')
-      const sessionContext = getContext(sessionId, 'session')
-      const isNormalTable = globalContext.hasTable(schema, name)
-      const isTempTable = sessionContext.hasTable(schema, name)
-
-      if (!isNormalTable && !isTempTable) {
-        if (ifExists) return { rowsAffected: 0 }
-        throw new Error(`Table '${name}' does not exist`)
-      }
-      else {
-        await lock.write(sessionId)
-        const context = isTempTable ? sessionContext : globalContext
-        context.dropTable(schema, name)
-        lock.close()
-        return { rowsAffected: 1 }
-      }
+      getContext('global').dropFunction(sql.name)
+      return { rowsAffected: 1 }
     })
   }
 
   // @override
+  public dropTable(sql: DropTable, sessionId: string): Task<Partial<IUpdateResult>> {
+    return new Sandbox(sessionId, true).dropTable(sql)
+  }
+
+  // @override
+  public insert(sql: Insert): Task<Partial<IUpdateResult>> {
+    // TODO
+    throw new Error('Not implemented')
+  }
+
+  // @override
   public async dropSchema(name: string, sessionId: string) {
-    const readonlyContext = getContext(sessionId, 'readonly')
+    const readonlyContext = getContext('readonly', sessionId)
     const tables = Object.keys(readonlyContext.tables[name])
-    tables.map(table => readonlyContext.getLock(name, table).close())
-    getContext(sessionId, 'session').dropSchema(name)
-    getContext(sessionId, 'global').dropSchema(name)
+    Promise.all(tables.map(table => readonlyContext.getLock(name, table).close(sessionId)))
+    getContext('session', sessionId).dropSchema(name)
+    getContext('global').dropSchema(name)
   }
 
   // @override
   protected async createSchema(name: string, sessionId: string) {
-    getContext(sessionId, 'global').createSchema(name)
-    getContext(sessionId, 'session').createSchema(name)
+    getContext('global').createSchema(name)
+    getContext('session', sessionId).createSchema(name)
   }
 }

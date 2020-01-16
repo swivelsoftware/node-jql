@@ -1,6 +1,5 @@
 import { Column as Column_, CreateTable, PrimaryKeyConstraint } from '@node-jql/sql-builder'
 import { getDefaultValue } from '.'
-import { CreateTableJQL } from './jql/create/table'
 
 /**
  * Column definition
@@ -54,10 +53,11 @@ export class Table extends CreateTable {
   public readonly schema: string
   public readonly columns: Column[]
 
-  constructor(jql: CreateTableJQL) {
-    super(jql)
-    this.schema = jql.schema
-    this.columns = jql.columns.map(col => new Column(col))
+  constructor(private readonly sql: CreateTable) {
+    super(sql)
+    if (!sql.schema) throw new Error('No default schema is defined')
+    this.schema = sql.schema
+    this.columns = sql.columns.map(col => new Column(col))
     if (!this.primaryKeys.length) throw new SyntaxError(`Table '${this.name}' has no primary keys`)
   }
 
@@ -72,5 +72,12 @@ export class Table extends CreateTable {
     else {
       return this.columns.filter(c => c.isPrimaryKey).map(c => c.name)
     }
+  }
+
+  /**
+   * Clone function
+   */
+  public clone(): Table {
+    return new Table(this.sql)
   }
 }

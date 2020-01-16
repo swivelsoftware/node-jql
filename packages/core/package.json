@@ -23,25 +23,25 @@
   ],
   "dependencies": {
     "@types/uuid": "^3.4.6",
-    "axios": "^0.19.0",
+    "axios": "^0.19.1",
     "chalk": "^3.0.0",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
-    "ts-node": "^8.4.1",
+    "ts-node": "^8.6.2",
     "typescript": "^3.7.4",
     "uuid": "^3.3.3",
     "wolfy87-eventemitter": "^5.2.8"
   },
   "devDependencies": {
-    "@types/jest": "^24.0.25",
+    "@types/jest": "^24.9.0",
     "@types/lodash": "^4.14.149",
-    "@types/node": "^13.1.2",
+    "@types/node": "^13.1.7",
     "jest": "^24.9.0",
     "madge": "^3.6.0",
-    "ts-jest": "^24.1.0",
+    "ts-jest": "^24.3.0",
     "tslint": "^5.20.1"
   },
   "peerDependencies": {
-    "@node-jql/sql-builder": "^1.0.0-rc.11"
+    "@node-jql/sql-builder": "^1.0.0-rc.13"
   }
 }

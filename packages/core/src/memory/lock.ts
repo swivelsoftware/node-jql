@@ -32,11 +32,10 @@ export class TableLock {
    * Request for reading
    * @param sessionId [string]
    */
-  public async read(sessionId: string) {
-    // no need to wait
-    if (this.readEnabled && !this.requestingRead.length) {
-      this.reading.push(sessionId)
-      return
+  public async read(sessionId: string): Promise<TableLock> {
+    // closed, no new request
+    if (this.isClosed) {
+      throw new Error(`Table '${this.name}' does not exist`)
     }
 
     // wait reading
@@ -45,10 +44,7 @@ export class TableLock {
     await new Promise(resolve => {
       (function waitAndCheck(firstCall = false) {
         setTimeout(() => {
-          if (self.isClosed) {
-            throw new Error(`Table '${self.name}' does not exist`)
-          }
-          else if (self.readEnabled && self.requestingRead[0] === sessionId) {
+          if (self.readEnabled && self.requestingRead[0] === sessionId) {
             self.requestingRead.shift()
             self.reading.push(sessionId)
             return resolve()
@@ -59,6 +55,7 @@ export class TableLock {
       })(true)
     })
     logger.debug({ tag: 'lock.ts', sessionId, msg: [`Start reading table '${self.name}'`] })
+    return this
   }
 
   /**
@@ -74,11 +71,10 @@ export class TableLock {
    * Request for writing
    * @param sessionId [string]
    */
-  public async write(sessionId: string) {
-    // no need to wait
-    if (this.writeEnabled && !this.requestingWrite.length) {
-      this.writing.push(sessionId)
-      return
+  public async write(sessionId: string): Promise<TableLock> {
+    // closed, no new request
+    if (this.isClosed) {
+      throw new Error(`Table '${this.name}' does not exist`)
     }
 
     // wait writing
@@ -87,10 +83,7 @@ export class TableLock {
     await new Promise(resolve => {
       (function waitAndCheck(firstCall = false) {
         setTimeout(() => {
-          if (self.isClosed) {
-            throw new Error(`Table '${self.name}' does not exist`)
-          }
-          else if (self.writeEnabled && self.requestingWrite[0] === sessionId) {
+          if (self.writeEnabled && self.requestingWrite[0] === sessionId) {
             self.requestingWrite.shift()
             self.writing.push(sessionId)
             return resolve()
@@ -101,6 +94,7 @@ export class TableLock {
       })(true)
     })
     logger.debug({ tag: 'lock.ts', sessionId, msg: [`Start writing table '${self.name}'`] })
+    return this
   }
 
   /**
@@ -116,7 +110,11 @@ export class TableLock {
   /**
    * Whether the table is deleted
    */
-  public close() {
+  public async close(sessionId: string): Promise<TableLock> {
+    const promise = this.write(sessionId)
     this.isClosed = true
+    await promise
+    logger.debug({ tag: 'lock.ts', sessionId, msg: [`Table '${this.name}' closed`] })
+    return this
   }
 }

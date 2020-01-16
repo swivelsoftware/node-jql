@@ -1,4 +1,4 @@
-import { Column, CreateSchema, CreateTable, DropSchema, DropTable, PrimaryKeyConstraint } from '@node-jql/sql-builder'
+import { Column, CreateFunction, CreateSchema, CreateTable, DropFunction, DropSchema, DropTable, PrimaryKeyConstraint } from '@node-jql/sql-builder'
 import { CoreApplication } from '.'
 
 let app: CoreApplication
@@ -8,6 +8,22 @@ test('Initialize', async done => {
   app = new CoreApplication({ logLevel: 'debug' })
   sessionId = await app.createSession()
   done()
+})
+
+test('Create function', done => {
+  app.update(
+    new CreateFunction.Builder('TEST', 'string')
+      .code(function() { return 'Hello, World' })
+      .build(),
+    {
+      sessionId,
+    },
+  )
+    .on('complete', ({ rowsAffected }) => {
+      expect(rowsAffected).toBe(1)
+      done()
+    })
+    .on('error', err => { throw err })
 })
 
 test('Create schema', done => {
@@ -69,6 +85,15 @@ test('Drop table', done => {
 
 test('Drop schema', done => {
   app.update(new DropSchema('TEMP_DB'), { sessionId })
+    .on('complete', ({ rowsAffected }) => {
+      expect(rowsAffected).toBe(1)
+      done()
+    })
+    .on('error', err => { throw err })
+})
+
+test('Drop function', done => {
+  app.update(new DropFunction('TEST'), { sessionId })
     .on('complete', ({ rowsAffected }) => {
       expect(rowsAffected).toBe(1)
       done()

@@ -1,7 +1,5 @@
-import { CreateFunction } from '@node-jql/sql-builder'
+import { CreateFunction, CreateTable, DropFunction, DropTable, Insert } from '@node-jql/sql-builder'
 import { IUpdateResult } from './index.if'
-import { CreateTableJQL } from './memory/jql/create/table'
-import { DropTableJQL } from './memory/jql/drop/table'
 import { Task } from './task'
 
 /**
@@ -22,10 +20,10 @@ export abstract class Engine {
 
   /**
    * CREATE TABLE
-   * @param jql [CreateTableJQL]
+   * @param sql [CreateTable]
    * @param sessionId [string]
    */
-  public abstract createTable(jql: CreateTableJQL, sessionId: string): Task<Partial<IUpdateResult>>
+  public abstract createTable(sql: CreateTable, sessionId: string): Task<Partial<IUpdateResult>>
 
   /**
    * CREATE FUNCTION
@@ -35,10 +33,10 @@ export abstract class Engine {
 
   /**
    * DROP TABLE
-   * @param jql [DropTableJQL]
+   * @param sql [DropTable]
    * @param sessionId [string]
    */
-  public abstract dropTable(jql: DropTableJQL, sessionId: string): Task<Partial<IUpdateResult>>
+  public abstract dropTable(sql: DropTable, sessionId: string): Task<Partial<IUpdateResult>>
 
   /**
    * DROP SCHEMA
@@ -46,6 +44,18 @@ export abstract class Engine {
    * @param sessionId [string]
    */
   public abstract async dropSchema(name: string, sessionId: string)
+
+  /**
+   * DROP FUNCTION
+   * @param sql [DropFunction]
+   */
+  public abstract dropFunction(sql: DropFunction): Task<Partial<IUpdateResult>>
+
+  /**
+   * INSERT INTO
+   * @param sql [Insert]
+   */
+  public abstract insert(sql: Insert): Task<Partial<IUpdateResult>>
 
   /**
    * CREATE SCHEMA when creating table
