@@ -21,7 +21,7 @@ const DEFAULT_OPERATORS = [
 ]
 
 class Builder implements IBuilder<MathExpression> {
-  private json: IMathExpression
+  private readonly json: IMathExpression
 
   constructor(operator: string) {
     const SUPPORTED_OPERATORS = _.get(dbConfigs, [dbType, 'mathOperators'], DEFAULT_OPERATORS)

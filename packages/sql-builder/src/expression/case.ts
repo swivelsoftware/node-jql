@@ -7,7 +7,7 @@ import { isUnknown } from './unknown'
 import { Value } from './value'
 
 class Builder implements IBuilder<CaseExpression> {
-  private json: ICaseExpression = {
+  private readonly json: ICaseExpression = {
     classname: CaseExpression.name,
     cases: [],
   }

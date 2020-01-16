@@ -4,7 +4,7 @@ import { stringify } from './dbType/stringify'
 import { IBuilder, IColumn, IStringify, IType } from './index.if'
 
 class Builder implements IBuilder<Column> {
-  private json: IColumn
+  private readonly json: IColumn
 
   constructor(name: string, type: IType)
   constructor(name: string, type: string, ...typeArgs: any[])

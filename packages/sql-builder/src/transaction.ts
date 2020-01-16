@@ -6,7 +6,7 @@ import { IBuilder, ISQL, IStringify, ITransaction } from './index.if'
 import { parse } from './parse'
 
 class Builder implements IBuilder<Transaction> {
-  private json: ITransaction = {
+  private readonly json: ITransaction = {
     classname: Transaction.name,
     sqls: [],
   }

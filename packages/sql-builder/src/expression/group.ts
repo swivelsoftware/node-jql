@@ -5,7 +5,7 @@ import { parse, register } from '../parse'
 import { GroupOperator, IGroupExpression } from './index.if'
 
 class Builder implements IBuilder<GroupExpression> {
-  private json: IGroupExpression
+  private readonly json: IGroupExpression
 
   constructor(operator: GroupOperator) {
     this.json = {

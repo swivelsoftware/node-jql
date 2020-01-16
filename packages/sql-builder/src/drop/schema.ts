@@ -6,7 +6,7 @@ import { register } from '../parse'
 import { IDropSchema } from './index.if'
 
 class Builder implements IBuilder<DropSchema> {
-  private json: IDropSchema
+  private readonly json: IDropSchema
 
   constructor(name: string) {
     this.json = {

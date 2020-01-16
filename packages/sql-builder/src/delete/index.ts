@@ -8,7 +8,7 @@ import { parse, register } from '../parse'
 import { IDelete } from './index.if'
 
 class Builder implements IBuilder<Delete> {
-  private json: IDelete
+  private readonly json: IDelete
 
   constructor(name: string) {
     this.json = {

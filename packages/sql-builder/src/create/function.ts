@@ -5,7 +5,7 @@ import { IBuilder, IStringify, IType } from '../index.if'
 import { ICreateFunction } from './index.if'
 
 class Builder implements IBuilder<CreateFunction> {
-  private json: ICreateFunction
+  private readonly json: ICreateFunction
 
   constructor(name: string, returnType: IType)
   constructor(name: string, returnType: string, ...returnTypeArgs: any[])

@@ -48,7 +48,7 @@ abstract class BaseCreateTable implements IBaseCreateTable, IStringify {
 }
 
 class CreateTableBuilder implements IBuilder<CreateTable> {
-  private json: ICreateTable
+  private readonly json: ICreateTable
 
   constructor(name: string) {
     this.json = {
@@ -164,7 +164,7 @@ export class CreateTable extends BaseCreateTable implements ICreateTable {
 }
 
 class CreateTableSelectBuilder implements IBuilder<CreateTableSelect> {
-  private json: ICreateTableSelect
+  private readonly json: ICreateTableSelect
 
   constructor(name: string, query: IQuery) {
     this.json = {

@@ -9,7 +9,7 @@ import { parse } from '../parse'
 import { IUpdate } from './index.if'
 
 class Builder implements IBuilder<Update> {
-  private json: IUpdate
+  private readonly json: IUpdate
 
   constructor(name: string) {
     this.json = {

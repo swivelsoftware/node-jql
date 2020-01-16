@@ -10,7 +10,7 @@ import { parse, register } from '../parse'
 import { IDatasource, IFromFunctionTable, IFromTable, IGroupBy, IOrderBy, IQuery, IResultColumn } from './index.if'
 
 class Builder implements IBuilder<Query> {
-  private json: IQuery = {
+  private readonly json: IQuery = {
     classname: Query.name,
   }
 

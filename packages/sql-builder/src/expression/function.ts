@@ -6,7 +6,7 @@ import { parse, register } from '../parse'
 import { IFunctionExpression } from './index.if'
 
 class Builder implements IBuilder<FunctionExpression> {
-  private json: IFunctionExpression
+  private readonly json: IFunctionExpression
 
   constructor(name: string) {
     this.json = {

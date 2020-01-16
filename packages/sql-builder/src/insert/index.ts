@@ -7,7 +7,7 @@ import { IQuery } from '../select/index.if'
 import { IInsert, IInsertSelect } from './index.if'
 
 class InsertBuilder implements IBuilder<Insert> {
-  private json: IInsert
+  private readonly json: IInsert
 
   constructor(name: string) {
     this.json = {
@@ -101,7 +101,7 @@ export class Insert implements IInsert, IStringify {
 }
 
 class InsertSelectBuilder implements IBuilder<InsertSelect> {
-  private json: IInsertSelect
+  private readonly json: IInsertSelect
 
   constructor(name: string) {
     this.json = {

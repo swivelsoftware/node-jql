@@ -7,7 +7,7 @@ import { IBetweenExpression } from './index.if'
 import { isUnknown, Unknown } from './unknown'
 
 class Builder implements IBuilder<BetweenExpression> {
-  private json: IBetweenExpression = {
+  private readonly json: IBetweenExpression = {
     classname: BetweenExpression.name,
   }
 

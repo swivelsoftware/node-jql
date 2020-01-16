@@ -6,7 +6,7 @@ import { register } from '../parse'
 import { ICreateSchema } from './index.if'
 
 class Builder implements IBuilder<CreateSchema> {
-  private json: ICreateSchema
+  private readonly json: ICreateSchema
 
   constructor(name: string) {
     this.json = {

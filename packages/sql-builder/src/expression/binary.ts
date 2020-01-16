@@ -27,7 +27,7 @@ const DEFAULT_OPERATORS = [
 ]
 
 class Builder implements IBuilder<BinaryExpression> {
-  private json: IBinaryExpression
+  private readonly json: IBinaryExpression
 
   constructor(operator: string) {
     const SUPPORTED_OPERATORS = _.get(dbConfigs, [dbType, 'binaryOperators'], DEFAULT_OPERATORS)
