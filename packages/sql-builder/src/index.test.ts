@@ -1,5 +1,6 @@
 import { BetweenExpression, BinaryExpression, Column, ColumnDefExpression, CreateFunction, CreateSchema, CreateTable, Delete, DropFunction, DropSchema, DropTable } from '.'
 import { FromFunctionTable, FromTable, FunctionExpression, GroupExpression, Insert, InsertSelect, PrimaryKeyConstraint, Query, ResultColumn, Value } from '.'
+import { Transaction } from './transaction'
 
 test('Create Function', () => {
   const sql = new CreateFunction.Builder('TEST', 'string')
@@ -170,5 +171,39 @@ test('Drop Schema', () => {
 
 test('Drop Function', () => {
   const sql = new DropFunction('TEST').toString()
+  console.log(sql)
+})
+
+test('Transaction', () => {
+  const sql = new Transaction.Builder()
+    .sql(
+      new CreateTable.Builder('TEMP_TABLE')
+        .ifNotExists()
+        .column(
+          new Column.Builder('id', 'BIGINT')
+            .options('AUTO_INCREMENT')
+            .toJson(),
+        )
+        .column(
+          new Column.Builder('col1', 'VARCHAR', 128)
+            .toJson(),
+        )
+        .column(
+          new Column.Builder('col1', 'INT')
+            .toJson(),
+        )
+        .constraint(new PrimaryKeyConstraint('id'))
+        .build(),
+    )
+    .sql(
+      new Insert.Builder('TEMP_TABLE')
+        .columns('col1', 'col2')
+        .value({ col1: 'Hello', col2: 5 })
+        .value({ col1: 'Halo', col2: 4 })
+        .value({ col1: 'Hi', col2: 2 })
+        .build(),
+    )
+    .build()
+    .toString()
   console.log(sql)
 })
