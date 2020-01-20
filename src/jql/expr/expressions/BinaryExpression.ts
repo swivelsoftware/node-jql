@@ -71,7 +71,7 @@ export class BinaryExpression extends ConditionalExpression implements IBinaryEx
   public toSquel(): squel.BaseBuilder {
     return squel.expr()
       .and(
-        `? ${this.operator} ?`,
+        this.$not ? `? NOT ${this.operator} ?` : `? ${this.operator} ?`,
         this.left.toSquel(),
         checkNull(this.right) ? null : this.right.toSquel(),
       )
@@ -93,8 +93,8 @@ export class BinaryExpression extends ConditionalExpression implements IBinaryEx
   }
 
   private exprToJson(expr: Expression): IExpression|any {
-    if (expr instanceof Unknown) return expr.assigned ? expr.value : undefined
-    if (expr instanceof Value) return expr.value
+    // if (expr instanceof Unknown) return expr.assigned ? expr.value : undefined
+    // if (expr instanceof Value) return expr.value
     return expr.toJson()
   }
 }

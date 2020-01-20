@@ -91,8 +91,8 @@ export class BetweenExpression extends ConditionalExpression implements IBetween
   }
 
   private exprToJson(expr: Expression): IExpression|any {
-    if (expr instanceof Unknown) return expr.assigned ? expr.value : undefined
-    if (expr instanceof Value) return expr.value
+    // if (expr instanceof Unknown) return expr.assigned ? expr.value : undefined
+    // if (expr instanceof Value) return expr.value
     return expr.toJson()
   }
 }
