@@ -1,5 +1,5 @@
 import { IFunctionExpression } from '../expression/index.if'
-import { IExpression, IParseable, ISQL } from '../index.if'
+import { IConditional, IExpression, IParseable, ISQL } from '../index.if'
 
 /**
  * Selected result column
@@ -10,10 +10,20 @@ export interface IResultColumn {
 }
 
 /**
+ * JOIN statement
+ */
+export interface IJoin {
+  operator: string
+  table: IDatasource
+  on?: IConditional
+}
+
+/**
  * Base data source
  */
 export interface IDatasource extends IParseable {
   as?: string
+  join?: IJoin[]
 }
 
 /**
@@ -37,7 +47,7 @@ export interface IFromFunctionTable extends IDatasource {
  */
 export interface IGroupBy {
   expr: IExpression
-  having?: IExpression
+  having?: IConditional
 }
 
 /**
@@ -54,7 +64,7 @@ export interface IOrderBy {
 export interface IQuery extends ISQL {
   select?: IResultColumn[]
   from?: IDatasource[]
-  where?: IExpression
+  where?: IConditional
   groupBy?: IGroupBy
   orderBy?: IOrderBy[]
 }

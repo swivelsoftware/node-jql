@@ -1,13 +1,24 @@
 import _ = require('lodash')
+import { dbConfigs, dbType } from '../dbType'
 import { stringify } from '../dbType/stringify'
 import { Expression } from '../expression'
 import { ColumnExpression } from '../expression/column'
 import { FunctionExpression } from '../expression/function'
 import { GroupExpression } from '../expression/group'
 import { IFunctionExpression, IGroupExpression } from '../expression/index.if'
-import { IBuilder, IExpression, IStringify } from '../index.if'
+import { IBuilder, IConditional, IExpression, IStringify } from '../index.if'
 import { parse, register } from '../parse'
-import { IDatasource, IFromFunctionTable, IFromTable, IGroupBy, IOrderBy, IQuery, IResultColumn } from './index.if'
+import { IDatasource, IFromFunctionTable, IFromTable, IGroupBy, IJoin, IOrderBy, IQuery, IResultColumn } from './index.if'
+
+/**
+ * Default set of JOIN operators supported, based on mysql
+ */
+const DEFAULT_OPERATORS = [
+  'INNER',
+  'LEFT',
+  'RIGHT',
+  'CROSS',
+]
 
 class Builder implements IBuilder<Query> {
   private readonly json: IQuery = {
@@ -36,9 +47,9 @@ class Builder implements IBuilder<Query> {
 
   /**
    * Add WHERE expression
-   * @param expr [IExpression]
+   * @param expr [IConditional]
    */
-  public where(expr: IExpression): Builder {
+  public where(expr: IConditional): Builder {
     if (this.json.where && this.json.where.classname === GroupExpression.name && (this.json.where as IGroupExpression).operator === 'AND') {
       (this.json.where as IGroupExpression).expressions.push(expr)
     }
@@ -57,9 +68,9 @@ class Builder implements IBuilder<Query> {
   /**
    * Set GROUP BY constraint
    * @param expr [IExpression|string]
-   * @param having [IExpression]
+   * @param having [IConditional]
    */
-  public groupBy(expr: IExpression|string, having?: IExpression): Builder {
+  public groupBy(expr: IExpression|string, having?: IConditional): Builder {
     if (typeof expr === 'string') expr = new ColumnExpression(expr)
     this.json.groupBy = { expr, having }
     return this
@@ -85,6 +96,39 @@ class Builder implements IBuilder<Query> {
 
   // @override
   public toJson(): IQuery {
+    return _.cloneDeep(this.json)
+  }
+}
+
+class JoinBuilder implements IBuilder<Join> {
+  private readonly json: IJoin
+
+  constructor(operator: string, table: IDatasource) {
+    const SUPPORTED_OPERATORS = _.get(dbConfigs, [dbType, 'joinOperators'], DEFAULT_OPERATORS)
+    if (SUPPORTED_OPERATORS.indexOf(operator) === -1) throw new SyntaxError(`Unsupported operator '${operator}'`)
+
+    this.json = {
+      operator,
+      table,
+    }
+  }
+
+  /**
+   * Set ON statement
+   * @param expr [IConditional]
+   */
+  public on(expr: IConditional): JoinBuilder {
+    this.json.on = expr
+    return this
+  }
+
+  // @override
+  public build(): Join {
+    return new Join(this.json)
+  }
+
+  // @override
+  public toJson(): IJoin {
     return _.cloneDeep(this.json)
   }
 }
@@ -130,14 +174,56 @@ export class ResultColumn implements IResultColumn, IStringify {
 }
 
 /**
+ * JOIN statement
+ */
+export class Join implements IJoin, IStringify {
+  public static Builder = JoinBuilder
+  public readonly operator: string
+  public readonly table: Datasource
+  public readonly on?: Expression
+
+  constructor(json: IJoin) {
+    this.operator = json.operator
+    this.table = parse(json.table)
+    if (json.on) this.on = parse<Expression>(json.on)
+  }
+
+  // @override
+  public toString(): string {
+    return stringify(Join.name, this)
+  }
+
+  // @override
+  public toJson(): IJoin {
+    const json: IJoin = {
+      operator: this.operator,
+      table: this.table.toJson(),
+    }
+    if (this.on) json.on = this.on.toJson()
+    return json
+  }
+}
+
+/**
  * Base data source
  */
 export abstract class Datasource implements IDatasource, IStringify {
   public readonly classname: string = Datasource.name
   public readonly as?: string
+  public readonly join: Join[] = []
 
   constructor(json: IDatasource) {
     if (json.as) this.as = json.as
+    if (json.join) this.join = json.join.map(json => new Join(json))
+  }
+
+  /**
+   * Add JOIN statement
+   * @param json [IJoin]
+   */
+  public addJoin(json: IJoin): Datasource {
+    this.join.push(new Join(json))
+    return this
   }
 
   // @override
@@ -147,10 +233,12 @@ export abstract class Datasource implements IDatasource, IStringify {
 
   // @override
   public toJson(): IDatasource {
-    return {
+    const json: IDatasource = {
       classname: this.classname,
       as: this.as,
     }
+    if (this.join.length) json.join = this.join.map(j => j.toJson())
+    return json
   }
 }
 
@@ -245,9 +333,18 @@ export class GroupBy implements IGroupBy, IStringify {
   public readonly expr: Expression
   public readonly having?: Expression
 
-  constructor(json: IGroupBy) {
-    this.expr = parse(json.expr)
-    if (json.having) this.having = parse<Expression>(json.having)
+  constructor(expr: IExpression, having?: IConditional)
+  constructor(json: IGroupBy)
+  constructor(...args: any[]) {
+    if ('classname' in args[0]) {
+      this.expr = parse(args[0] as IExpression)
+      if (args[1]) this.having = parse<Expression>(args[1] as IConditional)
+    }
+    else {
+      const json = args[0] as IGroupBy
+      this.expr = parse(json.expr)
+      if (json.having) this.having = parse<Expression>(json.having)
+    }
   }
 
   // @override
@@ -272,9 +369,18 @@ export class OrderBy implements IOrderBy, IStringify {
   public readonly expr: Expression
   public readonly order: 'ASC'|'DESC' = 'ASC'
 
-  constructor(json: IOrderBy) {
-    this.expr = parse(json.expr)
-    if (json.order) this.order = json.order
+  constructor(expr: IExpression, order?: 'ASC'|'DESC')
+  constructor(json: IOrderBy)
+  constructor(...args: any[]) {
+    if ('classname' in args[0]) {
+      this.expr = parse(args[0] as IExpression)
+      if (args[1]) this.order = args[1] as 'ASC'|'DESC'
+    }
+    else {
+      const json = args[0] as IOrderBy
+      this.expr = parse(json.expr)
+      if (json.order) this.order = json.order
+    }
   }
 
   // @override

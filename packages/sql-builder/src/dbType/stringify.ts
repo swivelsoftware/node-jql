@@ -8,7 +8,7 @@ import { IDropFunction, IDropSchema, IDropTable } from '../drop/index.if'
 import { IBetweenExpression, IBinaryExpression, ICaseExpression, IColumnDefExpression, IColumnExpression, IExistsExpression, IFunctionExpression, IGroupExpression, IMathExpression, IQueryExpression, IUnknown, IValue, IVariable } from '../expression/index.if'
 import { IColumn, IConstraint, IExpression, IPrimaryKeyConstraint, IStringify, ITransaction, IType } from '../index.if'
 import { IInsert, IInsertSelect } from '../insert/index.if'
-import { IFromFunctionTable, IFromTable, IGroupBy, IOrderBy, IQuery, IResultColumn } from '../select/index.if'
+import { IFromFunctionTable, IFromTable, IGroupBy, IJoin, IOrderBy, IQuery, IResultColumn } from '../select/index.if'
 import { IUpdate } from '../update/index.if'
 
 /**
@@ -154,11 +154,20 @@ const _default: { [key: string]: (json: any) => string } = {
   ResultColumn(json: IResultColumn): string {
     return `${json.expr.toString()}${json.as ? ` AS \`${json.as}\`` : ''}`
   },
+  Join(json: IJoin): string {
+    let str = `${json.operator} JOIN ${json.table.toString()}`
+    if (json.on) str += ` ON ${json.on.toString()}`
+    return str
+  },
   FromTable(json: IFromTable): string {
-    return `${json.schema ? `\`${json.schema}\`.\`${json.name}\`` : `\`${json.name}\``}${json.as ? ` AS \`${json.as}\`` : ''}`
+    let str = `${json.schema ? `\`${json.schema}\`.\`${json.name}\`` : `\`${json.name}\``}${json.as ? ` AS \`${json.as}\`` : ''}`
+    if (json.join && json.join.length) str += ` ${json.join.map(j => j.toString()).join(' ')}`
+    return str
   },
   FromFunctionTable(json: IFromFunctionTable): string {
-    return `${json.expr.toString()}${json.as ? ` AS \`${json.as}\`` : ''}`
+    let str = `${json.expr.toString()}${json.as ? ` AS \`${json.as}\`` : ''}`
+    if (json.join && json.join.length) str += ` ${json.join.map(j => j.toString()).join(' ')}`
+    return str
   },
   GroupBy(json: IGroupBy): string {
     let str = json.expr.toString()
