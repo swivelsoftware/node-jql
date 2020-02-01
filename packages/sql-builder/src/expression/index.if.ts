@@ -1,10 +1,10 @@
-import { IColumn, IExpression } from '../index.if'
+import { IColumn, IConditional, IExpression } from '../index.if'
 import { IQuery } from '../select/index.if'
 
 /**
  * [left] (NOT) BETWEEN [start] AND [end]
  */
-export interface IBetweenExpression extends IExpression {
+export interface IBetweenExpression extends IConditional {
   left?: IExpression
   not?: boolean
   start?: IExpression
@@ -14,7 +14,7 @@ export interface IBetweenExpression extends IExpression {
 /**
  * [left] (NOT) [operator] [right]
  */
-export interface IBinaryExpression extends IExpression {
+export interface IBinaryExpression extends IConditional {
   left?: IExpression
   not?: boolean
   operator: string
@@ -25,7 +25,7 @@ export interface IBinaryExpression extends IExpression {
  * WHEN [when] THEN [then]
  */
 export interface ICase {
-  when: IExpression
+  when: IConditional
   then: IExpression
 }
 
@@ -68,9 +68,9 @@ export type GroupOperator = 'AND'|'OR'
 /**
  * AND-OR expressions
  */
-export interface IGroupExpression extends IExpression {
+export interface IGroupExpression extends IConditional {
   operator: GroupOperator
-  expressions: IExpression[]
+  expressions: IConditional[]
 }
 
 /**
@@ -92,7 +92,7 @@ export interface IQueryExpression extends IExpression {
 /**
  * (NOT) EXISTS [query]
  */
-export interface IExistsExpression extends IExpression {
+export interface IExistsExpression extends IConditional {
   not?: boolean
   query: IQueryExpression
 }

@@ -1,6 +1,6 @@
 import _ = require('lodash')
 import { Expression } from '.'
-import { IBuilder, IExpression } from '../index.if'
+import { IBuilder, IConditional } from '../index.if'
 import { parse, register } from '../parse'
 import { GroupOperator, IGroupExpression } from './index.if'
 
@@ -17,9 +17,9 @@ class Builder implements IBuilder<GroupExpression> {
 
   /**
    * Add expression
-   * @param json [IExpression]
+   * @param json [IConditional]
    */
-  public expr(json: IExpression): Builder {
+  public expr(json: IConditional): Builder {
     this.json.expressions.push(json)
     return this
   }

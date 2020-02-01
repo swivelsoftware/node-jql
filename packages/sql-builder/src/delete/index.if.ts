@@ -1,4 +1,4 @@
-import { IExpression, ISQL } from '../index.if'
+import { IConditional, ISQL } from '../index.if'
 
 /**
  * DELETE FROM
@@ -6,5 +6,5 @@ import { IExpression, ISQL } from '../index.if'
 export interface IDelete extends ISQL {
   schema?: string
   name: string
-  where?: IExpression
+  where?: IConditional
 }

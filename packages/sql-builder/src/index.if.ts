@@ -59,6 +59,12 @@ export interface IExpression extends ISQL {
 }
 
 /**
+ * Expression interface that returns True or False
+ */
+export interface IConditional extends IExpression {
+}
+
+/**
  * Table column definition
  */
 export interface IColumn {

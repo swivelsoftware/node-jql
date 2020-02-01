@@ -1,6 +1,6 @@
 import _ = require('lodash')
 import { Expression } from '.'
-import { IBuilder, IExpression } from '../index.if'
+import { IBuilder, IConditional, IExpression } from '../index.if'
 import { parse, register } from '../parse'
 import { ICase, ICaseExpression } from './index.if'
 import { isUnknown } from './unknown'
@@ -14,10 +14,10 @@ class Builder implements IBuilder<CaseExpression> {
 
   /**
    * Add case
-   * @param when [IExpression]
+   * @param when [IConditional]
    * @param then [IExpression]
    */
-  public case(when: IExpression, then: IExpression): Builder {
+  public case(when: IConditional, then: IExpression): Builder {
     this.json.cases.push({ when, then })
     return this
   }

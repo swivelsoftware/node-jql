@@ -4,7 +4,7 @@ import { Expression } from '../expression'
 import { BinaryExpression } from '../expression/binary'
 import { GroupExpression } from '../expression/group'
 import { IBinaryExpression, IGroupExpression } from '../expression/index.if'
-import { IBuilder, IExpression, IStringify } from '../index.if'
+import { IBuilder, IConditional, IExpression, IStringify } from '../index.if'
 import { parse } from '../parse'
 import { IUpdate } from './index.if'
 
@@ -40,9 +40,9 @@ class Builder implements IBuilder<Update> {
 
   /**
    * Add WHERE expression
-   * @param expr [IExpression]
+   * @param expr [IConditional]
    */
-  public where(expr: IExpression): Builder {
+  public where(expr: IConditional): Builder {
     if (this.json.where && this.json.where.classname === GroupExpression.name && (this.json.where as IGroupExpression).operator === 'AND') {
       (this.json.where as IGroupExpression).expressions.push(expr)
     }

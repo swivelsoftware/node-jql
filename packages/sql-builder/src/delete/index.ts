@@ -3,7 +3,7 @@ import { stringify } from '../dbType/stringify'
 import { Expression } from '../expression'
 import { GroupExpression } from '../expression/group'
 import { IGroupExpression } from '../expression/index.if'
-import { IBuilder, IExpression, IStringify } from '../index.if'
+import { IBuilder, IConditional, IStringify } from '../index.if'
 import { parse, register } from '../parse'
 import { IDelete } from './index.if'
 
@@ -28,9 +28,9 @@ class Builder implements IBuilder<Delete> {
 
   /**
    * Add WHERE expression
-   * @param expr [IExpression]
+   * @param expr [IConditional]
    */
-  public where(expr: IExpression): Builder {
+  public where(expr: IConditional): Builder {
     if (this.json.where && this.json.where.classname === GroupExpression.name && (this.json.where as IGroupExpression).operator === 'AND') {
       (this.json.where as IGroupExpression).expressions.push(expr)
     }
