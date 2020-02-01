@@ -62,6 +62,7 @@ export interface IOrderBy {
  * SELECT
  */
 export interface IQuery extends ISQL {
+  distinct?: boolean
   select?: IResultColumn[]
   from?: IDatasource[]
   where?: IConditional

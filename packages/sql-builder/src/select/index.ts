@@ -26,6 +26,15 @@ class Builder implements IBuilder<Query> {
   }
 
   /**
+   * Set DISTINCT flag
+   * @param value [boolean]
+   */
+  public distinct(value = true): Builder {
+    this.json.distinct = value
+    return this
+  }
+
+  /**
    * Add result column
    * @param column [IResultColumn]
    */
@@ -178,6 +187,7 @@ export class ResultColumn implements IResultColumn, IStringify {
  */
 export class Join implements IJoin, IStringify {
   public static Builder = JoinBuilder
+
   public readonly operator: string
   public readonly table: Datasource
   public readonly on?: Expression
@@ -405,6 +415,7 @@ export class Query implements IQuery, IStringify {
   public static Builder = Builder
 
   public readonly classname: string = Query.name
+  public readonly distinct: boolean = false
   public readonly select: ResultColumn[] = []
   public readonly from?: Datasource[]
   public readonly where?: Expression
@@ -412,6 +423,7 @@ export class Query implements IQuery, IStringify {
   public readonly orderBy: OrderBy[] = []
 
   constructor(json: IQuery) {
+    if (json.distinct) this.distinct = true
     if (json.select) this.select = json.select.map(json => new ResultColumn(json))
     if (json.from) this.from = json.from.map(json => parse(json))
     if (json.where) this.where = parse<Expression>(json.where)
