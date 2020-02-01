@@ -1,6 +1,6 @@
 {
   "name": "@node-jql/sql-builder",
-  "version": "1.0.0-rc.13",
+  "version": "1.0.0-rc.14",
   "description": "Represent SQL in JSON format for building SQL string",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -27,17 +27,17 @@
     "lodash": "^4.17.15",
     "string-format": "^2.0.0",
     "ts-node": "^8.6.2",
-    "typescript": "^3.7.4"
+    "typescript": "^3.7.5"
   },
   "devDependencies": {
     "@types/deepmerge": "^2.2.0",
-    "@types/jest": "^24.9.0",
+    "@types/jest": "^25.1.1",
     "@types/lodash": "^4.14.149",
-    "@types/node": "^13.1.7",
+    "@types/node": "^13.7.0",
     "@types/string-format": "^2.0.0",
-    "jest": "^24.9.0",
-    "madge": "^3.6.0",
-    "ts-jest": "^24.3.0",
-    "tslint": "^5.20.1"
+    "jest": "^25.1.0",
+    "madge": "^3.7.0",
+    "ts-jest": "^25.1.0",
+    "tslint": "^6.0.0"
   }
 }
