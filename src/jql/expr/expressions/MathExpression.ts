@@ -63,7 +63,7 @@ export class MathExpression extends Expression implements IMathExpression {
   // @override
   public toSquel(): squel.FunctionBlock {
     return squel.rstr(
-      `? ${this.operator} ?`,
+      `(? ${this.operator} ?)`,
       this.left.toSquel(),
       this.right.toSquel(),
     )
