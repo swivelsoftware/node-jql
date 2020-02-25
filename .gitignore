@@ -63,3 +63,4 @@ typings/
 # build folder
 intermediate
 dist
+node-jql.code-workspace

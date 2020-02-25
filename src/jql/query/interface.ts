@@ -120,7 +120,12 @@ export interface IRemoteTable extends AxiosRequestConfig {
   /**
    * Result structure
    */
-  columns: Array<{ name: string, type?: Type, $as?: string }>
+  columns: Array<{
+    name: string,
+    type?: Type,
+    $as?: string,
+    nullable?: boolean,
+  }>
 }
 
 /**

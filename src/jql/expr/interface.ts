@@ -140,6 +140,16 @@ export interface IExistsExpression extends IConditionalExpression {
 }
 
 /**
+ * Query expression
+ */
+export interface IQueryExpression extends IExpression {
+  /**
+   * Sub-query
+   */
+  query: IQuery
+}
+
+/**
  * Raw JQL defining function expression
  */
 export interface IFunctionExpression extends IExpression {
@@ -241,6 +251,11 @@ export interface IUnknown extends IExpression {
  * Raw JQL for constants
  */
 export interface IValue extends IUnknown {
+  /**
+   * Available type for the unknown
+   */
+  type?: Type[]|Type
+
   /**
    * Value assigned
    */

@@ -1,12 +1,14 @@
-import { type } from '../../../type'
+import squel = require('squel')
+import { Expression } from '..'
+import { type, Type } from '../../../type'
 import { IValue } from '../interface'
-import { Unknown } from './Unknown'
 
 /**
  * JQL class for constants
  */
-export class Value extends Unknown implements IValue {
+export class Value extends Expression implements IValue {
   public readonly classname = Value.name
+  public type: Type[] = ['any']
   public value: any
 
   /**
@@ -20,11 +22,11 @@ export class Value extends Unknown implements IValue {
   constructor(value: any)
 
   constructor(...args: any[]) {
-    super(...args)
+    super()
 
     // parse args
     let value: any
-    if (typeof args[0] === 'object' && 'value' in args[0]) {
+    if (typeof args[0] === 'object' && args[0] !== null && 'value' in args[0]) {
       const json = args[0] as IValue
       value = json.value
     }
@@ -36,6 +38,20 @@ export class Value extends Unknown implements IValue {
     const type_ = typeof value
     if (type_ === 'bigint' || type_ === 'function') throw new TypeError(`Invalid type ${type_} for node-jql`)
     this.type = [type(this.value = value)]
+  }
+
+  // @override
+  public validate(): void { /* do nothing */ }
+
+  // @override
+  public toSquel(): squel.FunctionBlock {
+    if (Array.isArray(this.value)) {
+      let format = ''
+      for (let i = 0, length = this.value.length; i < length; i += 1) format += (i > 0 ? ', ' : '') + '?'
+      format = `(${format})`
+      return squel.rstr(format, ...this.value)
+    }
+    return squel.rstr('?', this.value)
   }
 
   // @override

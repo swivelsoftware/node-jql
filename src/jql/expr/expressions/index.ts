@@ -11,6 +11,7 @@ import { LikeExpression } from './LikeExpression'
 import { MathExpression } from './MathExpression'
 import { OrExpressions } from './OrExpressions'
 import { ParameterExpression } from './ParameterExpression'
+import { QueryExpression } from './QueryExpression'
 import { RegexpExpression } from './RegexpExpression'
 import { Unknown } from './Unknown'
 import { Value } from './Value'
@@ -29,6 +30,7 @@ export const expressions = {
   MathExpression,
   OrExpressions,
   ParameterExpression,
+  QueryExpression,
   RegexpExpression,
   Unknown,
   Value,
