@@ -125,6 +125,13 @@ export interface IColumnExpression extends IExpression {
 }
 
 /**
+ * Raw JQL defining columns expression
+ */
+export interface IColumnsExpression extends IExpression {
+  columns: IColumnExpression[]
+}
+
+/**
  * Raw JQL for `EXISTS {query}`
  */
 export interface IExistsExpression extends IConditionalExpression {

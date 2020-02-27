@@ -3,6 +3,7 @@ import { BetweenExpression } from './BetweenExpression'
 import { BinaryExpression } from './BinaryExpression'
 import { CaseExpression } from './CaseExpression'
 import { ColumnExpression } from './ColumnExpression'
+import { ColumnsExpression } from './ColumnsExpression'
 import { ExistsExpression } from './ExistsExpression'
 import { FunctionExpression } from './FunctionExpression'
 import { InExpression } from './InExpression'
@@ -22,6 +23,7 @@ export const expressions = {
   BinaryExpression,
   CaseExpression,
   ColumnExpression,
+  ColumnsExpression,
   ExistsExpression,
   FunctionExpression,
   InExpression,
