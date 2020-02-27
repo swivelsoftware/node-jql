@@ -1,10 +1,7 @@
 /* tslint:disable:no-console */
 
 import moment from 'moment'
-import { BinaryExpression, Column, ColumnExpression, CreateDatabaseJQL, CreateTableJQL, DropDatabaseJQL, DropTableJQL, FromTable, FunctionExpression, InExpression, InsertJQL, JoinClause, MathExpression, OrderBy, OrExpressions, PredictJQL, Query, ResultColumn, Type } from '.'
-import { LikeExpression } from './jql/expr/expressions/LikeExpression'
-import { RegexpExpression } from './jql/expr/expressions/RegexpExpression'
-import { GroupBy } from './jql/query/GroupBy'
+import { BinaryExpression, Column, ColumnExpression, CreateDatabaseJQL, CreateTableJQL, DropDatabaseJQL, DropTableJQL, FromTable, FunctionExpression, GroupBy, InExpression, InsertJQL, JoinClause, MathExpression, OrderBy, OrExpressions, PredictJQL, Query, RegexpExpression, ResultColumn, Type } from '.'
 
 test('CREATE DATABASE IF NOT EXISTS School', () => {
   const query = new CreateDatabaseJQL('School', true)
