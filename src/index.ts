@@ -15,7 +15,7 @@ export { IJQL } from './jql/interface'
 export { JQL } from './jql'
 export { parseJQL, isParseable } from './jql/parse'
 // jql/expr
-export { IExpression, IConditionalExpression, IGroupedExpressions, IBetweenExpression, BinaryOperator, IBinaryExpression, ICase, ICaseExpression, IColumnExpression, IExistsExpression, IFunctionExpression, IInExpression, IIsNullExpression, ILikeExpression, MathOperator, IMathExpression, IParameterExpression, IRegexpExpression, IUnknown, IValue } from './jql/expr/interface'
+export { IExpression, IConditionalExpression, IGroupedExpressions, IBetweenExpression, BinaryOperator, IBinaryExpression, ICase, ICaseExpression, IColumnExpression, IColumnsExpression, IExistsExpression, IFunctionExpression, IInExpression, IIsNullExpression, ILikeExpression, MathOperator, IMathExpression, IParameterExpression, IQueryExpression, IRegexpExpression, IUnknown, IValue } from './jql/expr/interface'
 export { Expression, ConditionalExpression } from './jql/expr'
 export { AndExpressions } from './jql/expr/expressions/AndExpressions'
 export { BetweenExpression } from './jql/expr/expressions/BetweenExpression'
