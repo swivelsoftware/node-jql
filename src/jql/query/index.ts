@@ -198,7 +198,16 @@ export class Query extends JQL implements IQuery {
     let builder = squel.select({ rawNesting })
     if (this.$distinct) builder.distinct()
     if (this.$from) for (const table of this.$from) builder = table.apply(builder)
-    if (!this.isSimpleWildcard) for (const { expression, $as } of this.$select) builder = builder.field(expression.toSquel(), $as)
+    if (!this.isSimpleWildcard) {
+      for (const { expression, $as, partitionBy } of this.$select) {
+        if (!partitionBy) {
+          builder = builder.field(expression.toSquel(), $as)
+        }
+        else {
+          builder = builder.field(`${expression.toString()} OVER (PARTITION BY ${Array.isArray(partitionBy) ? `\`${partitionBy[0]}\`.\`${partitionBy[1]}\`` : `\`${partitionBy}\``})`, $as)
+        }
+      }
+    }
     if (this.$where) builder = builder.where(this.$where.toSquel(false) as squel.Expression)
     if (this.$group) builder = this.$group.apply(builder)
     if (this.$order) {

@@ -61,6 +61,11 @@ export interface IResultColumn extends IJQL {
    * alias column name
    */
   $as?: string
+
+  /**
+   * partition column
+   */
+  partitionBy?: [string, string]|string
 }
 
 /**
@@ -120,12 +125,12 @@ export interface IRemoteTable extends AxiosRequestConfig {
   /**
    * Result structure
    */
-  columns: Array<{
+  columns: {
     name: string,
     type?: Type,
     $as?: string,
     nullable?: boolean,
-  }>
+  }[]
 }
 
 /**

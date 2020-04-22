@@ -12,6 +12,7 @@ import { IResultColumn } from './interface'
 export class ResultColumn extends JQL implements IResultColumn {
   public expression: Expression
   public $as?: string
+  public partitionBy?: [string, string]|string
 
   /**
    * @param json [IResultColumn]
@@ -21,27 +22,31 @@ export class ResultColumn extends JQL implements IResultColumn {
   /**
    * @param expression [expression|string]
    * @param $as [string] optional
+   * @param partitionBy [Array<string>|string] optional
    */
-  constructor(expression: IExpression|string, $as?: string)
+  constructor(expression: IExpression|string, $as?: string, partitionBy?: [string, string]|string)
 
   constructor(...args: any[]) {
     super()
 
     // parse args
-    let expression: IExpression, $as: string|undefined
+    let expression: IExpression, $as: string|undefined, partitionBy: [string, string]|string|undefined
     if (args.length === 1 && typeof args[0] === 'object' && !('classname' in args[0])) {
       const json = args[0] as IResultColumn
       expression = json.expression
       $as = json.$as
+      partitionBy = json.partitionBy
     }
     else {
       expression = typeof args[0] === 'string' ? new ColumnExpression(args[0]) : args[0]
       $as = args[1]
+      partitionBy = args[2]
     }
 
     // set args
     this.expression = parseExpr(expression)
     this.$as = $as
+    this.partitionBy = partitionBy
   }
 
   // @override
@@ -55,9 +60,11 @@ export class ResultColumn extends JQL implements IResultColumn {
   }
 
   // @override
-  public toSquel(): squel.QueryBuilder {
-    const builder = squel.select({}, [new squel.cls.GetFieldBlock()]) as squel.Select
-    return builder.field(this.expression.toSquel(), this.$as)
+  public toSquel(): squel.FunctionBlock {
+    let result = `${this.expression.toSquel()}`
+    if (this.partitionBy) result += ` OVER (PARTIION BY ${Array.isArray(this.partitionBy) ? `\`${this.partitionBy[0]}\`.\`${this.partitionBy[1]}\`` : `\`${this.partitionBy}\``})`
+    if (this.$as) result += ` AS \`${this.$as}\``
+    return squel.rstr(result)
   }
 
   // @override
