@@ -1,7 +1,8 @@
 import { AxiosRequestConfig } from 'axios'
 import { Type } from '../../Type'
-import { IConditionalExpression, IExpression } from '../expr/interface'
+import { IConditionalExpression, IExpression, IColumnExpression } from '../expr/interface'
 import { IJQL, IParseable } from '../interface'
+import { ColumnExpression } from '../expr/expressions/ColumnExpression'
 
 /**
  * Raw JQL for SELECT query
@@ -65,7 +66,7 @@ export interface IResultColumn extends IJQL {
   /**
    * partition column
    */
-  partitionBy?: [string, string]|string
+  partitionBy?: IColumnExpression[]|ColumnExpression
 }
 
 /**

@@ -200,11 +200,11 @@ export class Query extends JQL implements IQuery {
     if (this.$from) for (const table of this.$from) builder = table.apply(builder)
     if (!this.isSimpleWildcard) {
       for (const { expression, $as, partitionBy } of this.$select) {
-        if (!partitionBy) {
+        if (!partitionBy.length) {
           builder = builder.field(expression.toSquel(), $as)
         }
         else {
-          builder = builder.field(`${expression.toString()} OVER (PARTITION BY ${Array.isArray(partitionBy) ? `\`${partitionBy[0]}\`.\`${partitionBy[1]}\`` : `\`${partitionBy}\``})`, $as)
+          builder = builder.field(`${expression.toString()} OVER (PARTITION BY ${partitionBy.map(e => e.toString()).join(', ')})`, $as)
         }
       }
     }
