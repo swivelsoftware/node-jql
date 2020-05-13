@@ -43,7 +43,7 @@ export function parseJQL(json: IInsertJQL): InsertJQL
 export function parseJQL(json: IQuery): Query
 export function parseJQL(json: IParseable): JQL
 export function parseJQL(json: IParseable): JQL {
-  if (!json.classname) throw new SyntaxError('Unknown expression: classname not defined')
+  if (!json.classname) throw new SyntaxError(`Unknown expression: classname not defined in ${JSON.stringify(json)}`)
   switch (json.classname) {
     case CreateDatabaseJQL.name:
       return new CreateDatabaseJQL(json as ICreateDatabaseJQL)

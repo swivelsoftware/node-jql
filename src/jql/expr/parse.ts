@@ -13,7 +13,7 @@ export function parseExpr(json: IExpression|any): Expression {
     return new expressions.Unknown()
   }
   else if (typeof json === 'object' && !(json instanceof Date) && !(json instanceof RegExp) && !Array.isArray(json)) {
-    if (!json.classname) throw new SyntaxError('Unknown expression: classname not defined')
+    if (!json.classname) throw new SyntaxError(`Unknown expression: classname not defined in ${JSON.stringify(json)}`)
     const CONSTRUCTOR = expressions[json.classname]
     if (!CONSTRUCTOR) throw new SyntaxError(`Unknown expression: classname ${json.classname} not found`)
     return new CONSTRUCTOR(json)
