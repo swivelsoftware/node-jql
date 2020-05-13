@@ -75,7 +75,12 @@ export class RegexpExpression extends BinaryExpression implements IRegexpExpress
         return squel.expr().and('1 = 1')
       }
     }
-    return super.toSquel()
+    return squel.rstr(
+      `REGEXP_LIKE(?, ?, ?)`,
+      this.left.toSquel(),
+      this.right.value,
+      'i',
+    )
   }
 
   // @override
