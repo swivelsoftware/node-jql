@@ -34,6 +34,7 @@ export class Unknown extends Expression implements IUnknown {
       const json = args[0] as IUnknown
       json.type = json.type || 'any'
       types = Array.isArray(json.type) ? json.type : [json.type]
+      if (json['value'] !== undefined) this.value = json['value']
     }
     else {
       types = args
