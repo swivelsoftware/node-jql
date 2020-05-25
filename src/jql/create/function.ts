@@ -81,7 +81,7 @@ export class CreateFunctionJQL extends CreateJQL implements ICreateFunctionJQL {
 
   // @override
   public toJson(): ICreateFunctionJQL {
-    const result = { name: this.name, code: this.code } as ICreateFunctionJQL
+    const result = { classname: this.classname, name: this.name, code: this.code } as ICreateFunctionJQL
     if (this.aggregate) result.aggregate = this.aggregate
     if (this.type !== 'any') result.type = this.type
     if (this.parameters.length) result.parameters = this.parameters
