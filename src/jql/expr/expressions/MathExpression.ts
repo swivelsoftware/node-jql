@@ -3,8 +3,6 @@ import { Expression } from '..'
 import { checkNull } from '../../../utils/check'
 import { IExpression, IMathExpression, MathOperator } from '../interface'
 import { parseExpr } from '../parse'
-import { Unknown } from './Unknown'
-import { Value } from './Value'
 
 /**
  * JQL class defining mathematical expression

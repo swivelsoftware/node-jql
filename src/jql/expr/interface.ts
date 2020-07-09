@@ -202,7 +202,7 @@ export interface IRegexpExpression extends IBinaryExpression {
 /**
  * Mathematical operator
  */
-export type MathOperator = '+'|'-'|'*'|'/'|'%'|'MOD'|'DIV'
+export type MathOperator = '+'|'-'|'*'|'/'|'%'|'MOD'|'DIV'|'->>'
 
 /**
  * Raw JQL defining mathematical expression
