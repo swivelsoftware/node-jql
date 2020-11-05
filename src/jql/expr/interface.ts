@@ -110,6 +110,16 @@ export interface ICaseExpression extends IExpression {
 }
 
 /**
+ * Raw JQL defining variable expression
+ */
+export interface IVariable extends IExpression {
+  /**
+   * Variable name
+   */
+  name: string
+}
+
+/**
  * Raw JQL defining column expression
  */
 export interface IColumnExpression extends IExpression {

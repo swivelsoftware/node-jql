@@ -16,6 +16,7 @@ import { QueryExpression } from './QueryExpression'
 import { RegexpExpression } from './RegexpExpression'
 import { Unknown } from './Unknown'
 import { Value } from './Value'
+import { Variable } from './Variable'
 
 export const expressions = {
   AndExpressions,
@@ -36,4 +37,5 @@ export const expressions = {
   RegexpExpression,
   Unknown,
   Value,
+  Variable,
 }
