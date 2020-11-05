@@ -1,7 +1,6 @@
 import { Type } from '../../Type'
 import { IJQL, IParseable } from '../interface'
 import { IQuery } from '../query/interface'
-import { BinaryExpression } from './expressions/BinaryExpression'
 
 /**
  * Raw JQL for expression
@@ -52,7 +51,7 @@ export interface IBetweenExpression extends IConditionalExpression {
 /**
  * Binary operator
  */
-export type BinaryOperator = '='|'<>'|'<'|'<='|'>'|'>='|'IN'|'IS'|'LIKE'|'REGEXP'
+export type BinaryOperator = ':='|'='|'<>'|'<'|'<='|'>'|'>='|'IN'|'IS'|'LIKE'|'REGEXP'
 
 /**
  * Raw JQL for `{left} {operator} {right}`
@@ -153,7 +152,7 @@ export interface IExistsExpression extends IConditionalExpression {
   /**
    * Sub-query for checking
    */
-  query: IQuery
+  query: IQuery|IQueryExpression|ICaseExpression
 }
 
 /**
@@ -185,7 +184,7 @@ export interface IFunctionExpression extends IExpression {
  * Raw JQL for `{left} IN {right}`
  */
 export interface IInExpression extends IBinaryExpression {
-  right?: IUnknown|IValue|any[]|IQuery
+  right?: IUnknown|IValue|any[]|IQuery|IQueryExpression|ICaseExpression
 }
 
 /**
