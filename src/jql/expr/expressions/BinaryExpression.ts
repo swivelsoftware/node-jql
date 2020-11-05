@@ -4,8 +4,6 @@ import { checkNull } from '../../../utils/check'
 import { JQLError } from '../../../utils/error'
 import { BinaryOperator, IBinaryExpression, IExpression } from '../interface'
 import { parseExpr } from '../parse'
-import { Unknown } from './Unknown'
-import { Value } from './Value'
 
 /**
  * JQL class for `{left} {operator} {right}`
