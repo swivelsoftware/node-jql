@@ -67,8 +67,8 @@ export class BinaryExpression extends ConditionalExpression implements IBinaryEx
 
   // @override
   public toSquel(type: squel.Flavour = 'mysql', options?: any): squel.BaseBuilder {
-    const Squel = squel.useFlavour(type as any)
-    return Squel.expr()
+    const squel_ = squel.useFlavour(type as any)
+    return squel_.expr()
       .and(
         this.$not ? `? NOT ${this.operator} ?` : `? ${this.operator} ?`,
         this.left.toSquel(type, options),

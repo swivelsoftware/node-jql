@@ -44,8 +44,8 @@ export class Variable extends Expression implements IVariable {
 
   // @override
   public toSquel(type: squel.Flavour = 'mysql'): squel.FunctionBlock {
-    const Squel = squel.useFlavour(type as any)
-    return Squel.rstr(`@${this.name}`)
+    const squel_ = squel.useFlavour(type as any)
+    return squel_.rstr(`@${this.name}`)
   }
 
   // @override

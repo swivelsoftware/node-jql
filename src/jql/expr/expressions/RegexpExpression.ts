@@ -55,7 +55,7 @@ export class RegexpExpression extends BinaryExpression implements IRegexpExpress
 
   // @override
   public toSquel(type: squel.Flavour = 'mysql', options?: any): squel.BaseBuilder {
-    const Squel = squel.useFlavour(type as any)
+    const squel_ = squel.useFlavour(type as any)
     if (this.right instanceof Value) {
       if (this.right.value instanceof RegExp && this.right.value.flags) {
         const regexp = this.right.value
@@ -64,7 +64,7 @@ export class RegexpExpression extends BinaryExpression implements IRegexpExpress
         if (regexp.flags.indexOf('m') > -1) flags += 'm'
         if (regexp.flags.indexOf('u') > -1) flags += 'u'
         if (flags.length && flags.indexOf('i') === -1) flags += 'c'
-        return Squel.rstr(
+        return squel_.rstr(
           flags ? `REGEXP_LIKE(?, ?, ?)` : `REGEXP_LIKE(?, ?)`,
           this.left.toSquel(type, options),
           regexp.source,
@@ -73,10 +73,10 @@ export class RegexpExpression extends BinaryExpression implements IRegexpExpress
       }
       // empty string -> illegal argument to a regular expression
       else if (typeof this.right.value === 'string' && !this.right.value.length) {
-        return Squel.expr().and('1 = 1')
+        return squel_.expr().and('1 = 1')
       }
     }
-    return Squel.rstr(
+    return squel_.rstr(
       `REGEXP_LIKE(?, ?, ?)`,
       this.left.toSquel(type, options),
       this.right.value,

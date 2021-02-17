@@ -188,9 +188,9 @@ export class Query extends JQL implements IQuery {
 
   // @override
   public toSquel(type: squel.Flavour = 'mysql', options?: any): squel.Select {
-    const Squel = squel.useFlavour(type as any)
+    const squel_ = squel.useFlavour(type as any)
     const { rawNesting } = options || {}
-    let builder: squel.Select = Squel.select({ rawNesting })
+    let builder: squel.Select = squel_.select({ rawNesting })
     if (this.$distinct) builder = builder.distinct()
     if (this.$from) for (const fromTable of this.$from) builder = fromTable.apply(type, builder, options)
     if (!this.isSimpleWildcard) {

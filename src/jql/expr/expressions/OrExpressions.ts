@@ -6,14 +6,14 @@ export class OrExpressions extends GroupedExpressions {
 
   // @override
   public toSquel(type: squel.Flavour = 'mysql', options?: any): squel.Expression {
-    const Squel = squel.useFlavour(type as any)
+    const squel_ = squel.useFlavour(type as any)
     const { parentheses } = options || {}
-    let result = Squel.expr()
+    let result = squel_.expr()
     for (const expression of this.expressions) {
       const { text, values } = expression.toSquel(type, options).toParam()
       result = result.or(text, ...values)
     }
     const { text, values } = result.toParam()
-    return Squel.expr().or(parentheses && this.expressions.length > 1 ? `(${text})` : text, ...values)
+    return squel_.expr().or(parentheses && this.expressions.length > 1 ? `(${text})` : text, ...values)
   }
 }

@@ -54,8 +54,8 @@ export class InExpression extends BinaryExpression implements IInExpression {
 
   // @override
   public toSquel(type: squel.Flavour = 'mysql', options?: any): squel.Expression {
-    const Squel = squel.useFlavour(type as any)
-    return Squel.expr()
+    const squel_ = squel.useFlavour(type as any)
+    return squel_.expr()
       .and(
         `? ${this.$not ? 'NOT ' : ''}IN ?`,
         this.left.toSquel(type, options),

@@ -60,8 +60,8 @@ export class MathExpression extends Expression implements IMathExpression {
 
   // @override
   public toSquel(type: squel.Flavour = 'mysql', options?: any): squel.FunctionBlock {
-    const Squel = squel.useFlavour(type as any)
-    return Squel.rstr(
+    const squel_ = squel.useFlavour(type as any)
+    return squel_.rstr(
       `(? ${this.operator} ?)`,
       this.left.toSquel(type, options),
       this.right.toSquel(type, options),

@@ -56,11 +56,11 @@ export class CaseExpression extends Expression implements ICaseExpression {
 
   // @override
   public toSquel(type: squel.Flavour = 'mysql', options?: any): squel.Expression {
-    const Squel = squel.useFlavour(type as any)
+    const squel_ = squel.useFlavour(type as any)
     const params = [] as any[]
     this.cases.forEach(({ $when, $then }) => params.push($when.toSquel(type, options), $then.toSquel(type, options)))
     if (this.$else) params.push(this.$else.toSquel(type, options))
-    return Squel.expr().and(`CASE ${this.cases.map(() => 'WHEN ? THEN ?').join(' ')}${this.$else ? ' ELSE ?' : ''} END`, ...params)
+    return squel_.expr().and(`CASE ${this.cases.map(() => 'WHEN ? THEN ?').join(' ')}${this.$else ? ' ELSE ?' : ''} END`, ...params)
   }
 
   // @override

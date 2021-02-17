@@ -65,8 +65,8 @@ export class BetweenExpression extends ConditionalExpression implements IBetween
 
   // @override
   public toSquel(type: squel.Flavour = 'mysql', options?: any): squel.Expression {
-    const Squel = squel.useFlavour(type as any)
-    return Squel.expr()
+    const squel_ = squel.useFlavour(type as any)
+    return squel_.expr()
       .and(
         `? ${this.$not ? 'NOT ' : ''}BETWEEN ? AND ?`,
         this.left.toSquel(type, options),

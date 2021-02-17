@@ -50,7 +50,7 @@ export class LimitOffset extends QueryPartition implements ILimitOffset {
   }
 
   // @override
-  public validate(): void {}
+  public validate(): void { /* do nothing */ }
 
   // @override
   public toJson(): ILimitOffset {

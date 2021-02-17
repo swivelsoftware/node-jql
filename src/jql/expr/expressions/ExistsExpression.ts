@@ -55,8 +55,8 @@ export class ExistsExpression extends ConditionalExpression implements IExistsEx
 
   // @override
   public toSquel(type: squel.Flavour = 'mysql', options?: any): squel.Expression {
-    const Squel = squel.useFlavour(type as any)
-    return Squel.expr()
+    const squel_ = squel.useFlavour(type as any)
+    return squel_.expr()
       .and(
         `${this.$not ? 'NOT ' : ''}EXISTS ?`,
         this.query.toSquel(type, options),

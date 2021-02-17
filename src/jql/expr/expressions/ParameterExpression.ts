@@ -54,8 +54,8 @@ export class ParameterExpression extends Expression implements IParameterExpress
 
   // @override
   public toSquel(type: squel.Flavour = 'mysql', options?: any): squel.FunctionBlock {
-    const Squel = squel.useFlavour(type as any)
-    return Squel.rstr(`${this.prefix ? `${this.prefix} ` : ''}?${this.suffix ? ` ${this.suffix}` : ''}`, this.expression.toSquel(type, options))
+    const squel_ = squel.useFlavour(type as any)
+    return squel_.rstr(`${this.prefix ? `${this.prefix} ` : ''}?${this.suffix ? ` ${this.suffix}` : ''}`, this.expression.toSquel(type, options))
   }
 
   // @override
