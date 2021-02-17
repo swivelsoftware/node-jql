@@ -45,7 +45,7 @@ export class QueryExpression extends Expression implements IQueryExpression {
 
   // @override
   public toSquel(): squel.FunctionBlock {
-    return squel.rstr('?', this.query.toSquel())
+    return squel.rstr('(?)', this.query.toSquel())
   }
 
   // @override
