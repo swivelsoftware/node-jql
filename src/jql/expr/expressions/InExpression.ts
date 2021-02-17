@@ -1,8 +1,6 @@
 import squel from 'squel'
-import { Expression } from '..'
-import { Query } from '../../query'
 import { IQuery } from '../../query/interface'
-import { BinaryOperator, ICaseExpression, IExpression, IInExpression, IQueryExpression, IUnknown, IValue } from '../interface'
+import { BinaryOperator, ICaseExpression, IInExpression, IQueryExpression, IUnknown, IValue } from '../interface'
 import { parseExpr } from '../parse'
 import { BinaryExpression } from './BinaryExpression'
 import { CaseExpression } from './CaseExpression'
@@ -55,12 +53,13 @@ export class InExpression extends BinaryExpression implements IInExpression {
   }
 
   // @override
-  public toSquel(): squel.Expression {
-    return squel.expr()
+  public toSquel(type: squel.Flavour = 'mysql', options?: any): squel.Expression {
+    const Squel = squel.useFlavour(type as any)
+    return Squel.expr()
       .and(
         `? ${this.$not ? 'NOT ' : ''}IN ?`,
-        this.left.toSquel(),
-        this.right.toSquel(),
+        this.left.toSquel(type, options),
+        this.right.toSquel(type, options),
       )
   }
 }

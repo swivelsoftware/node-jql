@@ -1,15 +1,14 @@
 import squel from 'squel'
-import { JQL } from '..'
 import { Expression } from '../expr'
 import { ColumnExpression } from '../expr/expressions/ColumnExpression'
 import { IExpression } from '../expr/interface'
 import { parseExpr } from '../expr/parse'
-import { IOrderBy } from './interface'
+import { IOrderBy, QueryPartition } from './interface'
 
 /**
  * JQL class for ordering terms in query
  */
-export class OrderBy extends JQL implements IOrderBy {
+export class OrderBy extends QueryPartition implements IOrderBy {
   public expression: Expression
   public order: 'ASC'|'DESC'
 
@@ -45,20 +44,15 @@ export class OrderBy extends JQL implements IOrderBy {
   }
 
   // @override
-  get [Symbol.toStringTag](): string {
-    return OrderBy.name
-  }
-
-  // @override
   public validate(availableTables: string[]): void {
     this.expression.validate(availableTables)
   }
 
+
   // @override
-  public toSquel(): squel.FunctionBlock {
-    let builder = squel.select({}, [new squel.cls.GetFieldBlock()]) as squel.Select
-    builder = builder.field(this.expression.toSquel())
-    return squel.rstr(`? ${this.order}`, builder)
+  public apply(type: squel.Flavour, builder: squel.Select, options?: any): squel.Select {
+    const { text, values } = this.expression.toSquel(type, options).toParam()
+    return builder.order(text, this.order === 'ASC', ...values)
   }
 
   // @override

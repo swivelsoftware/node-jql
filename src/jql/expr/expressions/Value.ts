@@ -44,14 +44,15 @@ export class Value extends Expression implements IValue {
   public validate(): void { /* do nothing */ }
 
   // @override
-  public toSquel(): squel.FunctionBlock {
+  public toSquel(type: squel.Flavour = 'mysql'): squel.FunctionBlock {
+    const Squel = squel.useFlavour(type as any)
     if (Array.isArray(this.value)) {
       let format = ''
       for (let i = 0, length = this.value.length; i < length; i += 1) format += (i > 0 ? ', ' : '') + '?'
       format = `(${format})`
-      return squel.rstr(format, ...this.value)
+      return Squel.rstr(format, ...this.value)
     }
-    return squel.rstr('?', this.value)
+    return Squel.rstr('?', this.value)
   }
 
   // @override

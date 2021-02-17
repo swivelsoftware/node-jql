@@ -1,7 +1,7 @@
 import squel from 'squel'
 import { Type } from '../../../type'
 import { checkNull } from '../../../utils/check'
-import { Expression } from '../../expr'
+import { Expression } from '..'
 import { IUnknown, IValue } from '../interface'
 
 /**
@@ -55,14 +55,15 @@ export class Unknown extends Expression implements IUnknown {
   public validate(): void { /* do nothing */ }
 
   // @override
-  public toSquel(): squel.FunctionBlock {
+  public toSquel(type: squel.Flavour = 'mysql'): squel.FunctionBlock {
+    const Squel = squel.useFlavour(type as any)
     if (Array.isArray(this.value)) {
       let format = ''
       for (let i = 0, length = this.value.length; i < length; i += 1) format += (i > 0 ? ', ' : '') + '?'
       format = `(${format})`
-      return squel.rstr(format, ...this.value)
+      return Squel.rstr(format, ...this.value)
     }
-    return squel.rstr('?', this.value)
+    return Squel.rstr('?', this.value)
   }
 
   // @override

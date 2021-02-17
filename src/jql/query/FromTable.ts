@@ -1,16 +1,16 @@
 import squel from 'squel'
 import { Query } from '.'
-import { JQL } from '..'
+import { quote } from '../../utils/quote'
 import { ConditionalExpression } from '../expr'
 import { AndExpressions } from '../expr/expressions/AndExpressions'
 import { IConditionalExpression } from '../expr/interface'
 import { parseExpr } from '../expr/parse'
-import { IFromTable, IJoinClause, IQuery, IRemoteTable, JoinOperator } from './interface'
+import { IFromTable, IJoinClause, IQuery, JoinOperator, QueryPartition } from './interface'
 
 /**
  * JQL class defining join clause
  */
-export class JoinClause extends JQL implements IJoinClause {
+export class JoinClause extends QueryPartition implements IJoinClause {
   public operator: JoinOperator
   public table: FromTable
   public $on?: ConditionalExpression
@@ -70,24 +70,13 @@ export class JoinClause extends JQL implements IJoinClause {
   }
 
   // @override
-  get [Symbol.toStringTag](): string {
-    return FromTable.name
-  }
-
-  /**
-   * Apply join clause to query builder
-   * @param builder [squel.Select]
-   */
-  public apply(builder: squel.Select): squel.Select {
+  public apply(type: squel.Flavour, builder: squel.Select, options?: any): squel.Select {
     const { database, table, $as } = this.table
     if (typeof table === 'string') {
-      return builder[this.joinMethod](`${database ? `${database}.` : ''}${table}`, $as, this.$on && this.$on.toSquel())
-    }
-    else if (table instanceof Query) {
-      return builder[this.joinMethod](table.toSquel(), $as, this.$on && this.$on.toSquel())
+      return builder[this.joinMethod](`${database ? `${quote(type, database)}.` : ''}${quote(type, table)}`, $as, this.$on && this.$on.toSquel(type, options))
     }
     else {
-      return builder[this.joinMethod](`${table.method || 'GET'}(${table.url})`, $as, this.$on && this.$on.toSquel())
+      return builder[this.joinMethod](table.toSquel(type, options), $as, this.$on && this.$on.toSquel(type, options))
     }
   }
 
@@ -95,11 +84,6 @@ export class JoinClause extends JQL implements IJoinClause {
   public validate(availableTables: string[]): void {
     this.table.validate([])
     if (this.$on) this.$on.validate(availableTables)
-  }
-
-  // @override
-  public toSquel(): squel.QueryBuilder {
-    return this.apply(squel.select({}, [new squel.cls.JoinBlock()]) as squel.Select)
   }
 
   // @override
@@ -116,9 +100,9 @@ export class JoinClause extends JQL implements IJoinClause {
 /**
  * JQL class defining tables for query
  */
-export class FromTable extends JQL implements IFromTable {
+export class FromTable extends QueryPartition implements IFromTable {
   public database?: string
-  public table: string|Query|IRemoteTable
+  public table: string|Query
   public $as?: string
   public joinClauses: JoinClause[] = []
 
@@ -134,17 +118,17 @@ export class FromTable extends JQL implements IFromTable {
   constructor(table: string|[string, string], ...joinClauses: IJoinClause[])
 
   /**
-   * @param table [string|IQuery|IRemoteTable|Array<string>]
+   * @param table [string|IQuery|Array<string>]
    * @param $as [string]
    * @param joinClauses [Array<IJoinClause>] optional
    */
-  constructor(table: string|IQuery|IRemoteTable|[string, string], $as: string, ...joinClauses: IJoinClause[])
+  constructor(table: string|IQuery|[string, string], $as: string, ...joinClauses: IJoinClause[])
 
   constructor(...args: any[]) {
     super()
 
     // parse args
-    let database: string|undefined, table: string|IQuery|IRemoteTable, $as: string|undefined, joinClauses: IJoinClause[]
+    let database: string|undefined, table: string|IQuery, $as: string|undefined, joinClauses: IJoinClause[]
     if (args.length === 1 && typeof args[0] === 'object') {
       const json = args[0] as IFromTable
       database = json.database
@@ -181,25 +165,14 @@ export class FromTable extends JQL implements IFromTable {
   }
 
   // @override
-  get [Symbol.toStringTag](): string {
-    return FromTable.name
-  }
-
-  /**
-   * Apply table to query builder
-   * @param builder [squel.Select]
-   */
-  public apply(builder: squel.Select): squel.Select {
+  public apply(type: squel.Flavour, builder: squel.Select, options?: any): squel.Select {
     if (typeof this.table === 'string') {
-      builder = builder.from(`${this.database ? `${this.database}.` : ''}${this.table}`, this.$as)
-    }
-    else if (this.table instanceof Query) {
-      builder = builder.from(this.table.toSquel(), this.$as)
+      builder = builder.from(`${this.database ? `${quote(type, this.database)}.` : ''}${quote(type, this.table)}`, this.$as)
     }
     else {
-      builder = builder.from(`${this.table.method || 'GET'}(${this.table.url})`, this.$as)
+      builder = builder.from(this.table.toSquel(type, options), this.$as)
     }
-    for (const joinClause of this.joinClauses) joinClause.apply(builder)
+    for (const joinClause of this.joinClauses) joinClause.apply(type, builder, options)
     return builder
   }
 
@@ -210,11 +183,6 @@ export class FromTable extends JQL implements IFromTable {
     if (availableTables.indexOf(table) > -1) throw new SyntaxError(`Duplicate table name ${table}`)
     availableTables.push(table)
     for (const { table } of this.joinClauses) table.validate(availableTables)
-  }
-
-  // @override
-  public toSquel(): squel.QueryBuilder {
-    return this.apply(squel.select({}, [new squel.cls.FromTableBlock(), new squel.cls.JoinBlock()]) as squel.Select)
   }
 
   // @override

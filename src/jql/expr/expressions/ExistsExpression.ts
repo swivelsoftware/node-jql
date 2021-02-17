@@ -1,7 +1,7 @@
 import squel from 'squel'
-import { ConditionalExpression, Expression } from '..'
+import { ConditionalExpression } from '..'
 import { IQuery } from '../../query/interface'
-import { ICaseExpression, IExistsExpression, IExpression, IQueryExpression } from '../interface'
+import { ICaseExpression, IExistsExpression, IQueryExpression } from '../interface'
 import { parseExpr } from '../parse'
 import { CaseExpression } from './CaseExpression'
 import { QueryExpression } from './QueryExpression'
@@ -54,11 +54,12 @@ export class ExistsExpression extends ConditionalExpression implements IExistsEx
   }
 
   // @override
-  public toSquel(): squel.Expression {
-    return squel.expr()
+  public toSquel(type: squel.Flavour = 'mysql', options?: any): squel.Expression {
+    const Squel = squel.useFlavour(type as any)
+    return Squel.expr()
       .and(
         `${this.$not ? 'NOT ' : ''}EXISTS ?`,
-        this.query.toSquel(),
+        this.query.toSquel(type, options),
       )
   }
 

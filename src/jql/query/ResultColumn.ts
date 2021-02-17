@@ -1,15 +1,14 @@
 import squel from 'squel'
-import { JQL } from '..'
 import { Expression } from '../expr'
 import { ColumnExpression } from '../expr/expressions/ColumnExpression'
 import { IExpression, IColumnExpression } from '../expr/interface'
 import { parseExpr } from '../expr/parse'
-import { IResultColumn } from './interface'
+import { IResultColumn, QueryPartition } from './interface'
 
 /**
  * JQL class defining selected columns in query
  */
-export class ResultColumn extends JQL implements IResultColumn {
+export class ResultColumn extends QueryPartition implements IResultColumn {
   public expression: Expression
   public $as?: string
   public partitionBy: ColumnExpression[]
@@ -49,22 +48,24 @@ export class ResultColumn extends JQL implements IResultColumn {
     this.partitionBy = partitionBy.map(e => new ColumnExpression(e))
   }
 
-  // @override
-  get [Symbol.toStringTag](): string {
-    return ResultColumn.name
+  /**
+   * Apply result column to query builder
+   * @param type [squel.Flavour]
+   * @param builder [squel.Select]
+   * @param options [any]
+   */
+  public apply(type: squel.Flavour, builder: squel.Select, options?: any): squel.Select {
+    if (!this.partitionBy.length) {
+      return builder.field(this.expression.toSquel(type, options), this.$as)
+    }
+    else {
+      return builder.field(`${this.expression.toString(type, options)} OVER (PARTITION BY ${this.partitionBy.map(e => e.toString(type, options)).join(', ')})`, this.$as)
+    }
   }
 
   // @override
   public validate(availableTables: string[]): void {
     this.expression.validate(availableTables)
-  }
-
-  // @override
-  public toSquel(): squel.FunctionBlock {
-    let result = `${this.expression.toSquel()}`
-    if (this.partitionBy.length) result += ` OVER (PARTIION BY ${this.partitionBy.map(e => e.toString()).join(', ')})`
-    if (this.$as) result += ` AS \`${this.$as}\``
-    return squel.rstr(result)
   }
 
   // @override

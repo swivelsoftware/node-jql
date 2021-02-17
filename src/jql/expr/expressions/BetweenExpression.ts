@@ -1,10 +1,8 @@
 import squel from 'squel'
 import { checkNull } from '../../../utils/check'
-import { ConditionalExpression, Expression } from '../../expr'
+import { ConditionalExpression, Expression } from '..'
 import { IBetweenExpression, IExpression } from '../interface'
 import { parseExpr } from '../parse'
-import { Unknown } from './Unknown'
-import { Value } from './Value'
 
 /**
  * JQL class for `{left} BETWEEN {start} AND {end}`
@@ -66,13 +64,14 @@ export class BetweenExpression extends ConditionalExpression implements IBetween
   }
 
   // @override
-  public toSquel(): squel.Expression {
-    return squel.expr()
+  public toSquel(type: squel.Flavour = 'mysql', options?: any): squel.Expression {
+    const Squel = squel.useFlavour(type as any)
+    return Squel.expr()
       .and(
         `? ${this.$not ? 'NOT ' : ''}BETWEEN ? AND ?`,
-        this.left.toSquel(),
-        this.start.toSquel(),
-        this.end.toSquel(),
+        this.left.toSquel(type, options),
+        this.start.toSquel(type, options),
+        this.end.toSquel(type, options),
       )
   }
 
@@ -91,8 +90,6 @@ export class BetweenExpression extends ConditionalExpression implements IBetween
   }
 
   private exprToJson(expr: Expression): IExpression|any {
-    // if (expr instanceof Unknown) return expr.assigned ? expr.value : undefined
-    // if (expr instanceof Value) return expr.value
     return expr.toJson()
   }
 }

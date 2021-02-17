@@ -39,8 +39,9 @@ export class ColumnsExpression extends Expression implements IColumnsExpression 
   }
 
   // @override
-  public toSquel(): squel.FunctionBlock {
-    return this.columns.length > 1 ? squel.rstr(`(${this.columns.map(c => c.toString()).join(', ')})`) : this.columns[0].toSquel()
+  public toSquel(type: squel.Flavour = 'mysql', options?: any): squel.FunctionBlock {
+    const Squel = squel.useFlavour(type as any)
+    return this.columns.length > 1 ? Squel.rstr(`(${this.columns.map(c => c.toString(type, options)).join(', ')})`) : this.columns[0].toSquel(type)
   }
 
   // @override

@@ -1,5 +1,4 @@
-import squel from 'squel'
-import { JQL } from '../../jql'
+import { JQL } from '..'
 import { IConditionalExpression, IExpression } from './interface'
 
 /**
@@ -7,11 +6,6 @@ import { IConditionalExpression, IExpression } from './interface'
  */
 export abstract class Expression extends JQL implements IExpression {
   public readonly classname: string
-
-  // @override
-  get [Symbol.toStringTag](): string {
-    return this.classname
-  }
 
   // @override
   public abstract toJson(): IExpression

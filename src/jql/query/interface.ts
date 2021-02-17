@@ -1,8 +1,27 @@
-import { AxiosRequestConfig } from 'axios'
-import { Type } from '../../Type'
-import { IConditionalExpression, IExpression, IColumnExpression } from '../expr/interface'
+import { IConditionalExpression, IExpression, IColumnExpression, IValue } from '../expr/interface'
 import { IJQL, IParseable } from '../interface'
 import { ColumnExpression } from '../expr/expressions/ColumnExpression'
+import { JQL } from '..'
+import squel from 'squel'
+import { JQLError } from '../../utils/error'
+
+/**
+ * Query partition abstract class
+ */
+export abstract class QueryPartition extends JQL {
+  /**
+   * Apply partition to SELECT statement
+   * @param type [squel.Flavour]
+   * @param builder [squel.Select]
+   * @param options [any]
+   */
+  public abstract apply(type: squel.Flavour, builder: squel.Select, options?: any): squel.Select
+
+  // @override
+  public toSquel(): squel.BaseBuilder {
+    throw new JQLError('NOT_AVAILABLE')
+  }
+}
 
 /**
  * Raw JQL for SELECT query
@@ -42,11 +61,6 @@ export interface IQuery extends IJQL, IParseable {
    * LIMIT ... OFFSET ...
    */
   $limit?: ILimitOffset|number
-
-  /**
-   * Link queries with UNION
-   */
-  $union?: IQuery
 }
 
 /**
@@ -106,7 +120,7 @@ export interface IFromTable extends IJQL {
   /**
    * Table definition
    */
-  table: string|IQuery|IRemoteTable
+  table: string|IQuery
 
   /**
    * Alias table name
@@ -117,21 +131,6 @@ export interface IFromTable extends IJQL {
    * Join clauses
    */
   joinClauses?: IJoinClause[]|IJoinClause
-}
-
-/**
- * Raw JQL defining remote table through API
- */
-export interface IRemoteTable extends AxiosRequestConfig {
-  /**
-   * Result structure
-   */
-  columns: {
-    name: string,
-    type?: Type,
-    $as?: string,
-    nullable?: boolean,
-  }[]
 }
 
 /**
@@ -171,10 +170,10 @@ export interface ILimitOffset extends IJQL {
   /**
    * Limit result count
    */
-  $limit: number|IExpression
+  $limit: number|IValue
 
   /**
    * Result start from ...
    */
-  $offset?: number|IExpression
+  $offset?: number|IValue
 }

@@ -25,7 +25,6 @@ export class Query extends JQL implements IQuery {
   public $group?: GroupBy
   public $order?: OrderBy[]
   public $limit?: LimitOffset
-  public $union?: Query
 
   /**
    * @param json [Partial<IQuery>]
@@ -61,7 +60,6 @@ export class Query extends JQL implements IQuery {
     let $group: IGroupBy|string|undefined
     let $order: IOrderBy[]|IOrderBy|string|undefined
     let $limit: ILimitOffset|number|undefined
-    let $union: IQuery|undefined
     if (Array.isArray(args[0])) {
       $select = args[0]
       $from = args[1]
@@ -76,7 +74,6 @@ export class Query extends JQL implements IQuery {
       $group = json.$group
       $order = json.$order
       $limit = json.$limit
-      $union = json.$union
     }
     else if (args.length === 2) {
       $from = { database: args[0] || undefined, table: args[1] }
@@ -127,9 +124,6 @@ export class Query extends JQL implements IQuery {
       if (typeof $limit === 'number') $limit = { $limit }
       this.$limit = new LimitOffset($limit)
     }
-
-    // $union
-    if ($union) this.$union = new Query($union)
   }
 
   /**
@@ -189,35 +183,29 @@ export class Query extends JQL implements IQuery {
     if (this.$where) this.$where.validate(availableTables)
     if (this.$group) this.$group.validate(availableTables)
     if (this.$order) for (const order of this.$order) order.validate(availableTables)
-    if (this.$limit) this.$limit.validate(availableTables)
-    if (this.$union) this.$union.validate()
+    if (this.$limit) this.$limit.validate()
   }
 
   // @override
-  public toSquel(rawNesting?: boolean): squel.Select {
-    let builder = squel.select({ rawNesting })
-    if (this.$distinct) builder.distinct()
-    if (this.$from) for (const table of this.$from) builder = table.apply(builder)
+  public toSquel(type: squel.Flavour = 'mysql', options?: any): squel.Select {
+    const Squel = squel.useFlavour(type as any)
+    const { rawNesting } = options || {}
+    let builder: squel.Select = Squel.select({ rawNesting })
+    if (this.$distinct) builder = builder.distinct()
+    if (this.$from) for (const fromTable of this.$from) builder = fromTable.apply(type, builder, options)
     if (!this.isSimpleWildcard) {
-      for (const { expression, $as, partitionBy } of this.$select) {
-        if (!partitionBy.length) {
-          builder = builder.field(expression.toSquel(), $as)
-        }
-        else {
-          builder = builder.field(`${expression.toString()} OVER (PARTITION BY ${partitionBy.map(e => e.toString()).join(', ')})`, $as)
-        }
+      for (const resultColumn of this.$select) {
+        builder = resultColumn.apply(type, builder, options)
       }
     }
-    if (this.$where) builder = builder.where(this.$where.toSquel(false) as squel.Expression)
-    if (this.$group) builder = this.$group.apply(builder)
+    if (this.$where) builder = builder.where(this.$where.toSquel(type, { parentheses: false }) as squel.Expression)
+    if (this.$group) builder = this.$group.apply(type, builder, options)
     if (this.$order) {
-      for (const { expression, order } of this.$order) {
-        const { text, values } = expression.toSquel().toParam()
-        builder = builder.order(text, order === 'ASC', ...values)
+      for (const orderBy of this.$order) {
+        builder = orderBy.apply(type, builder, options)
       }
     }
-    if (this.$limit) builder = squel.select({}, [...builder.blocks, new squel.cls.StringBlock({}, this.$limit.toString())]) as squel.Select
-    if (this.$union) builder = builder.union(this.$union.toSquel(true))
+    if (this.$limit) builder = this.$limit.apply(type, builder)
     return builder
   }
 
@@ -231,7 +219,6 @@ export class Query extends JQL implements IQuery {
     if (this.$group) result.$group = this.$group.toJson()
     if (this.$order) result.$order = this.$order.map(orderBy => orderBy.toJson())
     if (this.$limit) result.$limit = this.$limit.toJson()
-    if (this.$union) result.$union = this.$union.toJson()
     return result
   }
 }

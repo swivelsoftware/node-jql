@@ -2,143 +2,12 @@
 
 [![npm version](https://badge.fury.io/js/node-jql.svg)](https://badge.fury.io/js/node-jql)
 
-This library defines only the JSON structure of SQL statements for the in-memory SQL database [node-jql-core](https://github.com/kennysng/node-jql-core). 
-
-If you are looking for the database core, please visit [node-jql-core](https://github.com/kennysng/node-jql-core). 
-
 # Documentation
 
 ## Type
 
 ```js
 type Type = 'string'|'number'|'boolean'|'object'|'Date'|'Array'|'any'
-```
-
-## ICreateDatabaseJQL
-
-```js
-new CreateDatabaseJQL(ICreateDatabaseJQL)
-new CreateDatabaseJQL(string, boolean?, string?)
-
-{
-  "name": string,
-  "$ifNotExists": boolean|undefined,
-  "engine": string|undefined
-}
-```
-
-## IDropDatabaseJQL
-
-```js
-new DropDatabaseJQL(IDropDatabaseJQL)
-new DropDatabaseJQL(string, boolean?)
-
-{
-  "name": string,
-  "$ifExists": boolean|undefined
-}
-```
-
-## ICreateTableJQL
-
-[IQuery](#IQuery)  
-[Type](#Type)
-
-```js
-new CreateTableJQL(ICreateTableJQL)  
-new CreateTableJQL([string, string]|string, IColumn[], boolean|undefined, string[]|string|undefined, ...string[])
-new CreateTableJQL(true, [string, string]|string, IColumn[], boolean|undefined, string[]|string|undefined, ...string[])
-
-{
-  "$temporary": boolean|undefined,
-  "database": boolean|undefined,
-  "name": string,
-  "$ifNotExists": boolean|undefined,
-  "columns": IColumn[],
-  "constraints": string[]|undefined,
-  "options": string[]|undefined,
-  "$as": IQuery|undefined
-}
-
-// IColumn
-new Column(IColumn)
-new Column(string, Type, boolean?, ...string[])
-
-{
-  "name": string,
-  "type": Type,
-  "nullable": boolean|undefined,
-  "defValue": any|undefined,
-  "options": string[]|string|undefined
-}
-```
-
-## IInsertJQL
-
-[IQuery](#IQuery)
-
-``` js
-new InsertJQL(IInsertJQL)
-new InsertJQL([string, string]|string, IQuery, string[])
-new InsertJQL([string, string]|string, ...any[])
-
-{
-  "database": string|undefined,
-  "name": string,
-  "values": any[]|undefined,
-  "columns": string[]|undefined,
-  "query": IQuery|undefined
-}
-```
-
-## IDropTableJQL
-
-```js
-new DropTableJQL(IDropTableJQL)
-new DropTableJQL(string, boolean?)
-new DropTableJQL(true, string, boolean?)
-
-{
-  "$temporary": boolean|undefined,
-  "name": string,
-  "$ifExists": boolean|undefined
-}
-```
-
-## ICreateFunctionJQL
-
-[Type](#Type)
-
-``` js
-new CreateFunctionJQL(ICreateFunctionJQL)
-new CreateFunctionJQL(string, string|Function, Type?, ...Type)
-new CreateFunctionJQL(true, string, string|Function, Type?, ...Type)
-
-{
-  "aggregate": boolean|undefined,
-  "name": string,
-  "fn": string|Function,
-  "parameters": Type[]|undefined,
-  "type": Type|undefined
-}
-```
-
-## IDropFunctionJQL
-
-```js
-new DropFunctionJQL(IDropFunctionJQL)
-new DropFunctionJQL(string, boolean?)
-
-{
-  "name": string,
-  "$ifExists": boolean|undefined
-}
-```
-
-## PredictJQL
-
-``` js
-new PredictJQL(...IJQL[])
 ```
 
 ## IQuery
@@ -288,12 +157,12 @@ new OrderBy(IExpression|string, 'ASC'|'DESC'?)
 
 ```js
 new LimitOffset(ILimitOffset)
-new LimitOffset(IExpression|number, IExpression|number?)
+new LimitOffset(IValue|number, IValue|number?)
 
 // LIMIT [$limit] OFFSET [$offset]
 {
-  "$limit": IExpression|number,
-  "$offset": IExpression|number|undefined,
+  "$limit": IValue|number,
+  "$offset": IValue|number|undefined,
 }
 ```
 

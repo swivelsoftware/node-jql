@@ -59,11 +59,12 @@ export class MathExpression extends Expression implements IMathExpression {
   }
 
   // @override
-  public toSquel(): squel.FunctionBlock {
-    return squel.rstr(
+  public toSquel(type: squel.Flavour = 'mysql', options?: any): squel.FunctionBlock {
+    const Squel = squel.useFlavour(type as any)
+    return Squel.rstr(
       `(? ${this.operator} ?)`,
-      this.left.toSquel(),
-      this.right.toSquel(),
+      this.left.toSquel(type, options),
+      this.right.toSquel(type, options),
     )
   }
 
