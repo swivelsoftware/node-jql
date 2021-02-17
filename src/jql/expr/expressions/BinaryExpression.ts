@@ -4,8 +4,6 @@ import { checkNull } from '../../../utils/check'
 import { JQLError } from '../../../utils/error'
 import { BinaryOperator, IBinaryExpression, IExpression } from '../interface'
 import { parseExpr } from '../parse'
-import { Unknown } from './Unknown'
-import { Value } from './Value'
 
 /**
  * JQL class for `{left} {operator} {right}`
@@ -68,12 +66,13 @@ export class BinaryExpression extends ConditionalExpression implements IBinaryEx
   }
 
   // @override
-  public toSquel(): squel.BaseBuilder {
-    return squel.expr()
+  public toSquel(type: squel.Flavour = 'mysql', options?: any): squel.BaseBuilder {
+    const Squel = squel.useFlavour(type as any)
+    return Squel.expr()
       .and(
         this.$not ? `? NOT ${this.operator} ?` : `? ${this.operator} ?`,
-        this.left.toSquel(),
-        checkNull(this.right) ? null : this.right.toSquel(),
+        this.left.toSquel(type, options),
+        checkNull(this.right) ? null : this.right.toSquel(type, options),
       )
   }
 

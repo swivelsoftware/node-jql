@@ -40,11 +40,12 @@ export class IsNullExpression extends BinaryExpression implements IIsNullExpress
   }
 
   // @override
-  public toSquel(): squel.Expression {
-    return squel.expr()
+  public toSquel(type: squel.Flavour = 'mysql', options?: any): squel.Expression {
+    const Squel = squel.useFlavour(type as any)
+    return Squel.expr()
       .and(
         `? IS ${this.$not ? 'NOT ' : ''}NULL`,
-        this.left.toSquel(),
+        this.left.toSquel(type, options),
       )
   }
 }

@@ -1,16 +1,15 @@
 import squel from 'squel'
-import { JQL } from '..'
-import { Expression } from '../expr'
-import { IExpression } from '../expr/interface'
+import { Value } from '../expr/expressions/Value'
+import { IValue } from '../expr/interface'
 import { parseExpr } from '../expr/parse'
-import { ILimitOffset } from './interface'
+import { ILimitOffset, QueryPartition } from './interface'
 
 /**
  * JQL class defining selected columns in query
  */
-export class LimitOffset extends JQL implements ILimitOffset {
-  public $limit: Expression
-  public $offset?: Expression
+export class LimitOffset extends QueryPartition implements ILimitOffset {
+  public $limit: Value
+  public $offset?: Value
 
   /**
    * @param json [IResultColumn]
@@ -21,13 +20,13 @@ export class LimitOffset extends JQL implements ILimitOffset {
    * @param expression [expression]
    * @param $as [string] optional
    */
-  constructor($limit: number|IExpression, $offset?: number|IExpression)
+  constructor($limit: number|IValue, $offset?: number|IValue)
 
   constructor(...args: any[]) {
     super()
 
     // parse args
-    let $limit: number|IExpression, $offset: number|IExpression|undefined
+    let $limit: number|IValue, $offset: number|IValue|undefined
     if (typeof args[0] !== 'number' && !('classname' in args[0])) {
       const json = args[0] as ILimitOffset
       $limit = json.$limit
@@ -40,29 +39,18 @@ export class LimitOffset extends JQL implements ILimitOffset {
 
     // set args
     this.$limit = parseExpr($limit)
-    if ($offset) this.$offset = parseExpr($offset)
+    if ($offset) this.$offset = parseExpr($offset) as Value
   }
 
   // @override
-  get [Symbol.toStringTag](): string {
-    return LimitOffset.name
+  public apply(type: squel.Flavour, builder: squel.Select): squel.Select {
+    builder = builder.limit(this.$limit.value)
+    if (this.$offset) builder = builder.offset(this.$offset.value)
+    return builder
   }
 
   // @override
-  public validate(availableTables: string[]): void {
-    this.$limit.validate(availableTables)
-    if (this.$offset) this.$offset.validate(availableTables)
-  }
-
-  // @override
-  public toSquel(): squel.FunctionBlock {
-    let limitBuilder = squel.select({}, [new squel.cls.GetFieldBlock()]) as squel.Select
-    limitBuilder = limitBuilder.field(this.$limit.toSquel())
-    if (!this.$offset) return squel.rstr(`LIMIT ?`, limitBuilder)
-    let offsetBuilder = squel.select({}, [new squel.cls.GetFieldBlock()]) as squel.Select
-    offsetBuilder = offsetBuilder.field(this.$offset.toSquel())
-    return squel.rstr(`LIMIT ? OFFSET ?`, limitBuilder, offsetBuilder)
-  }
+  public validate(): void {}
 
   // @override
   public toJson(): ILimitOffset {

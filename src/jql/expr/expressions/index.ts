@@ -3,6 +3,7 @@ import { BetweenExpression } from './BetweenExpression'
 import { BinaryExpression } from './BinaryExpression'
 import { CaseExpression } from './CaseExpression'
 import { ColumnExpression } from './ColumnExpression'
+import { ColumnsExpression } from './ColumnsExpression'
 import { ExistsExpression } from './ExistsExpression'
 import { FunctionExpression } from './FunctionExpression'
 import { InExpression } from './InExpression'
@@ -15,6 +16,7 @@ import { QueryExpression } from './QueryExpression'
 import { RegexpExpression } from './RegexpExpression'
 import { Unknown } from './Unknown'
 import { Value } from './Value'
+import { Variable } from './Variable'
 
 export const expressions = {
   AndExpressions,
@@ -22,6 +24,7 @@ export const expressions = {
   BinaryExpression,
   CaseExpression,
   ColumnExpression,
+  ColumnsExpression,
   ExistsExpression,
   FunctionExpression,
   InExpression,
@@ -34,4 +37,5 @@ export const expressions = {
   RegexpExpression,
   Unknown,
   Value,
+  Variable,
 }

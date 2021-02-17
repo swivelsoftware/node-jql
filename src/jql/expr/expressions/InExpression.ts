@@ -1,9 +1,10 @@
 import squel from 'squel'
-import { Query } from '../../query'
 import { IQuery } from '../../query/interface'
-import { BinaryOperator, IInExpression, IUnknown, IValue } from '../interface'
+import { BinaryOperator, ICaseExpression, IInExpression, IQueryExpression, IUnknown, IValue } from '../interface'
 import { parseExpr } from '../parse'
 import { BinaryExpression } from './BinaryExpression'
+import { CaseExpression } from './CaseExpression'
+import { QueryExpression } from './QueryExpression'
 import { Unknown } from './Unknown'
 import { Value } from './Value'
 
@@ -13,7 +14,7 @@ import { Value } from './Value'
 export class InExpression extends BinaryExpression implements IInExpression {
   public readonly classname = InExpression.name
   public readonly operator: BinaryOperator = 'IN'
-  public right: Unknown|Value|Query
+  public right: Unknown|Value|QueryExpression|CaseExpression
 
   /**
    * @param json [Partial<IInExpression>]
@@ -23,38 +24,42 @@ export class InExpression extends BinaryExpression implements IInExpression {
   /**
    * @param left [any]
    * @param $not [boolean]
-   * @param right [IUnknown|IValue|Array|IQuery] optional
+   * @param right [IUnknown|IValue|Array|IQuery|IQueryExpression|ICaseExpression] optional
    */
-  constructor(left: any, $not: boolean, right?: IUnknown|IValue|any[]|IQuery)
+  constructor(left: any, $not: boolean, right?: IUnknown|IValue|any[]|IQuery|IQueryExpression|ICaseExpression)
 
   constructor(...args: any[]) {
     super(args.length > 1 ? { left: args[0], operator: 'IN', right: args[2] } : { ...args[0], operator: 'IN' }, true)
 
     // parse args
-    let $not = false, right: IUnknown|IValue|any[]|IQuery|undefined
+    let $not = false, right: IUnknown|IValue|any[]|IQueryExpression|ICaseExpression|undefined
     if (args.length === 1) {
       const json = args[0] as IInExpression
       $not = json.$not || false
-      right = json.right
+      right = json.right && 'classname' in json.right && json.right.classname === 'Query'
+        ? new QueryExpression(json.right)
+        : json.right
     }
     else {
       $not = args[1]
-      right = args[2]
+      right = args[2] && args[2].classname === 'Query'
+      ? new QueryExpression(args[2])
+      : args[2]
     }
 
     // set args
     this.$not = $not
-    if (right && !Array.isArray(right) && right.classname === 'Query') this.right = new Query(right as IQuery)
-    if (!this.right) this.right = parseExpr<Unknown|Value>(right)
+    this.right = parseExpr(right)
   }
 
   // @override
-  public toSquel(): squel.Expression {
-    return squel.expr()
+  public toSquel(type: squel.Flavour = 'mysql', options?: any): squel.Expression {
+    const Squel = squel.useFlavour(type as any)
+    return Squel.expr()
       .and(
         `? ${this.$not ? 'NOT ' : ''}IN ?`,
-        this.left.toSquel(),
-        this.right.toSquel(),
+        this.left.toSquel(type, options),
+        this.right.toSquel(type, options),
       )
   }
 }

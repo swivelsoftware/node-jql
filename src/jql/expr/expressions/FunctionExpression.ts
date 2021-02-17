@@ -65,10 +65,11 @@ export class FunctionExpression extends Expression implements IFunctionExpressio
   }
 
   // @override
-  public toSquel(): squel.FunctionBlock {
-    return squel.rstr(
+  public toSquel(type: squel.Flavour = 'mysql', options?: any): squel.FunctionBlock {
+    const Squel = squel.useFlavour(type as any)
+    return Squel.rstr(
       `${this.name.toLocaleUpperCase()}(${this.parameters.map(() => '?').join(', ')})`,
-      ...this.parameters.map(parameter => parameter.toSquel()),
+      ...this.parameters.map(parameter => parameter.toSquel(type, options)),
     )
   }
 

@@ -1,8 +1,10 @@
 import squel from 'squel'
 import { ConditionalExpression } from '..'
-import { Query } from '../../query'
 import { IQuery } from '../../query/interface'
-import { IExistsExpression } from '../interface'
+import { ICaseExpression, IExistsExpression, IQueryExpression } from '../interface'
+import { parseExpr } from '../parse'
+import { CaseExpression } from './CaseExpression'
+import { QueryExpression } from './QueryExpression'
 
 /**
  * JQL class for `EXISTS {query}`
@@ -10,7 +12,7 @@ import { IExistsExpression } from '../interface'
 export class ExistsExpression extends ConditionalExpression implements IExistsExpression {
   public readonly classname = ExistsExpression.name
   public $not?: boolean
-  public query: Query
+  public query: QueryExpression|CaseExpression
 
   /**
    * @param json [Partial<IExistsExpression>]
@@ -18,23 +20,23 @@ export class ExistsExpression extends ConditionalExpression implements IExistsEx
   constructor(json: Partial<IExistsExpression>)
 
   /**
-   * @param json [IQuery]
+   * @param json [IQuery|IQueryExpression|ICaseExpression]
    * @param $not [boolean] optional
    */
-  constructor(query: IQuery, $not?: boolean)
+  constructor(query: IQuery|IQueryExpression|ICaseExpression, $not?: boolean)
 
   constructor(...args: any[]) {
     super()
 
     // parse args
-    let query: IQuery, $not = false
-    if (args[0].classname !== 'Query' && !('$select' in args[0] || '$from' in args[0])) {
+    let query: IQueryExpression|ICaseExpression, $not = false
+    if (['Query', 'QueryExpression', 'CaseExpression'].indexOf(args[0].classname) === -1 && 'query' in args[0]) {
       const json = args[0] as IExistsExpression
       $not = json.$not || false
-      query = json.query
+      query = json.query.classname === 'Query' ? new QueryExpression(json.query) : json.query as IQueryExpression|ICaseExpression
     }
     else {
-      query = args[0]
+      query = args[0].classname === 'Query' ? new QueryExpression(args[0]) : args[0] as IQueryExpression|ICaseExpression
       $not = args[1]
     }
 
@@ -42,7 +44,7 @@ export class ExistsExpression extends ConditionalExpression implements IExistsEx
     if (!query) throw new SyntaxError('Missing query')
 
     // set args
-    this.query = new Query(query)
+    this.query = parseExpr(query)
     this.$not = $not
   }
 
@@ -52,11 +54,12 @@ export class ExistsExpression extends ConditionalExpression implements IExistsEx
   }
 
   // @override
-  public toSquel(): squel.Expression {
-    return squel.expr()
+  public toSquel(type: squel.Flavour = 'mysql', options?: any): squel.Expression {
+    const Squel = squel.useFlavour(type as any)
+    return Squel.expr()
       .and(
         `${this.$not ? 'NOT ' : ''}EXISTS ?`,
-        this.query.toSquel(),
+        this.query.toSquel(type, options),
       )
   }
 

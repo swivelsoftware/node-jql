@@ -31,9 +31,4 @@ export class JQLError extends Error {
     this.name = name
     if (error) this.stack = `${this.stack}\n====================\nThrown by ${error.stack}`
   }
-
-  // @override
-  get [Symbol.toStringTag](): string {
-    return this.name
-  }
 }

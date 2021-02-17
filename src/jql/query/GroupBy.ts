@@ -1,16 +1,15 @@
 import squel from 'squel'
-import { JQL } from '..'
 import { ConditionalExpression, Expression } from '../expr'
 import { AndExpressions } from '../expr/expressions/AndExpressions'
 import { ColumnExpression } from '../expr/expressions/ColumnExpression'
 import { IConditionalExpression, IExpression } from '../expr/interface'
 import { parseExpr } from '../expr/parse'
-import { IGroupBy } from './interface'
+import { IGroupBy, QueryPartition } from './interface'
 
 /**
  * JQL class for `GROUP BY ... HAVING ...`
  */
-export class GroupBy extends JQL implements IGroupBy {
+export class GroupBy extends QueryPartition implements IGroupBy {
   public expressions: Expression[]
   public $having?: ConditionalExpression
 
@@ -57,17 +56,9 @@ export class GroupBy extends JQL implements IGroupBy {
   }
 
   // @override
-  get [Symbol.toStringTag](): string {
-    return GroupBy.name
-  }
-
-  /**
-   * Apply group statement to query builder
-   * @param builder [squel.Select]
-   */
-  public apply(builder: squel.Select): squel.Select {
-    for (const expression of this.expressions) builder = builder.group(expression.toString())
-    if (this.$having) builder = builder.having(this.$having.toSquel() as squel.Expression)
+  public apply(type: squel.Flavour, builder: squel.Select, options?: any): squel.Select {
+    for (const expression of this.expressions) builder = builder.group(expression.toString(type, options))
+    if (this.$having) builder = builder.having(this.$having.toSquel(type, options) as squel.Expression)
     return builder
   }
 
@@ -75,11 +66,6 @@ export class GroupBy extends JQL implements IGroupBy {
   public validate(availableTables: string[]): void {
     for (const expression of this.expressions) expression.validate(availableTables)
     if (this.$having) this.$having.validate(availableTables)
-  }
-
-  // @override
-  public toSquel(): squel.QueryBuilder {
-    return this.apply(squel.select({}, [new squel.cls.GroupByBlock(), new squel.cls.HavingBlock()]) as squel.Select)
   }
 
   // @override

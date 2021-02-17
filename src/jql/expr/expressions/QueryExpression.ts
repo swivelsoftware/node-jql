@@ -44,8 +44,9 @@ export class QueryExpression extends Expression implements IQueryExpression {
   }
 
   // @override
-  public toSquel(): squel.FunctionBlock {
-    return squel.rstr('?', this.query.toSquel())
+  public toSquel(type: squel.Flavour = 'mysql', options?: any): squel.FunctionBlock {
+    const Squel = squel.useFlavour(type as any)
+    return Squel.rstr('(?)', this.query.toSquel(type, options))
   }
 
   // @override
