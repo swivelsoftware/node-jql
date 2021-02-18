@@ -1,10 +1,10 @@
 import './jql/expr/expressions'
 
 // utils
-export { checkNull, equals } from './utils/check'
+export { checkNull } from './utils/check'
 export { JQLError } from './utils/error'
 // type
-export { Type, defaults, type, normalize, denormalize } from './type'
+export { Type, type } from './type'
 // jql
 export { IJQL } from './jql/interface'
 export { JQL } from './jql'
