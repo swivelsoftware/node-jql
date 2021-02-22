@@ -12,10 +12,11 @@ export abstract class QueryPartition extends JQL {
   /**
    * Apply partition to SELECT statement
    * @param type [squel.Flavour]
+   * @param query [IQuery]
    * @param builder [squel.Select]
    * @param options [any]
    */
-  public abstract apply(type: squel.Flavour, builder: squel.Select, options?: any): squel.Select
+  public abstract apply(type: squel.Flavour, query: IQuery, builder: squel.Select, options?: any): squel.Select
 
   // @override
   public toSquel(): squel.BaseBuilder {

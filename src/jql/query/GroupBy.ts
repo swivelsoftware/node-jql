@@ -4,7 +4,7 @@ import { AndExpressions } from '../expr/expressions/AndExpressions'
 import { ColumnExpression } from '../expr/expressions/ColumnExpression'
 import { IConditionalExpression, IExpression } from '../expr/interface'
 import { parseExpr } from '../expr/parse'
-import { IGroupBy, QueryPartition } from './interface'
+import { IGroupBy, IQuery, QueryPartition } from './interface'
 
 /**
  * JQL class for `GROUP BY ... HAVING ...`
@@ -56,8 +56,14 @@ export class GroupBy extends QueryPartition implements IGroupBy {
   }
 
   // @override
-  public apply(type: squel.Flavour, builder: squel.Select, options?: any): squel.Select {
-    for (const expression of this.expressions) builder = builder.group(expression.toString(type, options))
+  public apply(type: squel.Flavour, query: IQuery, builder: squel.Select, options?: any): squel.Select {
+    for (let expression of this.expressions) {
+      if (type !== 'mysql' && expression instanceof ColumnExpression && !expression.table && query.$select && Array.isArray(query.$select)) {
+        const target = query.$select.find(r => r.$as === (expression as ColumnExpression).name)
+        if (target) expression = parseExpr(target.expression)
+      }
+      builder = builder.group(expression.toString(type, options))
+    }
     if (this.$having) builder = builder.having(this.$having.toSquel(type, options) as squel.Expression)
     return builder
   }

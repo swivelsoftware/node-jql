@@ -3,7 +3,7 @@ import { Expression } from '../expr'
 import { ColumnExpression } from '../expr/expressions/ColumnExpression'
 import { IExpression } from '../expr/interface'
 import { parseExpr } from '../expr/parse'
-import { IOrderBy, QueryPartition } from './interface'
+import { IOrderBy, IQuery, QueryPartition } from './interface'
 
 /**
  * JQL class for ordering terms in query
@@ -50,7 +50,7 @@ export class OrderBy extends QueryPartition implements IOrderBy {
 
 
   // @override
-  public apply(type: squel.Flavour, builder: squel.Select, options?: any): squel.Select {
+  public apply(type: squel.Flavour, query: IQuery, builder: squel.Select, options?: any): squel.Select {
     const { text, values } = this.expression.toSquel(type, options).toParam()
     return builder.order(text, this.order === 'ASC', ...values)
   }

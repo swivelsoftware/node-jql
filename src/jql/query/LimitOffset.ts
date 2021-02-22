@@ -2,7 +2,7 @@ import squel from 'squel'
 import { Value } from '../expr/expressions/Value'
 import { IValue } from '../expr/interface'
 import { parseExpr } from '../expr/parse'
-import { ILimitOffset, QueryPartition } from './interface'
+import { ILimitOffset, IQuery, QueryPartition } from './interface'
 
 /**
  * JQL class defining selected columns in query
@@ -43,7 +43,7 @@ export class LimitOffset extends QueryPartition implements ILimitOffset {
   }
 
   // @override
-  public apply(type: squel.Flavour, builder: squel.Select): squel.Select {
+  public apply(type: squel.Flavour, query: IQuery, builder: squel.Select): squel.Select {
     builder = builder.limit(this.$limit.value)
     if (this.$offset) builder = builder.offset(this.$offset.value)
     return builder

@@ -70,7 +70,7 @@ export class JoinClause extends QueryPartition implements IJoinClause {
   }
 
   // @override
-  public apply(type: squel.Flavour, builder: squel.Select, options?: any): squel.Select {
+  public apply(type: squel.Flavour, query: IQuery, builder: squel.Select, options?: any): squel.Select {
     const { database, table, $as } = this.table
     if (typeof table === 'string') {
       return builder[this.joinMethod](`${database ? `${quote(type, database)}.` : ''}${quote(type, table)}`, $as, this.$on && this.$on.toSquel(type, options))
@@ -165,14 +165,14 @@ export class FromTable extends QueryPartition implements IFromTable {
   }
 
   // @override
-  public apply(type: squel.Flavour, builder: squel.Select, options?: any): squel.Select {
+  public apply(type: squel.Flavour, query: IQuery, builder: squel.Select, options?: any): squel.Select {
     if (typeof this.table === 'string') {
       builder = builder.from(`${this.database ? `${quote(type, this.database)}.` : ''}${quote(type, this.table)}`, this.$as)
     }
     else {
       builder = builder.from(this.table.toSquel(type, options), this.$as)
     }
-    for (const joinClause of this.joinClauses) joinClause.apply(type, builder, options)
+    for (const joinClause of this.joinClauses) joinClause.apply(type, query, builder, options)
     return builder
   }
 

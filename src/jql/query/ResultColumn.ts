@@ -3,7 +3,7 @@ import { Expression } from '../expr'
 import { ColumnExpression } from '../expr/expressions/ColumnExpression'
 import { IExpression, IColumnExpression } from '../expr/interface'
 import { parseExpr } from '../expr/parse'
-import { IResultColumn, QueryPartition } from './interface'
+import { IQuery, IResultColumn, QueryPartition } from './interface'
 
 /**
  * JQL class defining selected columns in query
@@ -48,13 +48,8 @@ export class ResultColumn extends QueryPartition implements IResultColumn {
     this.partitionBy = partitionBy.map(e => new ColumnExpression(e))
   }
 
-  /**
-   * Apply result column to query builder
-   * @param type [squel.Flavour]
-   * @param builder [squel.Select]
-   * @param options [any]
-   */
-  public apply(type: squel.Flavour, builder: squel.Select, options?: any): squel.Select {
+  // @override
+  public apply(type: squel.Flavour, query: IQuery, builder: squel.Select, options?: any): squel.Select {
     if (!this.partitionBy.length) {
       return builder.field(this.expression.toSquel(type, options), this.$as)
     }

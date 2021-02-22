@@ -191,20 +191,20 @@ export class Query extends JQL implements IQuery {
     const squel_ = squel.useFlavour(type as any)
     let builder: squel.Select = squel_.select()
     if (this.$distinct) builder = builder.distinct()
-    if (this.$from) for (const fromTable of this.$from) builder = fromTable.apply(type, builder, options)
+    if (this.$from) for (const fromTable of this.$from) builder = fromTable.apply(type, this, builder, options)
     if (!this.isSimpleWildcard) {
       for (const resultColumn of this.$select) {
-        builder = resultColumn.apply(type, builder, options)
+        builder = resultColumn.apply(type, this, builder, options)
       }
     }
     if (this.$where) builder = builder.where(this.$where.toSquel(type, { parentheses: false }) as squel.Expression)
-    if (this.$group) builder = this.$group.apply(type, builder, options)
+    if (this.$group) builder = this.$group.apply(type, this, builder, options)
     if (this.$order) {
       for (const orderBy of this.$order) {
-        builder = orderBy.apply(type, builder, options)
+        builder = orderBy.apply(type, this, builder, options)
       }
     }
-    if (this.$limit) builder = this.$limit.apply(type, builder)
+    if (this.$limit) builder = this.$limit.apply(type, this, builder)
     return builder
   }
 
