@@ -2,6 +2,7 @@ import squel from 'squel'
 import { Expression } from '..'
 import { IFunctionExpression } from '../interface'
 import { parseExpr } from '../parse'
+import { CaseExpression } from './CaseExpression'
 import { ColumnExpression } from './ColumnExpression'
 import { ParameterExpression } from './ParameterExpression'
 
@@ -65,12 +66,34 @@ export class FunctionExpression extends Expression implements IFunctionExpressio
   }
 
   // @override
-  public toSquel(type: squel.Flavour = 'mysql', options?: any): squel.FunctionBlock {
+  public toSquel(type: squel.Flavour = 'mysql', options?: any): squel.Expression | squel.FunctionBlock {
     const squel_ = squel.useFlavour(type as any)
-    return squel_.rstr(
-      `${this.name.toLocaleUpperCase()}(${this.parameters.map(() => '?').join(', ')})`,
-      ...this.parameters.map(parameter => parameter.toSquel(type, options)),
-    )
+    let name = this.name.toLocaleUpperCase()
+    switch (type) {
+      case 'mssql': {
+        switch (name) {
+          case 'IF': {
+            return new CaseExpression(
+              [{
+                $when: this.parameters[0].expression,
+                $then: this.parameters[1].expression,
+              }],
+              this.parameters[2] && this.parameters[2].expression
+            ).toSquel(type, options)
+          }
+          case 'IFNULL': {
+            name = 'ISNULL'
+          }
+        }
+      }
+      case 'mysql':
+      default: {
+        return squel_.rstr(
+          `${name}(${this.parameters.map(() => '?').join(', ')})`,
+          ...this.parameters.map(parameter => parameter.toSquel(type, options)),
+        )
+      }
+    }
   }
 
   // @override
