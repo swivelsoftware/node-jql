@@ -84,6 +84,9 @@ export class FunctionExpression extends Expression implements IFunctionExpressio
           case 'IFNULL': {
             name = 'ISNULL'
           }
+          case 'ANY_VALUE': {
+            name = 'FIRST_VALUE'
+          }
         }
       }
       case 'mysql':
