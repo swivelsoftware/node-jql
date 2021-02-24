@@ -81,11 +81,18 @@ export class FunctionExpression extends Expression implements IFunctionExpressio
               this.parameters[2] && this.parameters[2].expression
             ).toSquel(type, options)
           }
-          case 'IFNULL': {
-            name = 'ISNULL'
-          }
+          case 'IFNULL':
           case 'ANY_VALUE': {
-            name = 'MIN'
+            switch (name) {
+              case 'IFNULL': {
+                name = 'ISNULL'
+                break
+              }
+              case 'ANY_VALUE': {
+                name = 'MIN'
+                break
+              }
+            }
           }
         }
       }
