@@ -85,7 +85,7 @@ export class FunctionExpression extends Expression implements IFunctionExpressio
             name = 'ISNULL'
           }
           case 'ANY_VALUE': {
-            name = 'MAX'
+            name = 'MIN'
           }
         }
       }
