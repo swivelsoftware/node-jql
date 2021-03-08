@@ -4,7 +4,7 @@ import './jql/expr/expressions'
 export { checkNull } from './utils/check'
 export { JQLError } from './utils/error'
 // type
-export { Type, type } from './type'
+export { Type, type } from './Type'
 // jql
 export { IJQL } from './jql/interface'
 export { JQL } from './jql'

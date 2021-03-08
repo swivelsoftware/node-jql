@@ -1,5 +1,5 @@
 import squel from 'squel'
-import { Type } from '../../../type'
+import { Type } from '../../../Type'
 import { checkNull } from '../../../utils/check'
 import { Expression } from '..'
 import { IUnknown, IValue } from '../interface'
