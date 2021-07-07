@@ -164,10 +164,21 @@ export class FromTable extends QueryPartition implements IFromTable {
     return this.joinClauses.length > 0
   }
 
+  quoteDatabase(type: squel.Flavour, value: string): string {
+    switch (type) {
+      case 'mssql':
+        if (value.indexOf('.') === -1) value += '.dbo'
+        const pcs = value.split('.')
+        return `${quote(type, pcs[0])}.${quote(type, pcs[1])}`
+      default:
+        return quote(type, value)
+    }
+  }
+
   // @override
   public apply(type: squel.Flavour, query: IQuery, builder: squel.Select, options?: any): squel.Select {
     if (typeof this.table === 'string') {
-      builder = builder.from(`${this.database ? `${quote(type, this.database)}.` : ''}${quote(type, this.table)}`, this.$as)
+      builder = builder.from(`${this.database ? `${this.quoteDatabase(type, this.database)}.` : ''}${quote(type, this.table)}`, this.$as)
     }
     else {
       builder = builder.from(this.table.toSquel(type, options), this.$as)
