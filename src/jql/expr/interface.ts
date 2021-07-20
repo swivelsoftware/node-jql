@@ -175,6 +175,11 @@ export interface IFunctionExpression extends IExpression {
   name: string
 
   /**
+   * User-defined function
+   */
+  userDefined: boolean
+
+  /**
    * Parameters
    */
   parameters?: any[]|any

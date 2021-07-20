@@ -12,6 +12,7 @@ import { ParameterExpression } from './ParameterExpression'
 export class FunctionExpression extends Expression implements IFunctionExpression {
   public readonly classname = FunctionExpression.name
   public name: string
+  public userDefined: boolean = false
   public parameters: ParameterExpression[]
 
   /**
@@ -29,23 +30,25 @@ export class FunctionExpression extends Expression implements IFunctionExpressio
     super()
 
     // parse args
-    let name: string, parameters: any[]
+    let name: string, userDefined = false, parameters: any[]
     if (typeof args[0] === 'object') {
       const json = args[0] as IFunctionExpression
       name = json.name
+      userDefined = json.userDefined
       json.parameters = json.parameters || []
       parameters = Array.isArray(json.parameters) ? json.parameters : [json.parameters]
     }
     else {
       name = args[0]
-      parameters = args.slice(1)
+      if (typeof args[1] === 'boolean') userDefined = args[1]
+      parameters = args.slice(typeof args[1] === 'boolean' ? 2 : 1)
     }
 
     // check args
     if (!name) throw new SyntaxError('Missing function name')
 
     // set args
-    this.name = name.toLocaleUpperCase()
+    this.name = name.toLocaleLowerCase()
     this.parameters = parameters.map(parameter => {
       let expression = parseExpr(parameter)
       if (!(expression instanceof ParameterExpression)) expression = new ParameterExpression({ expression })
@@ -57,7 +60,7 @@ export class FunctionExpression extends Expression implements IFunctionExpressio
    * Whether it is a simple count function COUNT(*)
    */
   get isSimpleCount(): boolean {
-    return this.name === 'COUNT' && !this.parameters[0].prefix && this.parameters[0].expression instanceof ColumnExpression && !this.parameters[0].expression.table && this.parameters[0].expression.isWildcard
+    return this.name === 'count' && !this.parameters[0].prefix && this.parameters[0].expression instanceof ColumnExpression && !this.parameters[0].expression.table && this.parameters[0].expression.isWildcard
   }
 
   // @override
@@ -72,7 +75,7 @@ export class FunctionExpression extends Expression implements IFunctionExpressio
     switch (type) {
       case 'mssql': {
         switch (name) {
-          case 'IF': {
+          case 'if': {
             return new CaseExpression(
               [{
                 $when: this.parameters[0].expression,
@@ -81,25 +84,31 @@ export class FunctionExpression extends Expression implements IFunctionExpressio
               this.parameters[2] && this.parameters[2].expression
             ).toSquel(type, options)
           }
-          case 'IFNULL':
-          case 'ANY_VALUE': {
+          case 'ifnull':
+          case 'any_value': {
             switch (name) {
-              case 'IFNULL': {
-                name = 'ISNULL'
+              case 'ifnull': {
+                name = 'isnull'
                 break
               }
-              case 'ANY_VALUE': {
-                name = 'MIN'
+              case 'any_value': {
+                name = 'min'
                 break
               }
             }
           }
         }
+        if (this.userDefined) {
+          name = `dbo.${name}`
+        }
+        else {
+          name = name.toLocaleUpperCase()
+        }
       }
       case 'mysql':
       default: {
         return squel_.rstr(
-          `${name}(${this.parameters.map(() => '?').join(', ')})`,
+          `${name.toLocaleUpperCase()}(${this.parameters.map(() => '?').join(', ')})`,
           ...this.parameters.map(parameter => parameter.toSquel(type, options)),
         )
       }
@@ -110,6 +119,7 @@ export class FunctionExpression extends Expression implements IFunctionExpressio
   public toJson(): IFunctionExpression {
     const result: IFunctionExpression = {
       classname: this.classname,
+      userDefined: this.userDefined,
       name: this.name,
     }
     if (this.parameters.length > 0) result.parameters = this.parameters.map(expression => expression.toJson())
