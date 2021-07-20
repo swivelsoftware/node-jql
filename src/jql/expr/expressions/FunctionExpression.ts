@@ -22,6 +22,13 @@ export class FunctionExpression extends Expression implements IFunctionExpressio
 
   /**
    * @param name [string]
+   * @param userDefined [boolean]
+   * @param parameters [Array] optional
+   */
+  constructor(name: string, userDefined: boolean, ...parameters: any[])
+
+  /**
+   * @param name [string]
    * @param parameters [Array] optional
    */
   constructor(name: string, ...parameters: any[])
