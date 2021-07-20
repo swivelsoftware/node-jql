@@ -38,3 +38,5 @@ export { JoinClause, FromTable } from './jql/query/FromTable'
 export { GroupBy } from './jql/query/GroupBy'
 export { OrderBy } from './jql/query/OrderBy'
 export { LimitOffset } from './jql/query/LimitOffset'
+// utils
+export { setDatabase } from './utils/db'
