@@ -1,6 +1,5 @@
 /* tslint:disable:no-console */
-
-import { BinaryExpression, ColumnExpression, FromTable, FunctionExpression, GroupBy, InExpression, JoinClause, MathExpression, OrderBy, OrExpressions, Query, RegexpExpression, ResultColumn, Type } from '.'
+import { BinaryExpression, ColumnExpression, FromTable, FunctionExpression, GroupBy, InExpression, JoinClause, MathExpression, OrderBy, OrExpressions, Query, RegexpExpression, ResultColumn, Keyword, Phrase, Value } from '.'
 
 test('SELECT * FROM Student', () => {
   const query = new Query('Student')
@@ -107,4 +106,18 @@ test('RegexpExpression use case 2', () => {
   })
   query.validate()
   console.log(query.toString())
+})
+
+test('PhraseExpression', () => {
+  const query = new Query({
+    $select: new ResultColumn(new MathExpression(new Value(','), '+', new ColumnExpression('blcont', 'container'))),
+    $from: 'blcont',
+    $where: new Phrase([
+      new BinaryExpression(new ColumnExpression('blcont', 'blh'), '=', new Value('abc1234')),
+      new Keyword('for xml'),
+      new FunctionExpression('PATH', new Value(''))
+    ])
+  })
+  query.validate()
+  console.log(query.toString('mssql'))
 })

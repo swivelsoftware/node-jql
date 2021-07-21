@@ -92,8 +92,6 @@ export class BinaryExpression extends ConditionalExpression implements IBinaryEx
   }
 
   private exprToJson(expr: Expression): IExpression|any {
-    // if (expr instanceof Unknown) return expr.assigned ? expr.value : undefined
-    // if (expr instanceof Value) return expr.value
     return expr.toJson()
   }
 }

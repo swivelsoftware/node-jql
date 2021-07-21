@@ -200,6 +200,13 @@ export interface IIsNullExpression extends IBinaryExpression {
 }
 
 /**
+ * Raw JQL for keyword
+ */
+export interface IKeyword extends IExpression {
+  keyword: string
+}
+
+/**
  * Raw JQL for `{left} LIKE {right}`
  */
 export interface ILikeExpression extends IBinaryExpression {

@@ -11,6 +11,7 @@ import { LikeExpression } from '../jql/expr/expressions/LikeExpression'
 import { MathExpression } from '../jql/expr/expressions/MathExpression'
 import { OrExpressions } from '../jql/expr/expressions/OrExpressions'
 import { ParameterExpression } from '../jql/expr/expressions/ParameterExpression'
+import { Phrase } from '../jql/expr/expressions/Phrase'
 import { QueryExpression } from '../jql/expr/expressions/QueryExpression'
 import { RegexpExpression } from '../jql/expr/expressions/RegexpExpression'
 import { Query } from '../jql/query'
@@ -40,7 +41,7 @@ export function setDatabase(query: Query, database: string) {
 }
 
 function setDatabase_(expression: Expression, database: string) {
-  if (expression instanceof AndExpressions || expression instanceof OrExpressions) {
+  if (expression instanceof AndExpressions || expression instanceof OrExpressions || expression instanceof Phrase) {
     for (const expr of expression.expressions) {
       setDatabase_(expr, database)
     }

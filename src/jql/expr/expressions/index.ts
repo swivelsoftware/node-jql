@@ -8,10 +8,12 @@ import { ExistsExpression } from './ExistsExpression'
 import { FunctionExpression } from './FunctionExpression'
 import { InExpression } from './InExpression'
 import { IsNullExpression } from './IsNullExpression'
+import { Keyword } from './Keyword'
 import { LikeExpression } from './LikeExpression'
 import { MathExpression } from './MathExpression'
 import { OrExpressions } from './OrExpressions'
 import { ParameterExpression } from './ParameterExpression'
+import { Phrase } from './Phrase'
 import { QueryExpression } from './QueryExpression'
 import { RegexpExpression } from './RegexpExpression'
 import { Unknown } from './Unknown'
@@ -29,10 +31,12 @@ export const expressions = {
   FunctionExpression,
   InExpression,
   IsNullExpression,
+  Keyword,
   LikeExpression,
   MathExpression,
   OrExpressions,
   ParameterExpression,
+  Phrase,
   QueryExpression,
   RegexpExpression,
   Unknown,
