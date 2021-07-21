@@ -78,7 +78,7 @@ export class FunctionExpression extends Expression implements IFunctionExpressio
   // @override
   public toSquel(type: squel.Flavour = 'mysql', options?: any): squel.Expression | squel.FunctionBlock {
     const squel_ = squel.useFlavour(type as any)
-    let name = this.name.toLocaleUpperCase()
+    let name = this.name
     switch (type) {
       case 'mssql': {
         switch (name) {
