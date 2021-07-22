@@ -27,6 +27,9 @@ export function setDatabase(query: Query, database: string) {
     else {
       setDatabase(fromTable.table, database)
     }
+    for (const joinClause of fromTable.joinClauses || []) {
+      joinClause.table.database = database
+    }
   }
   if (query.$where) setDatabase_(query.$where, database)
   if (query.$group) {
