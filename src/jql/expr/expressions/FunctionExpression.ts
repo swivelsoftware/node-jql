@@ -45,10 +45,14 @@ export class FunctionExpression extends Expression implements IFunctionExpressio
       json.parameters = json.parameters || []
       parameters = Array.isArray(json.parameters) ? json.parameters : [json.parameters]
     }
+    else if (typeof args[1] === 'boolean') {
+      name = args[0]
+      userDefined = args[1]
+      parameters = args.slice(2)
+    }
     else {
       name = args[0]
-      if (typeof args[1] === 'boolean') userDefined = args[1]
-      parameters = args.slice(typeof args[1] === 'boolean' ? 2 : 1)
+      parameters = args.slice(1)
     }
 
     // check args
@@ -56,6 +60,7 @@ export class FunctionExpression extends Expression implements IFunctionExpressio
 
     // set args
     this.name = name.toLocaleLowerCase()
+    this.userDefined = userDefined
     this.parameters = parameters.map(parameter => {
       let expression = parseExpr(parameter)
       if (!(expression instanceof ParameterExpression)) expression = new ParameterExpression({ expression })
@@ -111,15 +116,16 @@ export class FunctionExpression extends Expression implements IFunctionExpressio
         else {
           name = name.toLocaleUpperCase()
         }
+        break
       }
       case 'mysql':
-      default: {
-        return squel_.rstr(
-          `${name.toLocaleUpperCase()}(${this.parameters.map(() => '?').join(', ')})`,
-          ...this.parameters.map(parameter => parameter.toSquel(type, options)),
-        )
-      }
+        name = name.toLocaleUpperCase()
+        break
     }
+    return squel_.rstr(
+      `${name}(${this.parameters.map(() => '?').join(', ')})`,
+      ...this.parameters.map(parameter => parameter.toSquel(type, options)),
+    )
   }
 
   // @override
