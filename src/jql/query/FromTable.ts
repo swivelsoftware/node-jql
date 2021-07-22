@@ -1,6 +1,6 @@
 import squel from 'squel'
 import { Query } from '.'
-import { quote } from '../../utils/quote'
+import { quoteTable, quoteDatabase } from '../../utils/quote'
 import { ConditionalExpression } from '../expr'
 import { AndExpressions } from '../expr/expressions/AndExpressions'
 import { IConditionalExpression } from '../expr/interface'
@@ -73,7 +73,7 @@ export class JoinClause extends QueryPartition implements IJoinClause {
   public apply(type: squel.Flavour, query: IQuery, builder: squel.Select, options?: any): squel.Select {
     const { database, table, $as } = this.table
     if (typeof table === 'string') {
-      return builder[this.joinMethod](`${database ? `${quote(type, database)}.` : ''}${quote(type, table)}`, $as, this.$on && this.$on.toSquel(type, options))
+      return builder[this.joinMethod](`${database ? `${quoteDatabase(type, database)}.` : ''}${quoteTable(type, table)}`, $as, this.$on && this.$on.toSquel(type, options))
     }
     else {
       return builder[this.joinMethod](table.toSquel(type, options), $as, this.$on && this.$on.toSquel(type, options))
@@ -164,21 +164,10 @@ export class FromTable extends QueryPartition implements IFromTable {
     return this.joinClauses.length > 0
   }
 
-  quoteDatabase(type: squel.Flavour, value: string): string {
-    switch (type) {
-      case 'mssql':
-        if (value.indexOf('.') === -1) value += '.dbo'
-        const pcs = value.split('.')
-        return `${quote(type, pcs[0])}.${quote(type, pcs[1])}`
-      default:
-        return quote(type, value)
-    }
-  }
-
   // @override
   public apply(type: squel.Flavour, query: IQuery, builder: squel.Select, options?: any): squel.Select {
     if (typeof this.table === 'string') {
-      builder = builder.from(`${this.database ? `${this.quoteDatabase(type, this.database)}.` : ''}${quote(type, this.table)}`, this.$as)
+      builder = builder.from(`${this.database ? `${quoteDatabase(type, this.database)}.` : ''}${quoteTable(type, this.table)}`, this.$as)
     }
     else {
       builder = builder.from(this.table.toSquel(type, options), this.$as)

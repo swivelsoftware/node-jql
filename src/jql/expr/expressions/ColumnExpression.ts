@@ -1,6 +1,6 @@
 import squel from 'squel'
 import { Expression } from '..'
-import { quote } from '../../../utils/quote'
+import { quoteTable } from '../../../utils/quote'
 import { IColumnExpression } from '../interface'
 
 /**
@@ -68,7 +68,7 @@ export class ColumnExpression extends Expression implements IColumnExpression {
   // @override
   public toSquel(type: squel.Flavour = 'mysql'): squel.FunctionBlock {
     const squel_ = squel.useFlavour(type as any)
-    return squel_.rstr(`${this.table ? `${quote(type, this.table)}.` : ''}${this.isWildcard ? '*' : quote(type, this.name)}`)
+    return squel_.rstr(`${this.table ? `${quoteTable(type, this.table)}.` : ''}${this.isWildcard ? '*' : quoteTable(type, this.name)}`)
   }
 
   // @override
