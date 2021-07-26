@@ -1,4 +1,4 @@
-import squel = require('squel')
+import squel from 'squel'
 import { Expression } from '..'
 import { type, Type } from '../../../Type'
 import { IValue } from '../interface'

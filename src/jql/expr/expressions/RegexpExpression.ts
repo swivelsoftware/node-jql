@@ -1,6 +1,5 @@
 // tslint:disable:no-eval
-
-import squel = require('squel')
+import squel from 'squel'
 import { checkNull } from '../../../utils/check'
 import { BinaryOperator, IRegexpExpression, IUnknown } from '../interface'
 import { parseExpr } from '../parse'
