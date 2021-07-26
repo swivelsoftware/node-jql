@@ -71,9 +71,13 @@ export class JoinClause extends QueryPartition implements IJoinClause {
 
   // @override
   public apply(type: squel.Flavour, query: IQuery, builder: squel.Select, options?: any): squel.Select {
+    const squel_ = squel.useFlavour(type as any)
     const { database, table, $as } = this.table
     if (typeof table === 'string') {
       return builder[this.joinMethod](`${database ? `${quoteDatabase(type, database)}.` : ''}${quoteTable(type, table)}`, $as, this.$on && this.$on.toSquel(type, options))
+    }
+    else if ('sql' in table) {
+      return builder[this.joinMethod](`(${table.sql})`, $as, this.$on && this.$on.toSquel(type, options))
     }
     else {
       return builder[this.joinMethod](table.toSquel(type, options), $as, this.$on && this.$on.toSquel(type, options))
@@ -102,7 +106,7 @@ export class JoinClause extends QueryPartition implements IJoinClause {
  */
 export class FromTable extends QueryPartition implements IFromTable {
   public database?: string
-  public table: string|Query
+  public table: string|Query|{ sql: string }
   public $as?: string
   public joinClauses: JoinClause[] = []
 
@@ -128,7 +132,7 @@ export class FromTable extends QueryPartition implements IFromTable {
     super()
 
     // parse args
-    let database: string|undefined, table: string|IQuery, $as: string|undefined, joinClauses: IJoinClause[]
+    let database: string|undefined, table: string|IQuery|{ sql: string }, $as: string|undefined, joinClauses: IJoinClause[]
     if (args.length === 1 && typeof args[0] === 'object') {
       const json = args[0] as IFromTable
       database = json.database
@@ -155,7 +159,7 @@ export class FromTable extends QueryPartition implements IFromTable {
 
     // set args
     this.database = database
-    this.table = typeof table === 'string' || 'columns' in table ? table : new Query(table)
+    this.table = typeof table === 'string' || 'sql' in table ? table : new Query(table)
     this.$as = $as
     if (joinClauses.length > 0) this.joinClauses = joinClauses.map(json => new JoinClause(json))
   }
@@ -166,8 +170,12 @@ export class FromTable extends QueryPartition implements IFromTable {
 
   // @override
   public apply(type: squel.Flavour, query: IQuery, builder: squel.Select, options?: any): squel.Select {
+    const squel_ = squel.useFlavour(type as any)
     if (typeof this.table === 'string') {
       builder = builder.from(`${this.database ? `${quoteDatabase(type, this.database)}.` : ''}${quoteTable(type, this.table)}`, this.$as)
+    }
+    else if ('sql' in this.table) {
+      builder = builder.from(`(${this.table.sql})`, this.$as)
     }
     else {
       builder = builder.from(this.table.toSquel(type, options), this.$as)

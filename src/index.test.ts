@@ -121,3 +121,15 @@ test('PhraseExpression', () => {
   query.validate()
   console.log(query.toString('mssql'))
 })
+
+test('from query', () => {
+  const query = new Query({
+    $from: new FromTable({
+      table: { sql: 'SELECT * FROM temp' },
+      $as: 'temp2'
+    }),
+    $limit: 100
+  })
+  query.validate()
+  console.log(query.toString('mssql'))
+})

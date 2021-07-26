@@ -24,7 +24,7 @@ export function setDatabase(query: Query, database: string) {
     if (typeof fromTable.table === 'string') {
       fromTable.database = database
     }
-    else {
+    else if (!('sql' in fromTable.table)) {
       setDatabase(fromTable.table, database)
     }
     for (const joinClause of fromTable.joinClauses || []) {

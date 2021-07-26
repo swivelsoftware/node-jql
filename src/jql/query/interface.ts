@@ -2,7 +2,7 @@ import { IConditionalExpression, IExpression, IColumnExpression, IValue } from '
 import { IJQL, IParseable } from '../interface'
 import { ColumnExpression } from '../expr/expressions/ColumnExpression'
 import { JQL } from '..'
-import squel from 'squel'
+import squel, { Squel } from 'squel'
 import { JQLError } from '../../utils/error'
 
 /**
@@ -121,7 +121,7 @@ export interface IFromTable extends IJQL {
   /**
    * Table definition
    */
-  table: string|IQuery
+  table: string|IQuery|{ sql: string }
 
   /**
    * Alias table name
