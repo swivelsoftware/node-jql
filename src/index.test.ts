@@ -1,5 +1,6 @@
 /* tslint:disable:no-console */
 import { BinaryExpression, ColumnExpression, FromTable, FunctionExpression, GroupBy, InExpression, JoinClause, MathExpression, OrderBy, OrExpressions, Query, RegexpExpression, ResultColumn, Keyword, Phrase, Value } from '.'
+import { CaseExpression } from './jql/expr/expressions/CaseExpression'
 
 test('SELECT * FROM Student', () => {
   const query = new Query('Student')
@@ -129,6 +130,20 @@ test('from query', () => {
       $as: 'temp2'
     }),
     $limit: 100
+  })
+  query.validate()
+  console.log(query.toString('mssql'))
+})
+
+test('CaseExpression', () => {
+  const query = new Query({
+    $from: 'test',
+    $where: new CaseExpression(new ColumnExpression('col1'), [
+      {
+        $when: new Value(1),
+        $then: new Value('one')
+      }
+    ], new Value('more then one'))
   })
   query.validate()
   console.log(query.toString('mssql'))

@@ -85,7 +85,7 @@ export interface ICase extends IJQL {
   /**
    * Condition check
    */
-  $when: IConditionalExpression
+  $when: IExpression
 
   /**
    * If condition matched
@@ -94,9 +94,11 @@ export interface ICase extends IJQL {
 }
 
 /**
- * Raw JQL for `CASE {cases} ELSE {$else}`
+ * Raw JQL for `CASE {expression} {cases} ELSE {$else}`
  */
 export interface ICaseExpression extends IExpression {
+  expression?: IExpression
+
   /**
    * cases
    */
