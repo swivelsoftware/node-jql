@@ -202,10 +202,10 @@ export interface IIsNullExpression extends IBinaryExpression {
 }
 
 /**
- * Raw JQL for keyword
+ * Raw JQL for raw SQL
  */
-export interface IKeyword extends IExpression {
-  keyword: string
+ export interface IRaw extends IExpression {
+  sql: string
 }
 
 /**

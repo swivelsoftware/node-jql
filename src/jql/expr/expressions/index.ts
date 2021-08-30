@@ -15,6 +15,7 @@ import { OrExpressions } from './OrExpressions'
 import { ParameterExpression } from './ParameterExpression'
 import { Phrase } from './Phrase'
 import { QueryExpression } from './QueryExpression'
+import { Raw } from './Raw'
 import { RegexpExpression } from './RegexpExpression'
 import { Unknown } from './Unknown'
 import { Value } from './Value'
@@ -38,6 +39,7 @@ export const expressions = {
   ParameterExpression,
   Phrase,
   QueryExpression,
+  Raw,
   RegexpExpression,
   Unknown,
   Value,
