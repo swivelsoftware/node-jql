@@ -1,5 +1,5 @@
 {
-  "name": "node-jql",
+  "name": "@swivel-admin/node-jql",
   "version": "3.0.22",
   "description": "The JSON structure of SQL statements for node-jql-core",
   "main": "dist/index.js",
