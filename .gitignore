@@ -64,3 +64,5 @@ typings/
 intermediate
 dist
 node-jql.code-workspace
+
+.npmrc
