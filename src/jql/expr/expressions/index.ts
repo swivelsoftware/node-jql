@@ -19,7 +19,6 @@ import { Raw } from './Raw'
 import { RegexpExpression } from './RegexpExpression'
 import { Unknown } from './Unknown'
 import { Value } from './Value'
-import { Variable } from './Variable'
 
 export const expressions = {
   AndExpressions,
@@ -42,6 +41,5 @@ export const expressions = {
   Raw,
   RegexpExpression,
   Unknown,
-  Value,
-  Variable,
+  Value
 }
