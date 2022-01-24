@@ -74,13 +74,12 @@ new ResultColumn(IExpression|string, string?)
 ## IFromTable
 
 [IQuery](#IQuery)  
-[IRemoteTable](#IRemoteTable)  
 [IJoinClause](#IJoinClause)
 
 ```js
 new FromTable(IFromTable)
-new FromTable(string|IQuery|IRemoteTable|[string, string], ...IJoinClause[])
-new FromTable(string|IQuery|IRemoteTable|[string, string], string, ...IJoinClause[])
+new FromTable(string|IQuery|[string, string], ...IJoinClause[])
+new FromTable(string|IQuery|[string, string], string, ...IJoinClause[])
 
 // [database].[table] AS [$as]
 {
@@ -88,17 +87,6 @@ new FromTable(string|IQuery|IRemoteTable|[string, string], string, ...IJoinClaus
   "table": string|IQuery|IRemoteTable,
   "$as": string|undefined,
   "joinClauses": IJoinClause[]|IJoinClause|undefined
-}
-```
-
-## IRemoteTable
-
-extends [AxiosRequestConfig](https://github.com/axios/axios#request-config)  
-[Type](#Type)
-
-```js
-{
-  "columns": Array<{ name: string, type?: Type }>
 }
 ```
 
@@ -210,6 +198,21 @@ new ColumnExpression(string)
 }
 ```
 
+### IColumnsExpression
+
+[IColumnExpression](#IColumnExpression)
+
+```js
+// column with table specified
+new ColumnsExpression(IColumnsExpression)
+new ColumnsExpression(IColumnExpression[])
+
+// ([table].[name], ...)
+{
+  "columns": IColumnExpression[]
+}
+```
+
 ### IFunctionExpression
 
 supports most of the SQL built-in functions and works similarly  
@@ -286,6 +289,17 @@ new Value(any)
 }
 ```
 
+### IRaw
+
+```js
+new Raw(IRaw|string) // aka new Keyword(IRaw|string)
+
+// [sql]
+{
+  "sql": string
+}
+```
+
 ## IConditionalExpression
 ---
 
@@ -341,19 +355,30 @@ new ExistsExpression(IQuery, boolean?)
 
 ### IGroupedExpressions
 
-[IConditionalExpression](#IConditionalExpression)
+[IExpression](#IExpression)
 
 ```js
 new AndExpressions(IGroupedExpressions)
-new AndExpressions(IConditionalExpression[])
+new AndExpressions(IExpression[])
 
 new OrExpressions(IGroupedExpressions)
-new OrExpressions(IConditionalExpression[])
+new OrExpressions(IExpression[])
 
 // ([expression] AND/OR [expression] ...)
 {
-  "expressions": IConditionalExpression[]
+  "expressions": IExpression[]
 }
+```
+
+### Phrase
+
+[IGroupedExpressions](#IGroupedExpressions)
+
+```js
+new Phrase(IGroupedExpressions)
+new Phrase(IExpression[])
+
+// [expression] [expression] ...
 ```
 
 ### IInExpression
@@ -397,13 +422,28 @@ new IsNullExpression(IExpression|any, boolean)
 
 ```js
 new LikeExpression(ILikeExpression)
-new InExpression(IExpression|any, boolean, IUnknown|string?)
+new LikeExpression(IExpression|any, boolean, IUnknown|string?)
 
-// [left] [$not] [operator] [right]
+// [left] [$not] LIKE [right]
 {
   "left": IExpression|any,
   "$not": boolean|undefined,
-  "operator": 'LIKE'|'REGEXP'|undefined,
   "right": IUnknown|string|undefined
+}
+```
+
+### IRegexpExpression
+
+[IExpression](#IExpression)
+
+```js
+new RegexpExpression(IRegexpExpression)
+new RegexpExpression(IExpression|any, boolean, IUnknown|Regexp|string?)
+
+// [left] [$not] REGEXP [right]
+{
+  "left": IExpression|any,
+  "$not": boolean|undefined,
+  "right": IUnknown|Regexp|string|undefined
 }
 ```

@@ -1,5 +1,5 @@
 import { ConditionalExpression } from '.'
-import { IConditionalExpression, IGroupedExpressions } from './interface'
+import { IExpression, IGroupedExpressions } from './interface'
 import { parseExpr } from './parse'
 
 /**
@@ -15,15 +15,15 @@ export abstract class GroupedExpressions extends ConditionalExpression implement
   constructor(json: Partial<IGroupedExpressions>)
 
   /**
-   * @param expressions [Array<IConditionalExpression>]
+   * @param expressions [Array<IExpression>]
    */
-  constructor(expressions: IConditionalExpression[])
+  constructor(expressions: IExpression[])
 
   constructor(...args: any[]) {
     super()
 
     // parse args
-    let expressions: IConditionalExpression[]
+    let expressions: IExpression[]
     if (!Array.isArray(args[0])) {
       const json = args[0] as IGroupedExpressions
       expressions = json.expressions
