@@ -1,7 +1,5 @@
 # node-jql
 
-[![npm version](https://badge.fury.io/js/node-jql.svg)](https://badge.fury.io/js/node-jql)
-
 # Documentation
 
 ## Type
