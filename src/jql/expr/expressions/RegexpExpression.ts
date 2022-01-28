@@ -55,6 +55,17 @@ export class RegexpExpression extends BinaryExpression implements IRegexpExpress
   // @override
   public toSquel(type: squel.Flavour = 'mysql', options?: any): squel.BaseBuilder {
     const squel_ = squel.useFlavour(type as any)
+
+    if (type === 'mssql') {
+      const squel_ = squel.useFlavour(type as any)
+      return squel_.expr()
+        .and(
+          this.$not ? `? NOT LIKE ?` : `? LIKE ?`,
+          this.left.toSquel(type, options),
+          checkNull(this.right) ? null : this.right.toSquel(type)
+        )
+    }
+
     if (this.right instanceof Value) {
       if (this.right.value instanceof RegExp && this.right.value.flags) {
         const regexp = this.right.value
