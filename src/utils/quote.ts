@@ -1,4 +1,4 @@
-import squel from 'squel'
+import squel from '@swivel-admin/squel'
 
 export function quoteDatabase(type: squel.Flavour, value: string): string {
   switch (type) {

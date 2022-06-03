@@ -1,4 +1,4 @@
-import squel from 'squel'
+import squel from '@swivel-admin/squel'
 import { Expression } from '..'
 import { quoteTable } from '../../../utils/quote'
 import { IColumnExpression } from '../interface'

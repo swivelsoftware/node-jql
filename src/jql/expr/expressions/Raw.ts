@@ -1,4 +1,4 @@
-import squel from 'squel'
+import squel from '@swivel-admin/squel'
 import { Expression } from '..'
 import { IRaw } from '../interface'
 

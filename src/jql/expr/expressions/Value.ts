@@ -1,4 +1,4 @@
-import squel from 'squel'
+import squel from '@swivel-admin/squel'
 import { Expression } from '..'
 import { type, Type } from '../../../Type'
 import { IValue } from '../interface'

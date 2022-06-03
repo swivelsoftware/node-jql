@@ -1,4 +1,4 @@
-import squel from 'squel'
+import squel from '@swivel-admin/squel'
 import { IQuery } from '../../query/interface'
 import { BinaryOperator, ICaseExpression, IInExpression, IQueryExpression, IUnknown, IValue } from '../interface'
 import { parseExpr } from '../parse'

@@ -1,4 +1,4 @@
-import squel from 'squel'
+import squel from '@swivel-admin/squel'
 import { Expression } from '..'
 import { checkNull } from '../../../utils/check'
 import { IExpression, IMathExpression, MathOperator } from '../interface'

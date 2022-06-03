@@ -1,4 +1,4 @@
-import squel from 'squel'
+import squel from '@swivel-admin/squel'
 import { JQL } from '..'
 import { ConditionalExpression } from '../expr'
 import { AndExpressions } from '../expr/expressions/AndExpressions'

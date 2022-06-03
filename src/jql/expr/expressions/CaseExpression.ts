@@ -1,4 +1,4 @@
-import squel from 'squel'
+import squel from '@swivel-admin/squel'
 import { ConditionalExpression, Expression } from '..'
 import { ICase, ICaseExpression, IExpression } from '../interface'
 import { parseExpr } from '../parse'
