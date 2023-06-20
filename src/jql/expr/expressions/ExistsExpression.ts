@@ -1,4 +1,4 @@
-import squel from '@swivel-admin/squel'
+import squel from 'squel'
 import { ConditionalExpression } from '..'
 import { IQuery } from '../../query/interface'
 import { ICaseExpression, IExistsExpression, IQueryExpression } from '../interface'

@@ -32,6 +32,7 @@ export { Raw } from './jql/expr/expressions/Raw'
 export { RegexpExpression } from './jql/expr/expressions/RegexpExpression'
 export { Unknown } from './jql/expr/expressions/Unknown'
 export { Value } from './jql/expr/expressions/Value'
+export { ForjsonExpression } from './jql/expr/expressions/ForjsonExpression'
 // jql/query
 export { IQuery, IResultColumn, IFromTable, JoinOperator, IJoinClause, IGroupBy, IOrderBy, ILimitOffset } from './jql/query/interface'
 export { Query } from './jql/query'

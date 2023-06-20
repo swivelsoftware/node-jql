@@ -281,3 +281,13 @@ export interface IValue extends IUnknown {
    */
   value: any
 }
+
+export interface IForjsonExpression extends IExpression {
+  /**
+   * Sub-query
+   */
+  query: IQuery
+
+  by: 'path'|'auto'
+
+}

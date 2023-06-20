@@ -19,6 +19,7 @@ import { Raw } from './Raw'
 import { RegexpExpression } from './RegexpExpression'
 import { Unknown } from './Unknown'
 import { Value } from './Value'
+import { ForjsonExpression } from './ForjsonExpression'
 
 export const expressions = {
   AndExpressions,
@@ -41,5 +42,6 @@ export const expressions = {
   Raw,
   RegexpExpression,
   Unknown,
-  Value
+  Value,
+  ForjsonExpression
 }

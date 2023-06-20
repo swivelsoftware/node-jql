@@ -2,7 +2,7 @@ import { IConditionalExpression, IExpression, IColumnExpression, IValue } from '
 import { IJQL, IParseable } from '../interface'
 import { ColumnExpression } from '../expr/expressions/ColumnExpression'
 import { JQL } from '..'
-import squel from '@swivel-admin/squel'
+import squel from 'squel'
 import { JQLError } from '../../utils/error'
 
 /**

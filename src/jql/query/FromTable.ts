@@ -1,4 +1,4 @@
-import squel from '@swivel-admin/squel'
+import squel from 'squel'
 import { Query } from '.'
 import { quoteTable, quoteDatabase } from '../../utils/quote'
 import { ConditionalExpression } from '../expr'

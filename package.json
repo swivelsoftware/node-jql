@@ -1,6 +1,6 @@
 {
   "name": "@swivel-admin/node-jql",
-  "version": "3.0.26",
+  "version": "3.0.27",
   "description": "The JSON structure of SQL statements for node-jql-core",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -14,17 +14,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://kennysng@github.com/kennysng/node-jql.git"
+    "url": "git+https://swivelsoftware@github.com/swivelsoftware/node-jql.git"
   },
-  "author": "Kennys Ng <kennysng@hotmail.com.hk>",
+  "author": "Kennys Ng <swivelsoftware@hotmail.com.hk>",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/kennysng/node-jql/issues"
+    "url": "https://github.com/swivelsoftware/node-jql/issues"
   },
   "files": [
     "dist"
   ],
-  "homepage": "https://github.com/kennysng/node-jql#readme",
+  "homepage": "https://github.com/swivelsoftware/node-jql#readme",
   "devDependencies": {
     "@types/jest": "^27.4.0",
     "@types/lodash": "^4.14.178",
@@ -40,6 +40,6 @@
     "typescript": "^4.5.5"
   },
   "dependencies": {
-    "@swivel-admin/squel": "^5.13.2"
+    "squel": "5.13.0"
   }
 }

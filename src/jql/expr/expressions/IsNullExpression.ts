@@ -1,4 +1,4 @@
-import squel from '@swivel-admin/squel'
+import squel from 'squel'
 import { BinaryOperator, IIsNullExpression } from '../interface'
 import { BinaryExpression } from './BinaryExpression'
 

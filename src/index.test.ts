@@ -1,5 +1,5 @@
 /* tslint:disable:no-console */
-import { BinaryExpression, ColumnExpression, FromTable, FunctionExpression, GroupBy, InExpression, JoinClause, MathExpression, OrderBy, OrExpressions, Query, RegexpExpression, ResultColumn, Keyword, Phrase, Value } from '.'
+import { BinaryExpression, ColumnExpression, FromTable, FunctionExpression, GroupBy, InExpression, JoinClause, MathExpression, OrderBy, OrExpressions, Query, RegexpExpression, ResultColumn, Keyword, Phrase, Value, QueryExpression, ForjsonExpression } from '.'
 import { CaseExpression } from './jql/expr/expressions/CaseExpression'
 
 test('SELECT * FROM Student', () => {
@@ -144,6 +144,20 @@ test('CaseExpression', () => {
         $then: new Value('one')
       }
     ], new Value('more then one'))
+  })
+  query.validate()
+  console.log(query.toString('mssql'))
+})
+
+test('For Json auto', () => {
+  const query = new Query({
+    $select: [
+      new ResultColumn(new ForjsonExpression(new Query({
+        $select: [new ResultColumn(new ColumnExpression('col1'))],
+        $from: new FromTable('a')
+      }), 'auto'))
+    ],
+    $from: 'test',
   })
   query.validate()
   console.log(query.toString('mssql'))

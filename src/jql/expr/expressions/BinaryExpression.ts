@@ -1,4 +1,4 @@
-import squel from '@swivel-admin/squel'
+import squel from 'squel'
 import { ConditionalExpression, Expression } from '..'
 import { checkNull } from '../../../utils/check'
 import { JQLError } from '../../../utils/error'

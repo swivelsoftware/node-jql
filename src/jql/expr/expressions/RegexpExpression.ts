@@ -1,5 +1,5 @@
 // tslint:disable:no-eval
-import squel from '@swivel-admin/squel'
+import squel from 'squel'
 import { checkNull } from '../../../utils/check'
 import { BinaryOperator, IRegexpExpression, IUnknown } from '../interface'
 import { parseExpr } from '../parse'

@@ -1,4 +1,4 @@
-import squel from '@swivel-admin/squel'
+import squel from 'squel'
 import { Type } from '../../../Type'
 import { checkNull } from '../../../utils/check'
 import { Expression } from '..'

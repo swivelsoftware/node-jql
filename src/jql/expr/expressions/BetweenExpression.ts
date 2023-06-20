@@ -1,4 +1,4 @@
-import squel from '@swivel-admin/squel'
+import squel from 'squel'
 import { checkNull } from '../../../utils/check'
 import { ConditionalExpression, Expression } from '..'
 import { IBetweenExpression, IExpression } from '../interface'

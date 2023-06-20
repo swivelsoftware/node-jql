@@ -1,4 +1,4 @@
-import squel from '@swivel-admin/squel'
+import squel from 'squel'
 import { Value } from '../expr/expressions/Value'
 import { IValue } from '../expr/interface'
 import { parseExpr } from '../expr/parse'
