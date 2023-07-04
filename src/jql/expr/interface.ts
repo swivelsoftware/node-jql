@@ -288,6 +288,6 @@ export interface IForjsonExpression extends IExpression {
    */
   query: IQuery
 
-  by: 'path'|'auto'
-
+  by?: 'path'|'auto'
+  type?: 'json'|'xml'
 }

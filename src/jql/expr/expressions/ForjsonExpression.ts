@@ -11,6 +11,7 @@ import { IQueryExpression } from '../interface'
 export class ForjsonExpression extends Expression implements IForjsonExpression {
   public readonly classname = ForjsonExpression.name
   public readonly by: 'path'|'auto'
+  public readonly type: 'json'|'xml'
   public readonly query: Query
 
   /**
@@ -23,8 +24,7 @@ export class ForjsonExpression extends Expression implements IForjsonExpression 
    * @param expression [IExpression]
    * @param suffix [string] optional
    */
-  constructor(query: IQuery, by: 'path'|'auto')
-
+  constructor(query: IQuery, by?: 'path'|'auto', type?: 'json'|'xml')
   constructor(...args: any[]) {
     super()
 
@@ -43,7 +43,8 @@ export class ForjsonExpression extends Expression implements IForjsonExpression 
 
     // set args
     this.query =  new Query(query)
-    this.by = args.length > 1 ? args[1] : args[0].by
+    this.by = ((args.length > 1 ? args[1] : args[0].by) || 'auto')
+    this.type = ((args.length > 1 ? args[2] : args[0].type || 'json'))
   }
 
   // @override
@@ -55,7 +56,9 @@ export class ForjsonExpression extends Expression implements IForjsonExpression 
   public toSquel(type: squel.Flavour = 'mssql', options?: any): squel.FunctionBlock {
     if (type !== 'mssql') throw new Error('Unsupported database')
     const squel_ = squel.useFlavour(type as any)
-    return squel_.rstr(`(? FOR JSON ${this.by.toUpperCase()})`, this.query.toSquel(type, options))
+    const sqlType = this.type.toUpperCase()
+    const by = this.type === 'xml' && this.by === 'path' ? `PATH('')` :  this.by.toUpperCase()
+    return squel_.rstr(`(? FOR ${sqlType} ${by})`, this.query.toSquel(type, options))
   }
 
   // @override

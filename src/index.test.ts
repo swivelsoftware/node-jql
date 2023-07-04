@@ -149,13 +149,27 @@ test('CaseExpression', () => {
   console.log(query.toString('mssql'))
 })
 
-test('For Json auto', () => {
+test('FOR JSON AUTO', () => {
   const query = new Query({
     $select: [
       new ResultColumn(new ForjsonExpression(new Query({
         $select: [new ResultColumn(new ColumnExpression('col1'))],
         $from: new FromTable('a')
-      }), 'auto'))
+      })))
+    ],
+    $from: 'test',
+  })
+  query.validate()
+  console.log(query.toString('mssql'))
+})
+
+test('FOR XML PATH', () => {
+  const query = new Query({
+    $select: [
+      new ResultColumn(new ForjsonExpression(new Query({
+        $select: [new ResultColumn(new ColumnExpression('col1'))],
+        $from: new FromTable('a')
+      }), 'path', 'xml'))
     ],
     $from: 'test',
   })
