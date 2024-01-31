@@ -108,6 +108,7 @@ export class FromTable extends QueryPartition implements IFromTable {
   public database?: string
   public table: string|Query|{ sql: string }
   public $as?: string
+  public nolock?: boolean
   public joinClauses: JoinClause[] = []
 
   /**
@@ -132,7 +133,11 @@ export class FromTable extends QueryPartition implements IFromTable {
     super()
 
     // parse args
-    let database: string|undefined, table: string|IQuery|{ sql: string }, $as: string|undefined, joinClauses: IJoinClause[]
+    let database: string|undefined,
+      table: string|IQuery|{ sql: string },
+      $as: string|undefined,
+      joinClauses: IJoinClause[],
+      nolock: boolean|undefined = false
     if (args.length === 1 && typeof args[0] === 'object') {
       const json = args[0] as IFromTable
       database = json.database
@@ -140,6 +145,7 @@ export class FromTable extends QueryPartition implements IFromTable {
       $as = json.$as
       json.joinClauses = json.joinClauses || []
       joinClauses = Array.isArray(json.joinClauses) ? json.joinClauses : [json.joinClauses]
+      nolock = json.nolock
     }
     else if (typeof args[1] === 'string') {
       database = Array.isArray(args[0]) ? args[0][0] : undefined
@@ -161,6 +167,7 @@ export class FromTable extends QueryPartition implements IFromTable {
     this.database = database
     this.table = typeof table === 'string' || 'sql' in table ? table : new Query(table)
     this.$as = $as
+    this.nolock = nolock || false
     if (joinClauses.length > 0) this.joinClauses = joinClauses.map(json => new JoinClause(json))
   }
 
@@ -172,7 +179,10 @@ export class FromTable extends QueryPartition implements IFromTable {
   public apply(type: squel.Flavour, query: IQuery, builder: squel.Select, options?: any): squel.Select {
     const squel_ = squel.useFlavour(type as any)
     if (typeof this.table === 'string') {
-      builder = builder.from(`${this.database ? `${quoteDatabase(type, this.database)}.` : ''}${quoteTable(type, this.table)}`, this.$as)
+      builder = builder.from(
+        `${this.database ? `${quoteDatabase(type, this.database)}.` : ''}${quoteTable(type, this.table)} ${this.nolock ? '(nolock)' : ''}`,
+        this.$as
+      )
     }
     else if ('sql' in this.table) {
       builder = builder.from(`(${this.table.sql})`, this.$as)

@@ -127,6 +127,7 @@ export interface IFromTable extends IJQL {
    * Alias table name
    */
   $as?: string
+  nolock?: boolean
 
   /**
    * Join clauses

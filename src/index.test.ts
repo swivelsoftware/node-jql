@@ -176,3 +176,18 @@ test('FOR XML PATH', () => {
   query.validate()
   console.log(query.toString('mssql'))
 })
+
+
+test('SELECT TOP (1) * FROM [aswhkg].[dbo].[awbhead] (nolock) awbhead', () => {
+  const query = new Query({
+    $from: new FromTable({
+      database: 'aswhkg',
+      table: 'awbhead',
+      $as: 'awbhead',
+      nolock: true
+    }),
+    $limit: 1
+  })
+  query.validate()
+  console.log(query.toString('mssql'))
+})
