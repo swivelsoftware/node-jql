@@ -72,9 +72,11 @@ export class JoinClause extends QueryPartition implements IJoinClause {
   // @override
   public apply(type: squel.Flavour, query: IQuery, builder: squel.Select, options?: any): squel.Select {
     const squel_ = squel.useFlavour(type as any)
-    const { database, table, $as } = this.table
+    const { database, table, $as, nolock } = this.table
     if (typeof table === 'string') {
-      return builder[this.joinMethod](`${database ? `${quoteDatabase(type, database)}.` : ''}${quoteTable(type, table)}`, $as, this.$on && this.$on.toSquel(type, options))
+      return builder[this.joinMethod](`
+        ${database ? `${quoteDatabase(type, database)}.` : ''}${quoteTable(type, table)}  ${nolock ? '(nolock)' : ''}
+      `, $as, this.$on && this.$on.toSquel(type, options))
     }
     else if ('sql' in table) {
       return builder[this.joinMethod](`(${table.sql})`, $as, this.$on && this.$on.toSquel(type, options))

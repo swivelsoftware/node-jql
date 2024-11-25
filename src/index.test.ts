@@ -184,7 +184,19 @@ test('SELECT TOP (1) * FROM [aswhkg].[dbo].[awbhead] (nolock) awbhead', () => {
       database: 'aswhkg',
       table: 'awbhead',
       $as: 'awbhead',
-      nolock: true
+      nolock: true,
+      joinClauses: [
+        {
+          operator: 'LEFT',
+          table: new FromTable({
+            database: 'aswhkg',
+            table: 'awbdetl',
+            $as: 'cargos',
+            nolock: true,
+          }),
+          $on: new BinaryExpression(new ColumnExpression('awbhead', 'ref'), '=', new ColumnExpression('cargos', 'blh'))
+        }
+      ]
     }),
     $limit: 1
   })
